@@ -60,6 +60,11 @@
       "key": "mediaAssetId",
       "value": "",
       "type": "string"
+    },
+    {
+      "key": "logEntryId",
+      "value": "",
+      "type": "string"
     }
   ],
   "item": [
@@ -1360,6 +1365,232 @@
             }
           },
           "description": "Stream media with Range header support for video seeking. Supports both header-based and query-based authentication for HTML5 compatibility."
+        }
+      ]
+    },
+    {
+      "name": "Syncstation API (/syncstation/*)",
+      "item": [
+        {
+          "name": "Sync status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "x-ws-tenant",
+                "value": "{{tenantId}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/syncstation/sync-status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "syncstation",
+                "sync-status"
+              ]
+            }
+          },
+          "description": "Get sync queue status - shows pending, synced, and failed log entries"
+        },
+        {
+          "name": "List log entries",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "x-ws-tenant",
+                "value": "{{tenantId}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/syncstation/log-entries",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "syncstation",
+                "log-entries"
+              ],
+              "query": [
+                {
+                  "key": "nodeId",
+                  "value": "{{nodeId}}",
+                  "description": "Filter by content node ID (optional)",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "local",
+                  "description": "Filter by status: local, pending, synced, failed (optional)",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', ()=> pm.response.to.have.status(200));",
+                  "let json={}; try{json=pm.response.json();}catch(e){}",
+                  "if(json && json.items && json.items.length > 0){ pm.collectionVariables.set('logEntryId', json.items[0].id); }"
+                ]
+              }
+            }
+          ],
+          "description": "List log entries for a content node. Returns all log entries if nodeId is not provided."
+        },
+        {
+          "name": "Create log entry",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "x-ws-tenant",
+                "value": "{{tenantId}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nodeId\": \"{{nodeId}}\",\n  \"title\": \"Test log entry from Postman\",\n  \"description\": \"This is a test log entry created via Postman API\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/syncstation/log-entries",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "syncstation",
+                "log-entries"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', ()=> pm.response.to.have.status(201));",
+                  "let json={}; try{json=pm.response.json();}catch(e){}",
+                  "if(json && json.entry && json.entry.id){ pm.collectionVariables.set('logEntryId', json.entry.id); }"
+                ]
+              }
+            }
+          ],
+          "description": "Create a new log entry linked to a content node"
+        },
+        {
+          "name": "Update log entry",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "x-ws-tenant",
+                "value": "{{tenantId}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated log entry title\",\n  \"description\": \"Updated description\",\n  \"status\": \"synced\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/syncstation/log-entries/{{logEntryId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "syncstation",
+                "log-entries",
+                "{{logEntryId}}"
+              ]
+            }
+          },
+          "description": "Update an existing log entry. All fields are optional."
+        },
+        {
+          "name": "Get single log entry",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "x-ws-tenant",
+                "value": "{{tenantId}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/syncstation/log-entries/{{logEntryId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "syncstation",
+                "log-entries",
+                "{{logEntryId}}"
+              ]
+            }
+          },
+          "description": "Get a single log entry by ID, including all attachments"
+        },
+        {
+          "name": "Delete log entry",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "x-ws-tenant",
+                "value": "{{tenantId}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/syncstation/log-entries/{{logEntryId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "syncstation",
+                "log-entries",
+                "{{logEntryId}}"
+              ]
+            }
+          },
+          "description": "Delete a log entry and all its attachments (cascading delete)"
         }
       ]
     }

@@ -23,7 +23,7 @@ const LogEntryIdParamsSchema = z.object({
 });
 
 const LogEntriesQuerySchema = z.object({
-  nodeId: z.string().uuid(),
+  nodeId: z.string().uuid().optional(),
   status: SyncStatus.optional(),
 });
 

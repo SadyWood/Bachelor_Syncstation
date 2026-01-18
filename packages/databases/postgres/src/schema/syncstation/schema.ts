@@ -18,16 +18,16 @@ export const logEntries = pgTable('log_entries', {
   id: uuid('id').primaryKey().defaultRandom(),
   tenantId: uuid('tenant_id').notNull(),
   userId: uuid('user_id').notNull(), // References users.id from users DB
-  nodeId: uuid('node_id').notNull(), // References content_nodes.node_id from workstation DB
+  contentNodeId: uuid('content_node_id').notNull(), // References content_nodes.node_id from workstation DB
 
   // Content
-  title: varchar('title', { length: 255 }).notNull(),
-  description: text('description'),
+  title: text('title'),
+  notes: text('notes'),
+  metadata: text('metadata').$type<Record<string, unknown>>(),
 
   // Sync tracking
-  status: syncStatusEnum('status').notNull().default('local'),
-  syncAttempts: integer('sync_attempts').notNull().default(0),
-  lastSyncError: text('last_sync_error'),
+  syncStatus: syncStatusEnum('sync_status').notNull().default('local'),
+  syncError: text('sync_error'),
 
   // Timestamps
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),

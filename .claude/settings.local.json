@@ -57,7 +57,8 @@
       "Bash(then echo \"EXISTS\")",
       "Bash(else echo \"NOT_FOUND\")",
       "Bash(fi)",
-      "Bash(git clone:*)"
+      "Bash(git clone:*)",
+      "Bash(psql:*)"
     ],
     "deny": [],
     "ask": []

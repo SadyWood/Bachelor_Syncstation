@@ -19,12 +19,12 @@ type LogEntryRow = {
   id: string;
   tenant_id: string;
   user_id: string;
-  node_id: string;
-  title: string;
-  description: string | null;
-  status: 'local' | 'pending' | 'synced' | 'failed';
-  sync_attempts: number;
-  last_sync_error: string | null;
+  content_node_id: string;
+  title: string | null;
+  notes: string | null;
+  metadata: Record<string, unknown> | null;
+  sync_status: 'local' | 'pending' | 'synced' | 'failed';
+  sync_error: string | null;
   created_at: Date;
   updated_at: Date;
   synced_at: Date | null;
@@ -46,12 +46,12 @@ function mapLogEntryToDto(row: LogEntryRow): LogEntry {
     id: row.id,
     tenantId: row.tenant_id,
     userId: row.user_id,
-    nodeId: row.node_id,
-    title: row.title,
-    description: row.description,
-    status: row.status,
-    syncAttempts: row.sync_attempts,
-    lastSyncError: row.last_sync_error,
+    nodeId: row.content_node_id,
+    title: row.title ?? '',
+    description: row.notes,
+    status: row.sync_status,
+    syncAttempts: 0, // Not in database anymore
+    lastSyncError: row.sync_error,
     createdAt: row.created_at.toISOString(),
     updatedAt: row.updated_at.toISOString(),
     syncedAt: row.synced_at?.toISOString() ?? null,
@@ -61,9 +61,9 @@ function mapLogEntryToDto(row: LogEntryRow): LogEntry {
 function mapLogEntryToSummary(row: LogEntryRow & { attachment_count: number }): LogEntrySummary {
   return LogEntrySummarySchema.parse({
     id: row.id,
-    nodeId: row.node_id,
-    title: row.title,
-    status: row.status,
+    nodeId: row.content_node_id,
+    title: row.title ?? '',
+    status: row.sync_status,
     attachmentCount: row.attachment_count,
     createdAt: row.created_at.toISOString(),
   });
@@ -87,20 +87,23 @@ function mapAttachmentToDto(row: LogAttachmentRow): LogAttachment {
    ======================================== */
 
 /**
- * List log entries for a specific content node
+ * List log entries (optionally filter by content node)
  */
 export async function listLogEntries(
   tenantId: string,
-  nodeId: string,
+  nodeId?: string,
   status?: SyncStatusT,
 ): Promise<LogEntrySummary[]> {
   const conditions = [
     eq(schema.logEntries.tenantId, tenantId),
-    eq(schema.logEntries.nodeId, nodeId),
   ];
 
+  if (nodeId) {
+    conditions.push(eq(schema.logEntries.contentNodeId, nodeId));
+  }
+
   if (status) {
-    conditions.push(eq(schema.logEntries.status, status));
+    conditions.push(eq(schema.logEntries.syncStatus, status));
   }
 
   const rows = await dbSync
@@ -108,20 +111,20 @@ export async function listLogEntries(
       id: schema.logEntries.id,
       tenant_id: schema.logEntries.tenantId,
       user_id: schema.logEntries.userId,
-      node_id: schema.logEntries.nodeId,
+      content_node_id: schema.logEntries.contentNodeId,
       title: schema.logEntries.title,
-      description: schema.logEntries.description,
-      status: schema.logEntries.status,
-      sync_attempts: schema.logEntries.syncAttempts,
-      last_sync_error: schema.logEntries.lastSyncError,
+      notes: schema.logEntries.notes,
+      metadata: schema.logEntries.metadata,
+      sync_status: schema.logEntries.syncStatus,
+      sync_error: schema.logEntries.syncError,
       created_at: schema.logEntries.createdAt,
       updated_at: schema.logEntries.updatedAt,
       synced_at: schema.logEntries.syncedAt,
       // Count attachments for this log entry
       attachment_count: sql<number>`(
         SELECT COUNT(*)::int
-        FROM ${schema.logAttachments}
-        WHERE ${schema.logAttachments.logEntryId} = ${schema.logEntries.id}
+        FROM log_attachments
+        WHERE log_attachments.log_entry_id = log_entries.id
       )`.as('attachment_count'),
     })
     .from(schema.logEntries)
@@ -136,7 +139,20 @@ export async function listLogEntries(
  */
 export async function getLogEntry(id: string, tenantId: string): Promise<LogEntry | null> {
   const rows = await dbSync
-    .select()
+    .select({
+      id: schema.logEntries.id,
+      tenant_id: schema.logEntries.tenantId,
+      user_id: schema.logEntries.userId,
+      content_node_id: schema.logEntries.contentNodeId,
+      title: schema.logEntries.title,
+      notes: schema.logEntries.notes,
+      metadata: schema.logEntries.metadata,
+      sync_status: schema.logEntries.syncStatus,
+      sync_error: schema.logEntries.syncError,
+      created_at: schema.logEntries.createdAt,
+      updated_at: schema.logEntries.updatedAt,
+      synced_at: schema.logEntries.syncedAt,
+    })
     .from(schema.logEntries)
     .where(and(eq(schema.logEntries.id, id), eq(schema.logEntries.tenantId, tenantId)))
     .limit(1);
@@ -169,12 +185,11 @@ export async function createLogEntry(data: {
     .values({
       tenantId: data.tenantId,
       userId: data.userId,
-      nodeId: data.nodeId,
+      contentNodeId: data.nodeId,
       title: data.title,
-      description: data.description ?? null,
-      status: 'local', // Default status
-      syncAttempts: 0,
-      lastSyncError: null,
+      notes: data.description ?? null,
+      syncStatus: 'local', // Default status
+      syncError: null,
     })
     .returning();
 
@@ -199,9 +214,9 @@ export async function updateLogEntry(
   };
 
   if (data.title !== undefined) updates.title = data.title;
-  if (data.description !== undefined) updates.description = data.description;
+  if (data.description !== undefined) updates.notes = data.description;
   if (data.status !== undefined) {
-    updates.status = data.status;
+    updates.syncStatus = data.status;
     if (data.status === 'synced') {
       updates.syncedAt = new Date();
     }
@@ -287,8 +302,8 @@ export async function deleteAttachment(id: string): Promise<boolean> {
 export async function getSyncStatus(tenantId: string, userId: string) {
   const result = await dbSync
     .select({
-      pending_count: sql<number>`COUNT(*) FILTER (WHERE ${schema.logEntries.status} = 'pending')::int`,
-      failed_count: sql<number>`COUNT(*) FILTER (WHERE ${schema.logEntries.status} = 'failed')::int`,
+      pending_count: sql<number>`COUNT(*) FILTER (WHERE ${schema.logEntries.syncStatus} = 'pending')::int`,
+      failed_count: sql<number>`COUNT(*) FILTER (WHERE ${schema.logEntries.syncStatus} = 'failed')::int`,
       last_sync_at: sql<string | null>`MAX(${schema.logEntries.syncedAt})`,
     })
     .from(schema.logEntries)

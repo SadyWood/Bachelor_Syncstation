@@ -68,25 +68,36 @@ Welcome to the HK26 Syncstation project! This document helps you understand the 
 
 ### Your Database: Syncstation
 
-You have your own database with two tables:
+> **Important: This is YOUR database to customize!**
+>
+> The Syncstation database schema, API endpoints, and Zod schemas are **starter examples** generated to get you started. They demonstrate the patterns and architecture, but you should:
+> - **Modify** - Change field names, types, or constraints to fit your needs
+> - **Remove** - Delete tables or fields you don't need
+> - **Extend** - Add new tables, columns, or relationships as your project requires
+>
+> The same goes for the API endpoints in `apps/api/src/routes/sync.log.ts` and schemas in `packages/schema/src/syncstation/` - they're examples, not rules. Feel free to adapt everything to match your team's requirements.
+
+You have your own database with two tables (but you can change this!):
 
 **log_entries** - Main table for log entries
 ```typescript
 {
   id: string (UUID)
-  tenantId: string (UUID)    // Which tenant (organization)
-  userId: string (UUID)      // Who logged this
-  nodeId: string (UUID)      // Which content node (project/episode)
-  title: string
-  description: string | null
-  status: 'local' | 'pending' | 'synced' | 'failed'
-  syncAttempts: number
-  lastSyncError: string | null
+  tenantId: string (UUID)         // Which tenant (organization)
+  userId: string (UUID)           // Who logged this
+  contentNodeId: string (UUID)    // Which content node (project/episode)
+  title: string | null
+  notes: string | null            // Description/notes (mapped to 'description' in API)
+  metadata: Record<string, unknown> | null  // JSON metadata
+  syncStatus: 'local' | 'pending' | 'synced' | 'failed'
+  syncError: string | null        // Last sync error message
   createdAt: string
   updatedAt: string
   syncedAt: string | null
 }
 ```
+
+> **Note:** The API uses different field names for compatibility (e.g., `description` in API → `notes` in database, `nodeId` in API → `contentNodeId` in database). This mapping happens in the repository layer.
 
 **log_attachments** - Attachments (images, videos, files)
 ```typescript
@@ -270,23 +281,169 @@ apps/api/src/routes/ws.content.ts
 
 ### 2. Test the API First
 
-**Before writing app code**, test the API endpoints:
+**Before writing app code**, test the API endpoints in Postman to understand the complete workflow.
+
+> **Important:** The Syncstation API endpoints are **example implementations** to demonstrate patterns and get you started. Feel free to modify, extend, or completely replace them based on your team's requirements.
+
+#### Setup Postman
 
 1. Start API: `pnpm dev:api`
 2. Open Postman
-3. Import: `postman/HK26-API.postman_collection.json`
+3. Import collection: `postman/HK26-API.postman_collection.json`
 4. Import environment: `postman/HK26-Local.postman_environment.json`
+5. Select "HK26-Local" environment (dropdown in top right)
 
-**Test sequence:**
-```
-1. POST /auth/login → Get access token
-2. GET /syncstation/sync-status → Verify auth works
-3. GET /ws/content-nodes → See available content
-4. POST /syncstation/log-entries → Create a log entry
-5. GET /syncstation/log-entries?nodeId=xxx → List entries
-```
+#### How Postman Variables Work
 
-**Note:** Syncstation API endpoints are already implemented and working! You just need to build the mobile app that calls them.
+The collection uses **collection variables** that automatically update as you test:
+
+- `accessToken` - Saved when you login, used in all authenticated requests
+- `tenantId` - Saved when you login, sent as `x-ws-tenant` header
+- `nodeId` - Saved when you get projects/tree, used for testing log entries
+- `logEntryId` - Saved when you create/list log entries, used for testing updates
+
+**You don't need to manually copy/paste tokens!** The test scripts do this automatically. However, you may need to **manually set** `nodeId` if you want to test with a specific content node.
+
+#### Complete Testing Workflow
+
+**Step 1: Login** 🔐
+
+1. Open: `Auth API` → `Login`
+2. Verify body has:
+   ```json
+   {
+     "email": "admin@hoolsy.com",
+     "password": "demopassword"
+   }
+   ```
+3. Click **Send**
+4. Check response - should return `accessToken` and user info
+5. ✅ Variables `accessToken` and `tenantId` are now saved automatically
+
+**Step 2: Get Projects** 📁
+
+1. Open: `Workstation API` → `List all projects`
+2. Click **Send**
+3. Response shows all projects, including the "Breaking Bad" demo project
+4. Find the **root project** in response:
+   ```json
+   {
+     "id": "019bd32e-c586-7223-9705-c35e0c66ae89",
+     "title": "Breaking Bad",
+     "nodeType": "root"
+   }
+   ```
+5. Copy the `id` value
+6. Go to: **Collections** → `HK26-API` → **Variables** tab
+7. Set `nodeId` to the copied ID (or manually paste in requests)
+
+**Step 3: Get Project Tree (Optional - Find Deeper Nodes)** 🌳
+
+If you want to test with a **specific episode** instead of the root project:
+
+1. Open: `Workstation API` → `Get project tree (nested)`
+2. Verify `nodeId` variable is set (from step 2)
+3. Click **Send**
+4. Response shows the **entire tree structure**:
+   ```json
+   {
+     "root": {
+       "id": "019bd32e-c586-7223-9705-c35e0c66ae89",
+       "title": "Breaking Bad",
+       "children": [
+         {
+           "id": "019bd32e-c586-7223-9705-...",
+           "title": "Season 1",
+           "children": [
+             {
+               "id": "019bd32e-c586-7223-9705-...",
+               "title": "Episode 1: Pilot",
+               "nodeType": "episode"
+             }
+           ]
+         }
+       ]
+     }
+   }
+   ```
+5. Find an **episode** node and copy its `id`
+6. Update the `nodeId` variable with this episode ID
+
+**Step 4: Test Syncstation API** 🎬
+
+Now you can test the Syncstation endpoints:
+
+**4a. Get Sync Status**
+1. Open: `Syncstation API` → `Sync status`
+2. Click **Send**
+3. Response shows sync statistics:
+   ```json
+   {
+     "ok": true,
+     "pendingCount": 0,
+     "failedCount": 0,
+     "lastSyncAt": null
+   }
+   ```
+
+**4b. List All Log Entries**
+1. Open: `Syncstation API` → `List log entries`
+2. Notice query params are **disabled** by default (shows all entries)
+3. Click **Send**
+4. Response shows all log entries for your tenant
+5. If you want to **filter by content node**, enable the `nodeId` query param
+
+**4c. Create a Log Entry**
+1. Open: `Syncstation API` → `Create log entry`
+2. Verify body:
+   ```json
+   {
+     "nodeId": "{{nodeId}}",
+     "title": "Test log entry from Postman",
+     "description": "This is a test log entry created via Postman API"
+   }
+   ```
+3. Click **Send**
+4. Response returns the created entry
+5. ✅ Variable `logEntryId` is saved automatically
+
+**4d. Get Single Log Entry**
+1. Open: `Syncstation API` → `Get single log entry`
+2. URL uses `{{logEntryId}}` from previous step
+3. Click **Send**
+4. Response includes the entry with all attachments
+
+**4e. Update Log Entry**
+1. Open: `Syncstation API` → `Update log entry`
+2. Modify the body as needed:
+   ```json
+   {
+     "title": "Updated title",
+     "description": "Updated description",
+     "status": "synced"
+   }
+   ```
+3. Click **Send**
+4. Response shows updated entry
+
+**4f. Delete Log Entry**
+1. Open: `Syncstation API` → `Delete log entry`
+2. Click **Send**
+3. Response: `204 No Content` (success)
+
+#### Tips for Testing
+
+- **Auth Token Expires:** If you get `401 Unauthorized`, run Login again
+- **Wrong Tenant:** If you get `400 TENANT_HEADER_MISSING`, check that `tenantId` variable is set
+- **Node Not Found:** Verify `nodeId` exists by listing projects first
+- **Variables Not Updating:** Check the **Tests** tab in each request - they contain scripts that save variables
+
+#### What's Next?
+
+Once you understand the API flow in Postman, you can:
+1. Build the same flow in your React Native app
+2. Use the same request/response types from `@hk26/schema`
+3. Implement offline-first by saving to SQLite first, then syncing to API
 
 ### 3. Start Building the Mobile App
 
