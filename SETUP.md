@@ -1,6 +1,13 @@
-# Setup
+# Setup Guide
 
-This guide walks you through first-time setup, seeding, and running the API + web locally.
+This guide walks you through first-time setup of the HK26 project repository.
+
+**What you'll set up:**
+- PostgreSQL database with 3 databases (users, workstation, syncstation)
+- API server with all endpoints
+- Your choice of: Syncstation mobile app, Workstation web app, or both
+
+This repository supports development for both **Syncstation** (mobile) and **Workstation** (web) teams. The setup process is the same regardless of which app you're working on.
 
 ## Prerequisites
 
@@ -14,13 +21,13 @@ This guide walks you through first-time setup, seeding, and running the API + we
 
 **Docker Desktop** is a containerization platform that packages applications and their dependencies into isolated containers. For our project, it provides:
 
-- **All databases pre-configured** - PostgreSQL, Neo4j, MongoDB, and TimescaleDB
+- **PostgreSQL pre-configured** - All three databases (users, workstation, syncstation) in one container
 - **Consistent environment** - Works identically on Windows, Mac, and Linux
-- **Zero database installation** - No need to manually install and configure 4 different databases
+- **Zero database installation** - No need to manually install and configure PostgreSQL
 - **Easy reset** - Wipe and rebuild databases with a single command
-- **Isolated from your system** - Databases run in containers without affecting your local machine
+- **Isolated from your system** - Database runs in a container without affecting your local machine
 
-Think of it as a virtual machine, but much lighter and faster. When you run `pnpm docker:up`, Docker Desktop starts all our database containers automatically.
+Think of it as a virtual machine, but much lighter and faster. When you run `pnpm docker:up`, Docker Desktop starts the PostgreSQL container automatically.
 
 ### Common Docker Desktop Installation Issues
 
@@ -105,13 +112,10 @@ Ensure Docker Desktop is actually running:
 
 ### Port Requirements
 
-- **5432** - PostgreSQL
+- **5432** - PostgreSQL (users, workstation, syncstation databases)
 - **3333** - API server
-- **5173** - Workstation web
-- **7474** - Neo4j browser UI (optional)
-- **7687** - Neo4j Bolt protocol (optional)
-- **27017** - MongoDB (optional)
-- **5433** - TimescaleDB (optional)
+- **5173** - Workstation web (if running)
+- **8081** - Syncstation mobile app (Expo dev server)
 
 ---
 
@@ -164,24 +168,20 @@ cp .env.example .env
 pnpm docker:up
 ```
 
-This starts **4 database containers**:
-- **PostgreSQL** on port 5432 (main relational database)
-- **Neo4j** on ports 7474/7687 (graph database)
-- **MongoDB** on port 27017 (document store)
-- **TimescaleDB** on port 5433 (time-series database)
+This starts the **PostgreSQL container** with three databases:
+- **users** - User accounts, authentication, platform access
+- **workstation** - Content nodes, projects, media (for Workstation team)
+- **syncstation** - Log entries and attachments (for Syncstation team)
 
-**Verify containers are running:**
+**Verify container is running:**
 ```bash
 pnpm docker:ps
 ```
 
 Expected output:
 ```
-NAME                IMAGE                         STATUS
-hoolsy-postgres     postgres:16-alpine            Up (healthy)
-hoolsy-neo4j        neo4j:5-community             Up
-hoolsy-mongodb      mongo:7                       Up
-hoolsy-timescaledb  timescale/timescaledb:...     Up
+NAME              IMAGE               STATUS
+sync-postgres     postgres:16-alpine  Up
 ```
 
 ### 6) Run migrations
@@ -197,7 +197,7 @@ pnpm db:migrate
 - Creates tables, indexes, and constraints in each PostgreSQL database:
   - `users` database - User accounts, sessions, permissions
   - `workstation` database - Projects, content nodes, media
-  - `marketplace` database - Marketplace listings and transactions
+  - `syncstation` database - Log entries and attachments for sync tracking
 
 The migration files are stored in `packages/databases/postgres/migrations/`.
 
@@ -247,11 +247,11 @@ pnpm db:seed:demo
 
 **Note:** The admin user (`admin@hoolsy.com`) has full admin access and won't be restricted in the frontend. The invited users have limited permissions (Manage or Viewer roles) and require registration via invite token.
 
-### 9) Start API and web
+### 9) Start API and apps
 
-Open **two terminal windows**:
+The API server is required for both Syncstation and Workstation. Choose which app(s) to run:
 
-**Terminal 1 - API server:**
+**Terminal 1 - API server (required):**
 ```bash
 pnpm dev:api
 ```
@@ -261,27 +261,48 @@ Wait for:
 ✅ API server running on http://localhost:3333
 ```
 
-**Terminal 2 - Web app:**
+**Terminal 2 - Choose your app:**
+
+**Option A: Syncstation mobile app**
+```bash
+pnpm dev:sync
+```
+Opens Expo dev server. Scan QR code with Expo Go app to run on your device.
+
+**Option B: Workstation web app**
 ```bash
 pnpm dev:ws
 ```
+Opens web app at `http://localhost:5173`
 
-Wait for:
+**Option C: Both (use a third terminal)**
+```bash
+# Terminal 2
+pnpm dev:ws
+
+# Terminal 3
+pnpm dev:sync
 ```
-✅ Workstation web running on http://localhost:5173
-```
 
-### 10) Log in to the Workstation
+### 10) Log in and test
 
-**Option A: Admin user (recommended for testing)**
+**Admin user (recommended for testing)**
 
 The demo seed creates an admin user with full access - no registration needed:
 
-1. **Open the web app** - `http://localhost:5173`
-2. **Log in with admin credentials**:
-   - Email: `admin@hoolsy.com`
-   - Password: `demopassword`
-3. **You're logged in!** Start exploring the Workstation with full admin access
+**Email:** `admin@hoolsy.com`
+**Password:** `demopassword`
+
+**For Workstation web:**
+1. Open `http://localhost:5173`
+2. Log in with admin credentials
+3. Explore Content Dashboard, Timeline Editor, and Admin Panel
+
+**For Syncstation mobile:**
+1. Open the Expo app on your device
+2. Scan the QR code from the terminal
+3. Log in with admin credentials
+4. Test creating log entries and syncing
 
 **Option B: Register with invite token (limited permissions)**
 
@@ -326,12 +347,11 @@ The node ID is generated during seeding and will be different each time. To get 
 ### Quick verification checklist
 
 - [ ] Docker Desktop is running
-- [ ] `pnpm docker:ps` shows 4 containers as "Up"
+- [ ] `pnpm docker:ps` shows sync-postgres container as "Up"
 - [ ] API server responds: `curl http://localhost:3333/healthz`
-- [ ] Web app loads: Open `http://localhost:5173`
-- [ ] You can log in with your demo user
-- [ ] Breaking Bad project appears in Content Dashboard
-- [ ] Pilot episode streams video in timeline editor
+- [ ] You can log in with admin@hoolsy.com / demopassword
+- [ ] Breaking Bad project appears in Content Dashboard (if using Workstation web)
+- [ ] Syncstation API endpoints respond: `curl http://localhost:3333/syncstation/sync-status` (requires auth)
 
 ### Docker Commands
 
@@ -369,12 +389,12 @@ Copy `.env.example` → `.env` and update the PostgreSQL connection to match you
 ADMIN_DATABASE_CONNECTION=postgres://postgres:your-password@localhost:5432
 USERS_DB_URL=postgres://svc_users:change-this-svc-users@localhost:5432/users
 WORKSTATION_DB_URL=postgres://svc_workstation:change-this-svc-workstation@localhost:5432/workstation
-MARKETPLACE_DB_URL=postgres://svc_marketplace:change-this-svc-marketplace@localhost:5432/marketplace
+SYNCSTATION_DB_URL=postgres://svc_syncstation:change-this-svc-syncstation@localhost:5432/syncstation
 ```
 
 ### 4) Bootstrap databases & roles
 
-Creates databases (**users**, **workstation**, **marketplace**), roles, and grants:
+Creates databases (**users**, **workstation**, **syncstation**), roles, and grants:
 
 ```bash
 pnpm db:bootstrap
@@ -529,21 +549,53 @@ DEMO_INVITE_PLATFORM_ID=1             # 1 = workstation (default)
 
 ## Accessing Databases
 
-### Neo4j Browser
-Open http://localhost:7474 in your browser.
-- Username: `neo4j`
-- Password: `hoolsy_dev` (or your `NEO4J_PASSWORD`)
+### PostgreSQL
 
-### MongoDB
-Connect with any MongoDB client:
-```
-mongodb://hoolsy:hoolsy_dev@localhost:27017/hoolsy_subjects?authSource=admin
+Connect with any PostgreSQL client (psql, pgAdmin, DBeaver, etc.):
+
+```bash
+# Users database
+psql postgres://svc_users:change-this-svc-users@localhost:5432/users
+
+# Workstation database
+psql postgres://svc_workstation:change-this-svc-workstation@localhost:5432/workstation
+
+# Syncstation database
+psql postgres://svc_syncstation:change-this-svc-syncstation@localhost:5432/syncstation
 ```
 
-### TimescaleDB
-Connect with any PostgreSQL client:
-```
-postgresql://hoolsy:hoolsy_dev@localhost:5433/hoolsy_analytics
+**Note:** These are service account credentials. The admin user is `postgres:hoolsy_dev`.
+
+### Database Architecture for Teams
+
+This repository supports multiple student teams working on different components:
+
+**For Syncstation team:**
+- **Primary database:** `syncstation` - Your log entries and attachments live here
+- **Shared access:** `workstation` - You'll read `content_nodes` to link logs to specific content
+- **Shared access:** `users` - Authentication happens here (login, JWT tokens)
+
+**For Workstation team:**
+- **Primary database:** `workstation` - Projects, content nodes, media, tasks
+- **Shared access:** `users` - Authentication
+
+**Key principle:**
+- Each team owns their own database for writes
+- Teams share read access to `users` (for auth) and `workstation` (for content references)
+- The API handles connections to all databases automatically
+
+**Example (Syncstation):**
+```typescript
+// Your team writes to syncstation DB
+await dbSync.insert(schema.logEntries).values({...});
+
+// But you read content nodes from workstation DB
+const contentNode = await dbWs.query.contentNodes.findFirst({
+  where: eq(schema.contentNodes.id, nodeId)
+});
+
+// And authentication uses users DB (handled by API)
+const user = await req.jwtVerify(); // Token validated against users DB
 ```
 
 ---

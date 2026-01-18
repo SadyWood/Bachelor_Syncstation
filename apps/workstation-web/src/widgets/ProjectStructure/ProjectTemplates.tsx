@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { BaseWidget } from '../../components/WidgetBase/BaseWidget';
 import { useContentStore } from '../../lib/use-content-store';
 import type { WidgetProps, TemplateType } from '../../types';
-import type { ContentNodeSchema } from '@workstation/schema';
+import type { ContentNodeSchema } from '@hk26/schema';
 import type { z } from 'zod';
 
 type ContentNode = z.infer<typeof ContentNodeSchema>;

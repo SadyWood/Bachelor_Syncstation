@@ -5,7 +5,7 @@ import { BaseWidget } from '../../components/WidgetBase/BaseWidget';
 import { useTimelineState } from '../../lib/timeline-state';
 import { msToTime, getTrackLabel } from '../../utils/timeline-helpers';
 import type { WidgetProps } from '../../components/WidgetBase/WidgetTypes';
-import type { Subject, SubjectAppearance } from '@workstation/schema';
+import type { Subject, SubjectAppearance } from '@hk26/schema';
 
 interface SubjectGroup {
   subject: Subject;

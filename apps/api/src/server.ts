@@ -8,6 +8,7 @@ import { env } from './config/env.js';
 import { jsonEmptyBodyPlugin } from './plugins/json-empty-body.js';
 import { authRoutes } from './routes/auth.js';
 import { healthRoutes } from './routes/health.js';
+import { syncLogRoutes } from './routes/sync.log.js';
 import { wsContentRoutes } from './routes/ws.content.js';
 import { wsMediaRoutes } from './routes/ws.media.js';
 import { wsMembersRoutes } from './routes/ws.members.js';
@@ -104,6 +105,8 @@ export async function build() {
   await app.register(wsContentRoutes);
   await app.register(wsMediaRoutes);
 
+  // Syncstation routes
+  await app.register(syncLogRoutes);
 
   return app;
 }

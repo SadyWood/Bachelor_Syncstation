@@ -12,6 +12,7 @@ This Skill helps you create well-structured Agent Skills for Claude Code that fo
 Use this Skill when:
 - Creating a new Agent Skill
 - Writing or updating SKILL.md files
+- Updating .claude/skills/index.md with new skills
 - Designing skill structure and frontmatter
 - Troubleshooting skill discovery issues
 - Converting existing prompts or workflows into Skills
@@ -224,7 +225,61 @@ Check these requirements:
 - [ ] Skill activates on relevant queries
 - [ ] Instructions are clear and actionable
 
-### Step 9: Test the Skill
+### Step 9: Update index.md
+
+After creating a new Skill, you must update `.claude/skills/index.md` to document it.
+
+**If using Claude Code:**
+Ask Claude to update the index:
+```
+Update .claude/skills/index.md with the new skill I just created
+```
+
+Claude will automatically:
+- Extract name and description from frontmatter
+- Generate the folder structure tree
+- Add it to index.md in the correct format
+
+**If using GitHub Copilot or manually:**
+Add a new section to `.claude/skills/index.md`:
+
+```markdown
+## skill-name
+
+**Description:** [Copy description from SKILL.md frontmatter]
+
+**Structure:**
+\`\`\`
+.claude/skills/skill-name/
+├── SKILL.md
+├── reference.md (if you have it)
+└── examples.md (if you have it)
+\`\`\`
+```
+
+**Tips:**
+- Keep sections separated by `---`
+- Copy description exactly from the SKILL.md frontmatter
+- Use ASCII tree format for folder structure
+- List all files in the skill directory
+
+**Example entry:**
+```markdown
+## my-new-skill
+
+**Description:** Process markdown files and generate documentation. Use when working with markdown, generating docs, or creating README files.
+
+**Structure:**
+\`\`\`
+.claude/skills/my-new-skill/
+├── SKILL.md
+├── examples.md
+└── templates/
+    └── template.md
+\`\`\`
+```
+
+### Step 10: Test the Skill
 
 1. **Restart Claude Code** (if running) to load the Skill
 
@@ -237,7 +292,7 @@ Check these requirements:
 
 4. **Check behavior**: Confirm Claude follows the instructions correctly
 
-### Step 10: Debug if needed
+### Step 11: Debug if needed
 
 If Claude doesn't use the Skill:
 
@@ -326,9 +381,10 @@ Detailed reference: See [reference.md](reference.md)
 3. **Clear instructions**: Write for Claude, not humans
 4. **Concrete examples**: Show real code, not pseudocode
 5. **List dependencies**: Mention required packages in description
-6. **Test with teammates**: Verify activation and clarity
-7. **Version your Skills**: Document changes in content
-8. **Use progressive disclosure**: Put advanced details in separate files
+6. **Update index.md**: Always update the index when creating a new skill
+7. **Test with teammates**: Verify activation and clarity
+8. **Version your Skills**: Document changes in content
+9. **Use progressive disclosure**: Put advanced details in separate files
 
 ## Validation checklist
 
@@ -342,6 +398,7 @@ Before finalizing a Skill, verify:
 - [ ] Examples are concrete and realistic
 - [ ] Dependencies are documented
 - [ ] File paths use forward slashes
+- [ ] index.md has been updated with the new skill
 - [ ] Skill activates on relevant queries
 - [ ] Claude follows instructions correctly
 
@@ -379,7 +436,8 @@ When creating a Skill, I will:
 3. Create the SKILL.md file with proper frontmatter
 4. Include clear instructions and examples
 5. Add supporting files if needed
-6. Provide testing instructions
-7. Validate against all requirements
+6. Update .claude/skills/index.md with the new skill
+7. Provide testing instructions
+8. Validate against all requirements
 
 The result will be a complete, working Skill that follows all best practices and validation rules.

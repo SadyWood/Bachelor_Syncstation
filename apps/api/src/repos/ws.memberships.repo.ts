@@ -1,5 +1,5 @@
 // apps/api/src/repos/ws.memberships.repo.ts
-import { UserRoleSchema, type UserRole } from '@workstation/schema';
+import { UserRoleSchema, type UserRole } from '@hk26/schema';
 import { and, eq, inArray } from 'drizzle-orm';
 import { z } from 'zod';
 import { dbWs, schema } from '../db.js';

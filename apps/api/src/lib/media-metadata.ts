@@ -3,7 +3,7 @@ import ffprobeStatic from 'ffprobe-static';
 import { fileTypeFromFile } from 'file-type';
 import ffmpeg from 'fluent-ffmpeg';
 import sharp from 'sharp';
-import type { MediaMetadata } from '@workstation/schema';
+import type { MediaMetadata } from '@hk26/schema';
 
 // Configure ffmpeg to use static ffprobe binary
 ffmpeg.setFfprobePath(ffprobeStatic.path);

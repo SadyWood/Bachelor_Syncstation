@@ -44,6 +44,15 @@ export const dbWs = drizzle(wsPool, {
   },
 });
 
+// Syncstation DB
+const syncPool = new Pool({ connectionString: env.SYNCSTATION_DB_URL });
+export const dbSync = drizzle(syncPool, {
+  schema: {
+    logEntries: schema.logEntries,
+    logAttachments: schema.logAttachments,
+  },
+});
+
 // Back-compat default (some legacy imports may still use `db`)
 export const db = dbUsers;
 export { schema };

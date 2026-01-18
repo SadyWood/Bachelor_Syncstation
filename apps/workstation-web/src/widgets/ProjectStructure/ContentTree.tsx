@@ -10,7 +10,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { BaseWidget } from '../../components/WidgetBase/BaseWidget';
 import { useContentStore } from '../../lib/use-content-store';
 import type { WidgetProps, DropPosition } from '../../types';
-import type { ContentNodeNested } from '@workstation/schema';
+import type { ContentNodeNested } from '@hk26/schema';
 import type { z } from 'zod';
 
 const logger = createLogger('ContentTree');

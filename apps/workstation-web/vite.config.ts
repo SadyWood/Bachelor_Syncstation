@@ -10,7 +10,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@workstation/schema': path.resolve(__dirname, '../../packages/schema/src/index.ts'),
+      '@hk26/schema': path.resolve(__dirname, '../../packages/schema/src/index.ts'),
     },
   },
   server: {

@@ -1,5 +1,5 @@
 import type { users } from './schema/users/schema.js';
-import type { PublicUser } from '@workstation/schema';
+import type { PublicUser } from '@hk26/schema';
 
 export function toPublicUser(row: typeof users.$inferSelect): PublicUser {
   return {

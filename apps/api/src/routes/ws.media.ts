@@ -9,7 +9,7 @@ import {
   CompleteUploadRequestSchema,
   CompleteUploadResponseSchema,
   MediaListResponseSchema,
-} from '@workstation/schema';
+} from '@hk26/schema';
 import { v7 as uuidv7 } from 'uuid';
 import { z } from 'zod';
 import { extractMediaMetadata } from '../lib/media-metadata.js';

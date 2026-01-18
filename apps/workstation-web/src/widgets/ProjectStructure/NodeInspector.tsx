@@ -1,5 +1,5 @@
 // apps/workstation-web/src/widgets/ProjectStructure/NodeInspector.tsx
-import { type ContentNodeSchema, type MediaAsset, MEDIA_KIND_OPTIONS, getMediaClassFromKind } from '@workstation/schema';
+import { type ContentNodeSchema, type MediaAsset, MEDIA_KIND_OPTIONS, getMediaClassFromKind } from '@hk26/schema';
 import { Save, Trash2, FileText, Upload, Film, Image, Music, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { BaseWidget } from '../../components/WidgetBase/BaseWidget';

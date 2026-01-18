@@ -5,7 +5,7 @@ import {
   RegisterRequest, RegisterResponse,
   InvitePreviewResponse, RefreshResponse, MeResponse,
   ErrorResponse, CanResponse,
-} from '@workstation/schema';
+} from '@hk26/schema';
 import { z } from 'zod';
 import { env } from '../config/env.js';
 import { getTenantById } from '../repos/workstation.repo.js';
@@ -18,7 +18,7 @@ import {
 } from '../services/auth.service.js';
 import { evaluateEffectivePerms } from '../services/perm.service.js';
 import { err } from '../utils/errors.js';
-import type { LoginBody, LoginReply, RegisterBody, RegisterReply, ErrorReply } from '@workstation/schema';
+import type { LoginBody, LoginReply, RegisterBody, RegisterReply, ErrorReply } from '@hk26/schema';
 import type { FastifyRequest, FastifyReply } from 'fastify';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 

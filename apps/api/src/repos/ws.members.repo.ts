@@ -1,6 +1,6 @@
 // apps/api/src/repos/ws.members.repo.ts
 import crypto from 'node:crypto';
-import { WsMemberSchema, UserRoleSchema, type WsMember, type UserRole } from '@workstation/schema';
+import { WsMemberSchema, UserRoleSchema, type WsMember, type UserRole } from '@hk26/schema';
 import { and, eq, inArray } from 'drizzle-orm';
 import { z } from 'zod';
 import { dbUsers, dbWs, schema } from '../db.js';

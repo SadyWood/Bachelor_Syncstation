@@ -16,6 +16,7 @@ const EnvSchema = z.object({
   USERS_DB_URL: z.string().url(),
   WORKSTATION_DB_URL: z.string().url(),
   MARKETPLACE_DB_URL: z.string().url().optional(),
+  SYNCSTATION_DB_URL: z.string().url(),
 
   JWT_SECRET: z.string().min(16),
   COOKIE_SECRET: z.string().min(16),

@@ -1,5 +1,5 @@
 // apps/api/src/repos/ws.roles.repo.ts
-import { RoleSchema, type Role } from '@workstation/schema';
+import { RoleSchema, type Role } from '@hk26/schema';
 import { and, eq, inArray, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { dbWs, schema } from '../db.js';

@@ -13,7 +13,7 @@ import {
 import { getAccessToken, getCurrentTenantId } from '../../lib/http';
 import { getMediaForNode } from '../../lib/media-client';
 import type { WidgetProps } from '../../components/WidgetBase/WidgetTypes';
-import type { MediaAsset } from '@workstation/schema';
+import type { MediaAsset } from '@hk26/schema';
 import '@hoolsy/timeline/dist/components/MediaPlayer.css';
 
 const logger = createLogger('MediaPreview');

@@ -1,7 +1,7 @@
 // apps/api/src/repos/ws.permissions.repo.ts
-import { PermissionCatalogResponse } from '@workstation/schema';
+import { PermissionCatalogResponse } from '@hk26/schema';
 import { dbWs, schema } from '../db.js';
-import type { PermissionCatalogItem } from '@workstation/schema';
+import type { PermissionCatalogItem } from '@hk26/schema';
 
 export async function listPermissionsCatalog(): Promise<PermissionCatalogItem[]> {
   const rows = await dbWs

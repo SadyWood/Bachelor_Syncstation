@@ -9,7 +9,7 @@ import {
   SuccessResponse,
   type MediaAsset,
   type MediaVariant,
-} from '@workstation/schema';
+} from '@hk26/schema';
 import { httpTyped, getAccessToken, getCurrentTenantId } from './http';
 import type { z } from 'zod';
 

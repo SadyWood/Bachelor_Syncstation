@@ -15,7 +15,7 @@ import {
   ReorderSiblingsRequest,
   type MediaClass,
   SuccessResponse,
-} from '@workstation/schema';
+} from '@hk26/schema';
 import { httpTyped } from './http';
 import type { z } from 'zod';
 

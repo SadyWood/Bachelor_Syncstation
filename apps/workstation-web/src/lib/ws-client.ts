@@ -8,7 +8,7 @@ import {
   type Role,
   RoleResponseSchema,
   SuccessResponse as SuccessResponseSchema,
-} from '@workstation/schema';
+} from '@hk26/schema';
 import { httpTyped } from './http';
 import type { RoleDetail } from '../types/permissions';
 

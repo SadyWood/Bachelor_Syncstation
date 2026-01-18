@@ -12,7 +12,7 @@ import {
   type SelectNodeByIdEvent,
 } from '../../lib/events';
 import type { WidgetProps } from '../../components/WidgetBase/WidgetTypes';
-import type { ContentNode, ContentNodeNestedT, ProjectSummary } from '@workstation/schema';
+import type { ContentNode, ContentNodeNestedT, ProjectSummary } from '@hk26/schema';
 import type { z } from 'zod';
 
 const logger = createLogger('ProjectBrowser');

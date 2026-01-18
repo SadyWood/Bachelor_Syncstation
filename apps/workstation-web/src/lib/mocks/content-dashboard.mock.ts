@@ -5,7 +5,7 @@
  */
 
 import type { Marker } from '@hoolsy/timeline';
-import type { Subject, SubjectAppearance } from '@workstation/schema';
+import type { Subject, SubjectAppearance } from '@hk26/schema';
 
 // ============================================================================
 // MOCK SUBJECTS - Metadata only

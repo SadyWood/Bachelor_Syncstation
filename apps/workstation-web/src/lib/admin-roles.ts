@@ -1,5 +1,5 @@
 // src/lib/admin-roles.ts
-import { RolesListResponseSchema, RoleResponseSchema, SuccessResponse as SuccessResponseSchema } from '@workstation/schema';
+import { RolesListResponseSchema, RoleResponseSchema, SuccessResponse as SuccessResponseSchema } from '@hk26/schema';
 import { httpTyped } from './http';
 
 export async function listRoles(tenantId: string) {

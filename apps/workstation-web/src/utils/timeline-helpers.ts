@@ -1,6 +1,6 @@
 // apps/workstation-web/src/utils/timeline-helpers.ts
-import { DEFAULT_TIMELINE_TRACKS } from '@workstation/schema';
-import type { SubjectType } from '@workstation/schema';
+import { DEFAULT_TIMELINE_TRACKS } from '@hk26/schema';
+import type { SubjectType } from '@hk26/schema';
 
 /**
  * Convert milliseconds to HH:MM:SS format (no milliseconds)

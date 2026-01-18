@@ -20,7 +20,7 @@ import type {
   ContentNodeSchema,
   ContentNodeNested,
   TemplateTypeT,
-} from '@workstation/schema';
+} from '@hk26/schema';
 import type { z } from 'zod';
 
 // Infer types from Zod schemas

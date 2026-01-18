@@ -1,9 +1,15 @@
-# Hoolsy Platforms Monorepo
+# HK26 Syncstation Monorepo
 
-Welcome to the **Hoolsy** monorepo. This repository contains multiple apps and shared packages that together power the platform.
-If you're setting up the project for the first time, **start with [SETUP.md](./SETUP.md)**. It explains database bootstrap,
-seeding, and how to run the API + web locally.
+Welcome to the **HK26 project repository**. This monorepo contains the full Hoolsy Platforms stack, including:
 
+- **Syncstation** - Mobile-first field logging system (React Native + Expo)
+- **Workstation** - Web-based content management and timeline editor (React + Vite)
+- **API Backend** - Fastify server with multi-database architecture
+- **Shared Packages** - Type-safe schemas, database ORM, logging, and components
+
+This repo is a copy of the original `hoolsy-platforms` repository where Workstation was developed. Students can work on **Syncstation** (mobile app), **Workstation** (web app), or both - the choice is yours.
+
+If you're setting up the project for the first time, **start with [SETUP.md](./SETUP.md)**. It explains database bootstrap, seeding, and how to run the API + apps locally.
 ---
 
 ## What is Hoolsy?
@@ -45,128 +51,228 @@ Hoolsy is building a **"media-to-commerce" engine** that makes content shoppable
 
 ---
 
-## Tech stack
+## Tech Stack
 
 - **TypeScript** (workspace-wide)
+- **Mobile (Syncstation)**: React Native + Expo
 - **Web (Workstation)**: React 19 + Vite + TailwindCSS
-- **API**: Node.js (Fastify/Express-style), TypeScript
-- **Database**: PostgreSQL + Drizzle ORM (migrations + seeding), Neo4j, MongoDB, TimescaleDB
+- **API**: Node.js (Fastify), TypeScript, Zod validation
+- **Database**: PostgreSQL + Drizzle ORM (migrations + seeding)
 - **Package manager**: pnpm (workspaces/monorepo)
 
-### Databases (multi-DB)
-- `users` – identities, invites, platforms, memberships
-- `workstation` – tenant/org domain models for the Workstation app
-- `marketplace` – reserved for Marketplace (not always required in dev)
+### Databases (multi-DB architecture)
 
-> **Important**: The repo includes scripts to bootstrap roles/DBs and refresh grants. Always read **SETUP.md** for the authoritative steps.
+- `users` – User accounts, authentication, platform access (shared)
+- `workstation` – Projects, content nodes, media (Workstation team, read-only for Syncstation)
+- `syncstation` – Log entries and attachments (Syncstation team)
+
+> **Important**: Each team has their own database but shares access to `users` for authentication and `workstation` for content references. The repo includes scripts to bootstrap roles/DBs and refresh grants. Always read **SETUP.md** for the authoritative steps.
 
 ---
 
-## Repository structure
+## Repository Structure
 
 ```
 .
 ├─ apps/
-│  ├─ api/                  # API server (auth, invites, me/refresh/logout, domain endpoints)
+│  ├─ api/                  # API server (Fastify + Zod validation)
+│  │                        # - Auth endpoints (/auth/*)
+│  │                        # - Workstation endpoints (/ws/*)
+│  │                        # - Syncstation endpoints (/syncstation/*)
+│  ├─ syncstation-app/      # React Native mobile app (Expo)
 │  ├─ workstation-web/      # React web app for Workstation (Vite + Tailwind)
-│  └─ marketplace-web/      # (Optional) Marketplace web app
+│  └─ marketplace-web/      # (Future) Marketplace web app
 │
 ├─ packages/
-│  ├─ databases/            # Drizzle schemas, migrations, bootstrap SQL, seed/test scripts
+│  ├─ databases/postgres/   # PostgreSQL schemas and migrations
 │  │  ├─ src/
-│  │  │  ├─ schema/         # Source-of-truth DB schemas (users/workstation/marketplace)
-│  │  │  └─ scripts/        # seed-demo.ts, seed-db.ts, bootstrap-db.ts, test-db.ts, etc.
-│  │  └─ migrations/        # Generated migration files per database
-│  ├─ schema/               # Shared runtime types & Zod schemas used across API + web
-│  └─ timeline/             # Custom timeline component package
+│  │  │  ├─ schema/         # Drizzle ORM schemas
+│  │  │  │  ├─ users/       # Users database schema
+│  │  │  │  ├─ workstation/ # Workstation database schema
+│  │  │  │  └─ syncstation/ # Syncstation database schema
+│  │  │  └─ scripts/        # Seed and bootstrap scripts
+│  │  ├─ migrations/        # Generated migration files per database
+│  │  └─ bootstrap/         # SQL scripts for database initialization
+│  ├─ schema/               # Shared Zod schemas & TypeScript types (@hk26/schema)
+│  │  ├─ src/
+│  │  │  ├─ auth/           # Auth request/response schemas
+│  │  │  ├─ workstation/    # Workstation API schemas
+│  │  │  └─ syncstation/    # Syncstation API schemas
+│  ├─ logger/               # Environment-aware structured logging (@hoolsy/logger)
+│  └─ timeline/             # Custom timeline component (@hoolsy/timeline)
 │
-├─ docker/                  # Docker Compose setup for databases
-│  ├─ docker-compose.yml
-│  ├─ postgres/init/        # PostgreSQL init scripts
-│  ├─ neo4j/                # Neo4j configuration
-│  ├─ mongo/init/           # MongoDB init scripts
-│  └─ timescale/init/       # TimescaleDB init scripts
+├─ docker/                  # Docker Compose setup
+│  ├─ docker-compose.yml    # PostgreSQL container definition
+│  └─ README.md             # Docker setup instructions
 │
-├─ .env-example             # Template env file; copy to .env and edit
-├─ pnpm-workspace.yaml      # Monorepo package boundaries
-├─ package.json             # Root scripts (db:* + dev:* helpers)
-├─ SETUP.md                 # **Start here** for local setup (bootstrap, migrate, seed, run)
+├─ postman/                 # Postman API collection
+│  ├─ HK26-API.postman_collection.json
+│  └─ HK26-Local.postman_environment.json
+│
+├─ .env.example             # Template env file; copy to .env and edit
+├─ pnpm-workspace.yaml      # Monorepo workspace configuration
+├─ package.json             # Root scripts (db:*, dev:*, docker:* helpers)
+├─ SETUP.md                 # **Start here** for local setup
 └─ README.md                # This file
 ```
 
-### `apps/workstation-web/` (React)
-- Routing: React Router
-- Styling: TailwindCSS + a small design system (see `src/styles/ui.css`)
-- Auth: `/auth/login`, `/auth/refresh`, `/auth/me` (access token in memory, refresh cookie via API)
-- State: lightweight context (`src/state/AuthContext.tsx`)
-- Widgets/Grid: `react-grid-layout` based widgets under `src/widgets/*`
-- HTTP client: `src/lib/http.ts` (handles auth header + refresh on 401)
+### `apps/syncstation-app/` (React Native + Expo)
+- **Mobile-first field logging** - Record observations, tasks, and notes in the field
+- **Offline support** - Local SQLite storage with background sync
+- **Media capture** - Take photos/videos and attach to log entries
+- **Content linking** - Link logs to specific content nodes from Workstation
+- **Expo Router** - File-based routing for React Native
 
-### `apps/api/` (TypeScript)
-- Exposes auth endpoints and Workstation domain endpoints
-- Uses Drizzle ORM for data access
-- Reads DB URLs + JWT/cookie secrets from `.env`
-- Seeds create platforms, permissions catalog, demo tenants/roles, etc.
+### `apps/workstation-web/` (React)
+- **Content management** - Projects, seasons, episodes, media
+- **Timeline editor** - Frame-accurate video editing and subject tagging
+- **Team collaboration** - Tasks, permissions, role-based access
+- **TailwindCSS** - Utility-first styling
+- **React Router** - Client-side routing
+- **Widget system** - Customizable dashboard with `react-grid-layout`
+
+### `apps/api/` (Fastify + TypeScript)
+- **Multi-database architecture** - Separate connections to users, workstation, syncstation DBs
+- **Type-safe validation** - Zod schemas for all requests/responses
+- **JWT authentication** - Access tokens + httpOnly refresh cookies
+- **Multi-tenancy** - Tenant isolation via `x-ws-tenant` header
+- **Permission system** - Role-based access control (RBAC)
 
 ### `packages/databases/`
-- `bootstrap` SQL: creates databases/roles, grants privileges, enables pgcrypto
-- Migrations generated via **drizzle-kit**
-- Re-run **`pnpm db:bootstrap`** after migrations to ensure grants on new tables/sequences
-- Clients for Neo4j, MongoDB, and TimescaleDB (for subject modeling)
+- **Drizzle ORM** - Type-safe database schemas and queries
+- **Multi-DB migrations** - Separate migration folders for each database
+- **Bootstrap scripts** - SQL scripts to create databases, roles, and grants
+- **Seed scripts** - Foundational data (platforms, permissions) and demo data
 
-### `packages/schema/`
-- Shared `zod` schemas & TS types consumed by both API and web
-- Keep these canonical; web & api import from here
+### `packages/schema/` (@hk26/schema)
+- **Single source of truth** - All API contracts defined here
+- **Zod validation** - Runtime type checking and validation
+- **Type inference** - TypeScript types derived from Zod schemas
+- **Shared across API + apps** - Ensures consistency
 
 ---
 
 ## Scripts (root)
 
 ```bash
-# Install deps
+# Install dependencies
 pnpm install
 
 # Docker (recommended)
-pnpm docker:up      # start all database containers
-pnpm docker:down    # stop containers
-pnpm docker:reset   # wipe data and restart
+pnpm docker:up      # Start PostgreSQL container
+pnpm docker:down    # Stop container
+pnpm docker:reset   # Wipe data and restart
+pnpm docker:ps      # Show container status
+pnpm docker:logs    # View container logs
 
 # Database lifecycle
-pnpm db:bootstrap   # create/refresh DBs + roles + grants (local PG only)
-pnpm db:generate    # generate migrations for all DBs
-pnpm db:migrate     # apply migrations for all DBs
-pnpm db:rebuild     # generate + migrate (recommended)
-pnpm db:seed        # foundational seeds
-pnpm db:seed:demo   # demo invite & membership (prints invite token)
-pnpm db:test        # quick connectivity + table checks
-pnpm db:nuke        # **danger**: drop DBs and roles
+pnpm db:bootstrap   # Create DBs + roles + grants (local PostgreSQL only)
+pnpm db:generate    # Generate migrations for all databases
+pnpm db:migrate     # Apply migrations to all databases
+pnpm db:rebuild     # Generate + migrate (one command)
+pnpm db:seed        # Seed foundational data (platforms, permissions, etc.)
+pnpm db:seed:demo   # Seed demo data (admin user, Breaking Bad project)
+pnpm db:test        # Test database connectivity
+pnpm db:nuke        # **DANGER**: Drop all databases and roles
+
+# Generate/migrate specific databases
+pnpm db:generate:users        # Generate users DB migrations
+pnpm db:generate:workstation  # Generate workstation DB migrations
+pnpm db:generate:syncstation  # Generate syncstation DB migrations
+pnpm db:migrate:users         # Migrate users DB
+pnpm db:migrate:workstation   # Migrate workstation DB
+pnpm db:migrate:syncstation   # Migrate syncstation DB
 
 # Run services
-pnpm dev:api        # API on http://localhost:3333
-pnpm dev:ws         # Workstation web on http://localhost:5173
+pnpm dev:api        # API server → http://localhost:3333
+pnpm dev:ws         # Workstation web → http://localhost:5173
+pnpm dev:sync       # Syncstation mobile app → Expo dev server
+
+# Build & validation
+pnpm build          # Build all packages
+pnpm typecheck      # Type-check all packages
+pnpm lint           # Lint all packages
 ```
 
-> Most developers can jump in with: `pnpm install` → follow **SETUP.md** → `pnpm dev:api` and `pnpm dev:ws`.
+> **Quick start:** `pnpm install` → follow [SETUP.md](./SETUP.md) → `pnpm dev:api` + `pnpm dev:sync`
 
 ---
 
-## Conventions & notes
+## Conventions & Best Practices
 
-- **Tenants/orgs**: The Workstation app shows the user name and current tenant in the side nav; the API returns `me.user` and `currentTenantInfo`.
-- **Auth tokens**: Access token is stored in memory/session scope; refresh is httpOnly cookie (dev: not `secure`, prod: `secure`).
-- **Permissions**: A wildcard-style permissions catalog is seeded; role bindings are per-tenant. Read the seeds for examples.
-- **Type safety**: Shared Zod schemas live in `packages/schema`; both API and web parse/validate against them.
+### Type Safety (type-safety-schema skill)
+- **All API contracts live in `@hk26/schema`** - Never duplicate schemas between frontend and backend
+- **Zod schemas are the source of truth** - TypeScript types are inferred from Zod
+- **Request/response validation** - All endpoints validate with Zod schemas
+- **Import from @hk26/schema** - Both API and apps import the same schemas
+
+### Multi-Database Architecture
+- **Each team owns their database** - Syncstation owns `syncstation`, Workstation owns `workstation`
+- **Shared authentication** - All teams authenticate via `users` database
+- **Read cross-database** - Syncstation can read from `workstation` (e.g., content_nodes)
+- **Database clients in API** - `dbUsers`, `dbWs`, `dbSync` for each database
+
+### Authentication & Multi-Tenancy
+- **JWT tokens** - Access token in memory, refresh token in httpOnly cookie
+- **Tenant header** - `x-ws-tenant` header required for tenant-specific operations
+- **User context** - `req.jwtVerify()` returns decoded token with `sub` (userId)
+
+### Permissions
+- **Role-based access control (RBAC)** - Roles defined per tenant
+- **Permission catalog** - 200+ permissions seeded in database
+- **Permission decorators** - `app.needsPerm('permission.name')` for route protection
 
 ---
 
-## Getting started
+## Getting Started
 
-1. **Read and follow [SETUP.md](./SETUP.md).**
-2. Run `pnpm dev:api` and `pnpm dev:ws`.
-3. **Log in with admin user** - Use `admin@hoolsy.com` / `demopassword` for full access (or register with invite token for role-based testing).
-4. **Test the timeline editor** - The demo seed includes a Breaking Bad Season 1, Episode 1 video clip. Navigate to Content Dashboard → Breaking Bad → SEASON 1 → Pilot S1.E1 to test video streaming and timeline editing.
+This repository supports both **Syncstation** (mobile) and **Workstation** (web) development. Follow the path that matches your project:
 
-If anything fails, check the *Common issues* section in **SETUP.md**.
+### Option A: Syncstation (Mobile App Development)
+
+Developing the mobile-first field logging system:
+
+1. **Read and follow [SETUP.md](./SETUP.md)** to set up databases
+2. Run the API server: `pnpm dev:api`
+3. Run the mobile app: `pnpm dev:sync`
+4. **Log in with demo user** - `admin@hoolsy.com` / `demopassword`
+5. **Test API endpoints** - Use Postman collection in `postman/` folder
+6. **Your API endpoints are ready:**
+   - `GET /syncstation/log-entries?nodeId=xxx` - List log entries for a content node
+   - `POST /syncstation/log-entries` - Create new log entry
+   - `PATCH /syncstation/log-entries/:id` - Update log entry
+   - `GET /syncstation/sync-status` - Get sync queue status
+
+### Option B: Workstation (Web Development)
+
+Developing the web-based content management system:
+
+1. **Read and follow [SETUP.md](./SETUP.md)** to set up databases
+2. Run the API server: `pnpm dev:api`
+3. Run the web app: `pnpm dev:ws`
+4. **Log in with admin user** - `admin@hoolsy.com` / `demopassword`
+5. **Explore the features:**
+   - Content Dashboard - Browse projects and episodes
+   - Timeline Editor - Breaking Bad → SEASON 1 → Pilot S1.E1
+   - Admin Panel - Manage team members, roles, and permissions
+   - Task Management - Create and track content tasks
+
+### Option C: Both (Full Stack)
+
+You can run both apps simultaneously to test integration:
+
+```bash
+# Terminal 1 - API
+pnpm dev:api
+
+# Terminal 2 - Workstation web
+pnpm dev:ws
+
+# Terminal 3 - Syncstation mobile
+pnpm dev:sync
+```
+
+If anything fails, check the troubleshooting section in [SETUP.md](./SETUP.md).
 
 ### Demo Video
 
@@ -269,28 +375,31 @@ Despite these limitations, you can explore the core workflow: team setup → con
 
 ## Documentation
 
-Detailed documentation is available for each component of the monorepo:
+Detailed documentation is available for each component:
 
 ### Applications
 
-- **[API Backend](apps/api/README.md)** - Fastify-based REST API with authentication, multi-tenancy, content management, media handling, and RBAC
-- **[Workstation Web](apps/workstation-web/README.md)** - React 19 frontend with widget system, timeline editor, and content management
+- **[API Backend](apps/api/README.md)** - Fastify REST API with multi-database support, authentication, and RBAC
+- **[Syncstation App](apps/syncstation-app/README.md)** - React Native mobile app with offline-first architecture
+- **[Workstation Web](apps/workstation-web/README.md)** - React web app with timeline editor and content management
 - **[Marketplace Web](apps/marketplace-web/README.md)** - Future marketplace application (scaffolding only)
 
 ### Packages
 
-- **[Schema](packages/schema/README.md)** - Shared TypeScript/Zod schemas for API and frontend type safety
-- **[Databases](packages/databases/postgres/README.md)** - PostgreSQL schemas, Drizzle ORM, migrations, and seeding
-- **[Logger](packages/logger/README.md)** - Environment-aware structured logging package
-- **[Timeline](packages/timeline/README.md)** - Timeline editor component for video editing
+- **[Schema (@hk26/schema)](packages/schema/README.md)** - Shared Zod schemas for type-safe API contracts
+- **[Databases (@hoolsy/databases)](packages/databases/postgres/README.md)** - PostgreSQL schemas, migrations, and seeding
+- **[Logger (@hoolsy/logger)](packages/logger/README.md)** - Environment-aware structured logging
+- **[Timeline (@hoolsy/timeline)](packages/timeline/README.md)** - Timeline editor component for video editing
 
 ### Infrastructure
 
-- **[Docker](docker/README.md)** - Multi-database Docker Compose setup (PostgreSQL, Neo4j, MongoDB, TimescaleDB)
+- **[Docker Setup](docker/README.md)** - PostgreSQL Docker container setup
 
-### Tools
+### Tools & Guides
 
-- **[Postman Collection](postman/README.md)** - API testing collection with auto-populated variables and test scripts
+- **[Postman Collection](postman/README.md)** - HK26 API testing collection with environment variables
+- **[Setup Guide](SETUP.md)** - Complete setup instructions for first-time developers
+- **[Getting Started](GETTING-STARTED.md)** - Comprehensive guide for students to understand the architecture and start coding
 
 ---
 

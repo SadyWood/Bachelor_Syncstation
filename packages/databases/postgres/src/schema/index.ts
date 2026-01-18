@@ -37,7 +37,16 @@ export {
   type ContentNode,
 } from './workstation/content.js';
 
+// Syncstation tables
+export {
+  syncStatusEnum,
+  attachmentTypeEnum,
+  logEntries,
+  logAttachments,
+} from './syncstation/schema.js';
+
 // Namespaced optional exports
 export * as usersSchema from './users/schema.js';
 export * as workstationSchema from './workstation/schema.js';
 export * as marketplaceSchema from './marketplace/schema.js';
+export * as syncstationSchema from './syncstation/schema.js';

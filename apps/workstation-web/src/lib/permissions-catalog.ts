@@ -1,5 +1,5 @@
 // src/lib/permissions-catalog.ts
-import { PermissionsCatalogResponseSchema } from '@workstation/schema';
+import { PermissionsCatalogResponseSchema } from '@hk26/schema';
 import { httpTyped } from './http';
 
 export async function listPermissionCatalog() {

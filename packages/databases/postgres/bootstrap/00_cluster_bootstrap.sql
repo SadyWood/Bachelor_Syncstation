@@ -4,8 +4,8 @@
 \pset border 1
 
 \echo
-\echo ========================= Hoolsy Bootstrap (cluster) =========================
-\echo Target DBs: users, workstation, marketplace
+\echo ========================= HK26 Bootstrap (cluster) =========================
+\echo Target DBs: users, workstation, syncstation
 \echo ============================================================================
 \echo
 
@@ -20,6 +20,9 @@ BEGIN
   END IF;
   IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'marketplace_owner') THEN
     CREATE ROLE marketplace_owner LOGIN PASSWORD 'change-this-marketplace';
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'syncstation_owner') THEN
+    CREATE ROLE syncstation_owner LOGIN PASSWORD 'change-this-syncstation';
   END IF;
 END$$;
 
@@ -36,6 +39,9 @@ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'svc_marketplace') THEN
     CREATE ROLE svc_marketplace LOGIN PASSWORD 'change-this-svc-marketplace';
   END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'svc_syncstation') THEN
+    CREATE ROLE svc_syncstation LOGIN PASSWORD 'change-this-svc-syncstation';
+  END IF;
 END$$;
 
 \echo
@@ -49,5 +55,8 @@ CREATE DATABASE workstation OWNER workstation_owner ENCODING 'UTF8' TEMPLATE tem
 \echo ok
 \echo -n ' - marketplace ... '
 CREATE DATABASE marketplace OWNER marketplace_owner ENCODING 'UTF8' TEMPLATE template1;
+\echo ok
+\echo -n ' - syncstation ... '
+CREATE DATABASE syncstation OWNER syncstation_owner ENCODING 'UTF8' TEMPLATE template1;
 \echo ok
 \set ON_ERROR_STOP on

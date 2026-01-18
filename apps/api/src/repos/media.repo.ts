@@ -8,7 +8,7 @@ import {
   type StorageProviderT,
   type MediaVariantTypeT,
   type MediaMetadata,
-} from '@workstation/schema';
+} from '@hk26/schema';
 import { and, eq } from 'drizzle-orm';
 import { dbWs, schema } from '../db.js';
 

@@ -9,7 +9,7 @@ import {
   InvitePreviewResponse,
   type LoginBody,
   type RegisterBody,
-} from '@workstation/schema';
+} from '@hk26/schema';
 import { setAccessToken, httpTyped, http } from './http';
 
 export async function login(req: LoginBody) {

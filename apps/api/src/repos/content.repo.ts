@@ -4,7 +4,7 @@ import {
   ProjectSummary,
   type NodeTypeT,
   type ContentNode,
-} from '@workstation/schema';
+} from '@hk26/schema';
 import { and, eq, isNull, sql, desc, asc, inArray } from 'drizzle-orm';
 import { dbWs, schema } from '../db.js';
 

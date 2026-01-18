@@ -1,7 +1,7 @@
 // apps/workstation-web/src/widgets/ContentDashboard/Timeline.tsx
 import { createLogger } from '@hoolsy/logger';
 import { Timeline, Toolbox, assignSubTracks } from '@hoolsy/timeline';
-import { appearanceToTimelineItem, DEFAULT_TIMELINE_TRACKS } from '@workstation/schema';
+import { appearanceToTimelineItem, DEFAULT_TIMELINE_TRACKS } from '@hk26/schema';
 import { Clock } from 'lucide-react';
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { BaseWidget } from '../../components/WidgetBase/BaseWidget';
@@ -10,7 +10,7 @@ import { SHOW_SCENE_CUT_MARKERS, sceneCutMarkers } from '../../lib/mocks/content
 import { useTimelineState } from '../../lib/timeline-state';
 import type { WidgetProps } from '../../components/WidgetBase/WidgetTypes';
 import type { TimelineItem as HoolsyTimelineItem, ToolType } from '@hoolsy/timeline';
-import type { Subject, SubjectAppearance } from '@workstation/schema';
+import type { Subject, SubjectAppearance } from '@hk26/schema';
 import '@hoolsy/timeline/dist/styles/theme.css';
 import '@hoolsy/timeline/dist/Timeline.css';
 import '@hoolsy/timeline/dist/components/Toolbox.css';

@@ -1,147 +1,226 @@
-# Setting up Packages with Clear API Boundaries
+# Setting Up Packages with Clear API Boundaries
 
-This guide shows how to structure shared packages in the monorepo with clear public/internal APIs.
-
-## When to use this
-
-Apply this pattern to all shared packages:
-- ✅ `packages/timeline` - Shared UI components
-- ✅ `packages/schema` - API contracts
-- ✅ Any new shared package you create
-- ❌ Apps (different pattern - types go in `types/` directories)
-
-## The Re-export Pattern
-
-Packages control their API surface through **re-exports**, not ESLint rules:
-
-1. **Component files export types freely:**
-   ```tsx
-   // src/components/Button.tsx
-   export interface ButtonProps {
-     label: string;
-     onClick: () => void;
-   }
-
-   export function Button({ label, onClick }: ButtonProps) {
-     return <button onClick={onClick}>{label}</button>;
-   }
-   ```
-
-2. **Entry points re-export for consumers:**
-   ```ts
-   // src/index.ts (public API)
-   export { Button } from './components/Button';
-   export type { ButtonProps } from './components/Button';
-   ```
-
-3. **Consumers import from the package root:**
-   ```tsx
-   // In apps/workstation-web
-   import { Button, type ButtonProps } from '@hoolsy/timeline';
-   ```
+This guide shows how to structure packages in the monorepo with clear public APIs.
 
 ## Package Structure
 
-**Recommended structure:**
+This monorepo uses a simple package structure:
 
 ```
-packages/your-package/
+packages/
+├── database/          # Drizzle schemas and DB clients
+├── schema/            # Zod schemas for API contracts
+├── eslint-config/     # Shared ESLint configuration
+└── tsconfig/          # Shared TypeScript configs
+```
+
+## packages/schema Structure
+
+The schema package is the single source of truth for all API contracts:
+
+```
+packages/schema/
 ├── src/
-│   ├── index.ts              ✅ Public API - stable, documented
-│   ├── internal.ts           ✅ Internal API - unstable, for testing
-│   ├── components/
-│   │   └── Button.tsx        ✅ Exports Button + ButtonProps
-│   ├── hooks/
-│   │   └── useExample.ts     ✅ Exports hook + return types
-│   └── core/
-│       └── models/
-│           └── Model.ts      ✅ Exports domain types
-├── package.json              ✅ "exports": { ".": "./src/index.ts" }
-└── README.md                 ✅ Documents public API
+│   ├── index.ts              # Main export - re-exports all schemas
+│   ├── auth/
+│   │   ├── login.ts          # Login request/response schemas
+│   │   ├── register.ts       # Registration schemas
+│   │   └── index.ts          # Re-exports auth schemas
+│   ├── user/
+│   │   ├── user.ts           # User entity schema
+│   │   └── index.ts
+│   ├── content/
+│   │   ├── node.ts           # Content node schemas
+│   │   └── index.ts
+│   └── common/
+│       ├── response.ts       # Common response wrappers
+│       └── index.ts
+├── package.json
+└── tsconfig.json
 ```
 
-## Steps to Set Up a New Package
+## Creating New Schemas
 
-### 1. Create entry points
+### 1. Create the schema file
 
-**src/index.ts** (public API):
-```ts
-/**
- * @package your-package - Brief description
- *
- * PUBLIC API - This is the stable interface.
- * Import from this file for production use.
- */
+**Example**: `packages/schema/src/content/project.ts`
 
-// Primary exports
-export { Button } from './components/Button';
-export type { ButtonProps } from './components/Button';
+```typescript
+import { z } from 'zod';
 
-// ... more exports
+// Entity schema
+export const projectSchema = z.object({
+  id: z.string().uuid(),
+  title: z.string(),
+  description: z.string().nullable(),
+  tenantId: z.string().uuid(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+});
+
+// List response schema
+export const projectListResponseSchema = z.object({
+  ok: z.literal(true),
+  items: z.array(projectSchema),
+});
+
+// Detail response schema
+export const projectDetailResponseSchema = z.object({
+  ok: z.literal(true),
+  project: projectSchema,
+});
+
+// Export inferred types
+export type Project = z.infer<typeof projectSchema>;
+export type ProjectListResponse = z.infer<typeof projectListResponseSchema>;
+export type ProjectDetailResponse = z.infer<typeof projectDetailResponseSchema>;
 ```
 
-**src/internal.ts** (optional, for testing):
-```ts
-/**
- * INTERNAL API - Unstable, for testing/advanced use only.
- * These APIs may change in minor versions.
- */
+### 2. Re-export from domain index
 
-// Re-export public API
-export * from './index';
+**packages/schema/src/content/index.ts**
 
-// Export internal components
-export { ButtonInternal } from './components/ButtonInternal';
-export type { ButtonInternalProps } from './components/ButtonInternal';
+```typescript
+export * from './node';
+export * from './project';
 ```
 
-### 2. Configure package.json exports
+### 3. Re-export from main index
 
-```json
-{
-  "name": "@hoolsy/your-package",
-  "exports": {
-    ".": "./src/index.ts",
-    "./internal": "./src/internal.ts"
-  }
+**packages/schema/src/index.ts**
+
+```typescript
+export * from './auth';
+export * from './user';
+export * from './content';
+export * from './common';
+```
+
+### 4. Use in API
+
+**apps/api/src/routes/projects.ts**
+
+```typescript
+import {
+  projectSchema,
+  projectListResponseSchema,
+  type Project
+} from '@hk26/schema';
+
+app.get('/api/projects', async (req, reply) => {
+  const projects = await db.query.projects.findMany();
+
+  // Validate response
+  return projectListResponseSchema.parse({
+    ok: true,
+    items: projects,
+  });
+});
+```
+
+### 5. Use in Frontend
+
+**apps/web/src/api/projects.ts**
+
+```typescript
+import { type Project, type ProjectListResponse } from '@hk26/schema';
+
+export async function fetchProjects(): Promise<ProjectListResponse> {
+  const response = await fetch('/api/projects');
+  return response.json();
 }
 ```
 
-This prevents consumers from importing from deep paths like `@hoolsy/your-package/components/Button`.
+**apps/mobile/src/api/projects.ts**
 
-### 3. Document your public API
+```typescript
+import { type Project, type ProjectListResponse } from '@hk26/schema';
 
-Add JSDoc comments to exported types in `index.ts`:
-
-```ts
-/**
- * Button component props
- * @property label - Button text to display
- * @property onClick - Handler called on click
- * @example
- * ```tsx
- * <Button label="Click me" onClick={() => alert('Clicked!')} />
- * ```
- */
-export type { ButtonProps } from './components/Button';
+export async function fetchProjects(): Promise<ProjectListResponse> {
+  const response = await axios.get<ProjectListResponse>('/api/projects');
+  return response.data;
+}
 ```
 
-### 4. No ESLint configuration needed
+## Common Schema Patterns
 
-Packages DON'T need package-specific ESLint configs. The root [eslint.config.js](../../../eslint.config.js) handles all type safety rules:
+### Request/Response Pair
 
-- **Apps**: Type exports restricted to `types/` directories (enforced by ESLint)
-- **Packages**: Type exports allowed anywhere (controlled by re-exports)
+```typescript
+// Request schema
+export const createProjectRequestSchema = z.object({
+  title: z.string().min(1),
+  description: z.string().optional(),
+});
+
+// Response schema
+export const createProjectResponseSchema = z.object({
+  ok: z.literal(true),
+  project: projectSchema,
+});
+
+// Types
+export type CreateProjectRequest = z.infer<typeof createProjectRequestSchema>;
+export type CreateProjectResponse = z.infer<typeof createProjectResponseSchema>;
+```
+
+### Error Response
+
+**packages/schema/src/common/response.ts**
+
+```typescript
+export const errorResponseSchema = z.object({
+  ok: z.literal(false),
+  error: z.string(),
+  code: z.string().optional(),
+});
+
+export type ErrorResponse = z.infer<typeof errorResponseSchema>;
+```
+
+### Paginated Response
+
+```typescript
+export const paginatedResponseSchema = <T extends z.ZodType>(itemSchema: T) =>
+  z.object({
+    ok: z.literal(true),
+    items: z.array(itemSchema),
+    pagination: z.object({
+      page: z.number().int(),
+      perPage: z.number().int(),
+      total: z.number().int(),
+      totalPages: z.number().int(),
+    }),
+  });
+
+// Usage
+export const paginatedProjectsResponseSchema = paginatedResponseSchema(projectSchema);
+export type PaginatedProjectsResponse = z.infer<typeof paginatedProjectsResponseSchema>;
+```
 
 ## Benefits
 
-✅ **Simple and maintainable** - No complex ESLint configurations
-✅ **Clear API boundaries** - Public (index.ts) vs internal (internal.ts)
-✅ **Easy refactoring** - Change internals without breaking consumers
-✅ **Prevents coupling** - package.json exports field blocks deep imports
-✅ **Better docs** - Single place to document the public API
-✅ **Versioning clarity** - Public API changes = major version, internal changes = minor
+✅ **Single source of truth** - All API contracts in one place
+✅ **Runtime validation** - Catch errors at API boundaries
+✅ **Type safety** - TypeScript types inferred from schemas
+✅ **Shared across apps** - Web, mobile, and API use same types
+✅ **Refactor safety** - Changing schema updates all consumers
+✅ **Documentation** - Schemas serve as API documentation
 
-## Real-world example
+## What NOT to Put in packages/schema
 
-See [packages/timeline/src/index.ts](../../../packages/timeline/src/index.ts) for a well-documented public API.
+❌ **DB row types** - These stay in service files
+❌ **UI state** - These go in `apps/*/src/types/`
+❌ **Component props** - These stay in component files
+❌ **Internal implementation** - These stay in service/route files
+❌ **Framework-specific types** - These go in `apps/*/src/types/`
+
+## Quick Reference
+
+| Need to add... | Location | Export? |
+|---------------|----------|---------|
+| New API endpoint type | `packages/schema/src/` | ✅ Yes |
+| Form state | `apps/*/src/types/forms.ts` | ✅ Yes (within app) |
+| DB query result | Service file | ❌ No |
+| Component props | Component file | ❌ No |
+| Navigation types | `apps/*/src/types/navigation.ts` | ✅ Yes (within app) |

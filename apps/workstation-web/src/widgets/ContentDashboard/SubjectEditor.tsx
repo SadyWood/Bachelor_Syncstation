@@ -1,12 +1,12 @@
 // apps/workstation-web/src/widgets/ContentDashboard/SubjectEditor.tsx
-import { SUGGESTED_SUBJECT_TYPES } from '@workstation/schema';
+import { SUGGESTED_SUBJECT_TYPES } from '@hk26/schema';
 import { Edit3, Save, X } from 'lucide-react';
 import React, { useState, useMemo } from 'react';
 import { BaseWidget } from '../../components/WidgetBase/BaseWidget';
 import { useTimelineState } from '../../lib/timeline-state';
 import { getTrackLabel } from '../../utils/timeline-helpers';
 import type { WidgetProps } from '../../components/WidgetBase/WidgetTypes';
-import type { Subject, SubjectType } from '@workstation/schema';
+import type { Subject, SubjectType } from '@hk26/schema';
 
 export default function SubjectEditor({ title, onClose }: Omit<WidgetProps, 'id'>) {
   const { subjects, updateSubject, selectedSubjectId } = useTimelineState();

@@ -13,6 +13,7 @@ const SCHEMA_MAP = {
   users: toPosix(path.resolve(__dirname, './src/schema/users/schema.ts')),
   workstation: toPosix(path.resolve(__dirname, './src/schema/workstation/schema.ts')),
   marketplace: toPosix(path.resolve(__dirname, './src/schema/marketplace/schema.ts')),
+  syncstation: toPosix(path.resolve(__dirname, './src/schema/syncstation/schema.ts')),
 };
 
 const adminUrlForDb = `${ADMIN.replace(/\/?$/, '')}/${DB_NAME}`;

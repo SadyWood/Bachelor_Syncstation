@@ -10,7 +10,7 @@ import {
   ProjectResponse,
   ProjectTreeFlatResponse,
   NodeResponse,
-} from '@workstation/schema';
+} from '@hk26/schema';
 import { z } from 'zod';
 import * as contentRepo from '../repos/content.repo.js';
 import { generateUniqueSlug } from '../utils/slug.js';

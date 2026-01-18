@@ -9,18 +9,15 @@ description: Enforce type safety and schema centralization in this monorepo. Use
 
 Keep API contracts defined exactly once in `packages/schema` and reused everywhere.
 Prevent duplicated request/response types in app code.
-Maintain a strict boundary between shared contracts and UI-only types.
+Maintain a strict boundary between shared contracts and app-specific types.
 
 ## Non-negotiable rules
 
 1. Never introduce `any`, `unknown`, or `as any` to bypass typing.
 2. Shared API contracts must live in `packages/schema` as Zod schemas + inferred TS types.
 3. App-specific types must live in a `types/` directory (e.g., `apps/*/src/types/`).
-4. Types may ONLY be exported from approved locations:
-   - **Apps**: `apps/*/src/types/**` (enforced by ESLint)
-   - **Packages**: Anywhere (API surface controlled by re-exports from `index.ts` and `internal.ts`)
-5. DB mapping and Drizzle row types are NOT exported (implementation detail, stay in repo files).
-6. Frontend must never import from `apps/api` (only from `packages/schema`).
+4. DB row types from Drizzle are NOT exported (implementation detail, stay in repo/service files).
+5. Frontend must never import from `apps/api` (only from `packages/schema`).
 
 ## Decision tree
 
@@ -30,28 +27,23 @@ For any type/interface:
   - **Yes**: Move to `packages/schema` and define a Zod schema.
   - **No**: Continue to next question.
 
-- **Is it a DB row type or ORM mapping type?**
-  - **Yes**: Keep it in the repo file (e.g., `MediaAssetRow` in `media.repo.ts`). **DO NOT export it**.
+- **Is it a DB row type or Drizzle query result?**
+  - **Yes**: Keep it in the service/repo file. **DO NOT export it**.
   - **No**: Continue to next question.
 
-- **Is it a shared UI component type (used across multiple apps)?**
-  - **Yes**: Move to a shared UI package (e.g., `packages/timeline`).
-  - Export ONLY from `src/index.ts` (public) or `src/internal.ts` (unstable/testing).
-  - **No**: Continue to next question.
-
-- **Is it app-specific (UI state, component props, local types)?**
+- **Is it app-specific (UI state, component props, form state)?**
   - **Yes**: Move to `apps/*/src/types/` and organize by domain:
-    - `common.ts` - Shared types (icons, sorting)
-    - `components.ts` - UI component props
-    - `layout.ts` - Navigation, layout
-    - `widgets.ts` - Widget system
-    - `permissions.ts`, `events.ts`, etc. - Domain-specific
+    - `common.ts` - Shared types across the app
+    - `components.ts` - Component props
+    - `forms.ts` - Form state
+    - `navigation.ts` - Routing, navigation
+    - Domain-specific files as needed
   - **No**: If unsure, ask for clarification.
 
 ## How to work (always)
 
 1. **Detect duplicates:**
-   - Look for local `api-types` files or repeated Response/Request shapes in apps.
+   - Look for local type files or repeated Response/Request shapes in apps.
 
 2. **Classify each type:**
    - Shared contract vs UI-only vs internal implementation.
@@ -61,58 +53,149 @@ For any type/interface:
    - Export schema and inferred types (`z.infer`).
    - Update imports across backend and frontend.
 
-4. **Add runtime validation on boundaries:**
-   - Validate API responses in clients with the Zod schema when feasible.
+4. **Add runtime validation:**
+   - Validate API requests/responses with Zod schemas.
 
 5. **Remove dead code:**
    - Delete old duplicated types after migration.
 
-## Output format for PR reviews
+## Examples
 
-- List duplicated contracts found
-- For each: where it should live (schema vs UI vs internal)
-- Exact file moves and import changes
-- A short checklist to confirm completion
+### ✅ Correct: Shared contract in packages/schema
 
-See `checklist.md` for the quality gate and `examples.md` for examples.
+**packages/schema/src/auth/login.ts**
+```typescript
+import { z } from 'zod';
+
+export const loginRequestSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8),
+});
+
+export const loginResponseSchema = z.object({
+  accessToken: z.string(),
+  refreshToken: z.string(),
+  user: z.object({
+    id: z.string().uuid(),
+    email: z.string().email(),
+    name: z.string().nullable(),
+    tenantId: z.string().uuid(),
+  }),
+});
+
+export type LoginRequest = z.infer<typeof loginRequestSchema>;
+export type LoginResponse = z.infer<typeof loginResponseSchema>;
+```
+
+**Used in API:**
+```typescript
+import { loginRequestSchema, loginResponseSchema } from '@hk26/schema';
+
+app.post('/auth/login', async (req, reply) => {
+  const body = loginRequestSchema.parse(req.body); // Validates + types
+  // ... auth logic
+  return loginResponseSchema.parse(result);
+});
+```
+
+**Used in frontend:**
+```typescript
+import { type LoginRequest, type LoginResponse } from '@hk26/schema';
+
+const response = await fetch('/auth/login', {
+  method: 'POST',
+  body: JSON.stringify(loginData satisfies LoginRequest),
+});
+const data: LoginResponse = await response.json();
+```
+
+### ✅ Correct: App-specific UI types
+
+**apps/web/src/types/forms.ts**
+```typescript
+// Form state - frontend only
+export interface LoginFormState {
+  email: string;
+  password: string;
+  errors: Record<string, string>;
+  isSubmitting: boolean;
+}
+```
+
+**apps/mobile/src/types/navigation.ts**
+```typescript
+// Navigation types - mobile only
+export type RootStackParamList = {
+  Login: undefined;
+  Home: undefined;
+  Profile: { userId: string };
+};
+```
+
+### ❌ Incorrect: Duplicated types
+
+**DON'T DO THIS** in `apps/web/src/lib/api-types.ts`:
+```typescript
+// ❌ This duplicates backend types
+export interface User {
+  id: string;
+  email: string;
+  name: string | null;
+  tenantId: string;
+}
+
+export interface LoginResponse {
+  accessToken: string;
+  refreshToken: string;
+  user: User;
+}
+```
+
+**Fix:** Import from `@hk26/schema` instead.
+
+### ✅ Correct: Internal DB types
+
+**apps/api/src/services/user.service.ts**
+```typescript
+import { users } from '@hk26/postgres';
+
+// Internal: Drizzle query result type
+type UserRow = typeof users.$inferSelect;
+
+// Map DB row to API contract
+function mapUserToDto(row: UserRow) {
+  return {
+    id: row.id,
+    email: row.email,
+    name: row.name,
+    tenantId: row.tenantId,
+  };
+}
+```
 
 ## Package strategy
 
-### For shared UI packages (e.g., `packages/timeline`)
+Packages control their API through re-exports:
 
-Packages are meant to be reused, so they MUST export types. The API surface is controlled by re-exports, not ESLint rules:
-
-1. **Create clear entry points:**
-   - `src/index.ts` - Public, stable API
-   - `src/internal.ts` - Internal API for testing/advanced use
-
-2. **Components and hooks:**
-   - Export types directly from component files: `export interface ButtonProps`
-   - Re-export from `index.ts` (public) or `internal.ts` (internal): `export type { ButtonProps } from './components/Button';`
-   - Component files can freely export types
-
-3. **No ESLint restrictions:**
-   - Packages DON'T need ESLint rules restricting type exports
-   - The API surface is controlled by what you re-export from entry points
-   - Consumers import from the package root (e.g., `@hoolsy/timeline`), which resolves to `index.ts`
-   - The package.json `exports` field further controls what's accessible
-
-4. **Example structure:**
-   ```
-   packages/timeline/
-   ├── src/
-   │   ├── index.ts              ✅ Re-exports public API
-   │   ├── internal.ts           ✅ Re-exports internal API
-   │   ├── components/
-   │   │   └── Timeline.tsx      ✅ Exports Timeline + TimelineProps
-   │   └── hooks/
-   │       └── useTimeline.ts    ✅ Exports hook + return type
-   └── package.json              ✅ "exports": { ".": "./src/index.ts" }
+1. **Export from package:**
+   ```typescript
+   // packages/schema/src/index.ts
+   export * from './auth/login';
+   export * from './user/user';
    ```
 
-5. **Benefits:**
-   - Simple and maintainable
-   - Clear public API surface through re-exports
-   - Easy to refactor internals without breaking consumers
-   - Consumers know what's stable (index.ts) vs unstable (internal.ts)
-   - No need for complex ESLint configurations
+2. **Consumers import from package root:**
+   ```typescript
+   import { loginRequestSchema, type LoginRequest } from '@hk26/schema';
+   ```
+
+## Output format for PR reviews
+
+When reviewing code, check:
+
+- List duplicated contracts found
+- For each: where it should live (schema vs app types vs internal)
+- Exact file moves and import changes needed
+- Checklist to confirm completion
+
+See [checklist.md](checklist.md) for the quality gate and [examples.md](examples.md) for more examples.

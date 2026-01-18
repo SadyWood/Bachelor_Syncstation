@@ -4,7 +4,7 @@ import React, { createContext, useContext, useEffect, useMemo, useState } from '
 import * as api from '../lib/auth-client';
 import { setCurrentTenantId as setHttpTenantId } from '../lib/http';
 import { canFromEffective, type EffectivePerms } from '../utils/permissions';
-import type { PublicUser, LoginBody, RegisterBody } from '@workstation/schema';
+import type { PublicUser, LoginBody, RegisterBody } from '@hk26/schema';
 
 const logger = createLogger('AuthContext');
 

@@ -99,3 +99,19 @@ export {
   RegisterRequest, RegisterResponse, type RegisterBody, type RegisterReply,
   InvitePreviewResponse, type InvitePreviewReply,
 } from './users/common.js';
+
+// Syncstation
+export {
+  SyncStatus, type SyncStatusT,
+  AttachmentType, type AttachmentTypeT,
+  LogAttachmentSchema, type LogAttachment,
+  LogEntrySchema, type LogEntry,
+  LogEntrySummarySchema, type LogEntrySummary,
+  CreateLogEntryRequest, type CreateLogEntryRequestBody,
+  UpdateLogEntryRequest, type UpdateLogEntryRequestBody,
+  UploadAttachmentRequest, type UploadAttachmentRequestBody,
+  LogEntryResponse, type LogEntryResponseData,
+  LogEntriesListResponse, type LogEntriesListResponseData,
+  AttachmentUploadResponse, type AttachmentUploadResponseData,
+  SyncStatusResponse, type SyncStatusResponseData,
+} from './syncstation/log-entry.js';

@@ -1,13 +1,13 @@
-# Postman Collection - Hoolsy Workstation API
+# Postman Collection - HK26 API
 
-API testing collection for Hoolsy Workstation backend - comprehensive request suite for authentication, content management, media uploads, and RBAC.
+API testing collection for HK26 backend - comprehensive request suite for authentication, content management, media uploads, and RBAC.
 
 ## Overview
 
-This directory contains a complete Postman collection for testing the Hoolsy Workstation API:
+This directory contains a complete Postman collection for testing the HK26 API:
 
-- **Collection**: `Hoolsy-Workstation-API.postman_collection.json` - 40+ API requests
-- **Environment**: `Hoolsy-Local.postman_environment.json` - Local development variables
+- **Collection**: `HK26-API.postman_collection.json` - 40+ API requests
+- **Environment**: `HK26-Local.postman_environment.json` - Local development variables
 
 **Features:**
 - ✅ Auto-populating variables (tokens, IDs)
@@ -22,21 +22,21 @@ This directory contains a complete Postman collection for testing the Hoolsy Wor
 
 - **Postman** - Desktop app or web version
 - **API running locally** - See [apps/api/README.md](../apps/api/README.md)
-- **Database seeded** - Run `pnpm --filter @hoolsy/databases seed:setup`
+- **Database seeded** - Run `pnpm db:seed`
 
 ### Import Collection
 
 1. **Open Postman**
 2. **Import Collection**:
    - Click **Import** button
-   - Select `Hoolsy-Workstation-API.postman_collection.json`
+   - Select `HK26-API.postman_collection.json`
    - Click **Import**
 3. **Import Environment**:
    - Click **Import** button
-   - Select `Hoolsy-Local.postman_environment.json`
+   - Select `HK26-Local.postman_environment.json`
    - Click **Import**
 4. **Activate Environment**:
-   - Select **Hoolsy Local** from environment dropdown (top right)
+   - Select **HK26 Local** from environment dropdown (top right)
 
 ### Configure Variables
 
@@ -52,7 +52,7 @@ Before testing, set your credentials in the **collection variables** or **enviro
 
 **Or use Environment Variables**:
 1. Click environment dropdown → Manage Environments
-2. Select **Hoolsy Local**
+2. Select **HK26 Local**
 3. Update the same variables
 
 ## Getting Started Workflow
@@ -178,7 +178,7 @@ Supports:
 - `accessToken` (from Login, Refresh, Register)
 - `tenantId` (from Login, Me, Register)
 
-### Workstation NEW (/ws/*)
+### Workstation API (/ws/*)
 
 **Members:**
 - **List members** - `GET /ws/members`
@@ -235,12 +235,9 @@ Supports:
 - `uploadId` (from Init upload)
 - `mediaAssetId` (from Complete upload)
 
-### Workstation LEGACY
+### Syncstation API (/syncstation/*)
 
-Deprecated endpoints (use /ws/* versions instead):
-- `GET /members` → Use `GET /ws/members`
-- `POST /invite` → Use `POST /ws/invite`
-- `POST /members/:userId/deactivate` → Use `POST /ws/members/:userId/deactivate`
+*Coming soon: Syncstation on-set logging endpoints*
 
 ## Auto-Populated Variables
 
@@ -403,7 +400,7 @@ pm.test('ok=true', () => pm.expect(json.ok).to.eql(true));
 **Cause:** Environment not selected or test scripts failed
 
 **Fix:**
-1. Ensure **Hoolsy Local** environment is selected (top right)
+1. Ensure **HK26 Local** environment is selected (top right)
 2. Check **Console** tab for test script errors
 3. Manually set variables if needed:
    - Right-click collection → Edit → Variables tab
@@ -415,7 +412,7 @@ pm.test('ok=true', () => pm.expect(json.ok).to.eql(true));
 **Fix:**
 ```bash
 # Start API server
-pnpm --filter @workstation/api dev
+pnpm dev:api
 
 # Verify server is running
 curl http://localhost:3333/healthz
@@ -436,12 +433,12 @@ curl http://localhost:3333/healthz
 ### Custom Environment
 
 Create additional environments for:
-- **Staging**: `baseUrl: https://staging.hoolsy.com`
-- **Production**: `baseUrl: https://api.hoolsy.com`
+- **Staging**: `baseUrl: https://staging.hk26.com`
+- **Production**: `baseUrl: https://api.hk26.com`
 
 **Steps:**
-1. Duplicate **Hoolsy Local** environment
-2. Rename to **Hoolsy Staging**
+1. Duplicate **HK26 Local** environment
+2. Rename to **HK26 Staging**
 3. Update `baseUrl` to staging URL
 4. Switch environment dropdown to use different servers
 

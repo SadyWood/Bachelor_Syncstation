@@ -1,7 +1,7 @@
 // apps/workstation-web/src/lib/timeline-state.tsx
 import React, { createContext, useContext, useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import type { TimelineTrack, Marker } from '@hoolsy/timeline';
-import type { Subject, SubjectAppearance } from '@workstation/schema';
+import type { Subject, SubjectAppearance } from '@hk26/schema';
 
 interface TimelineState {
   currentTime: number;

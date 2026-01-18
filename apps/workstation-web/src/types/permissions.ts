@@ -1,6 +1,6 @@
 // src/types/permissions.ts
 
-import type { RoleResponse } from '@workstation/schema';
+import type { RoleResponse } from '@hk26/schema';
 
 /**
  * Permissions-related types for the workstation frontend
