@@ -1,0 +1,240 @@
+/* packages/timeline/src/Timeline.css */
+
+.timeline-container {
+  position: relative;
+  background: var(--timeline-bg-secondary);
+  border: 1px solid var(--timeline-border-primary);
+  overflow: hidden;
+  user-select: none;
+  font-family: var(--timeline-font-family);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============================================================================
+   RULER
+   ============================================================================ */
+
+.timeline-ruler {
+  display: flex;
+  background: var(--timeline-bg-tertiary);
+  border-bottom: 1px solid var(--timeline-border-primary);
+  flex-shrink: 0;
+}
+
+.ruler-label-spacer {
+  flex-shrink: 0;
+  background: var(--timeline-bg-elevated);
+  border-right: 1px solid var(--timeline-border-primary);
+}
+
+.ruler-content {
+  position: relative;
+  flex: 1;
+}
+
+.ruler-mark {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--timeline-border-secondary);
+}
+
+.ruler-mark.major {
+  background: var(--timeline-border-tertiary);
+}
+
+.ruler-time {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  font-size: var(--timeline-font-size-xs);
+  color: var(--timeline-text-secondary);
+  white-space: nowrap;
+}
+
+/* ============================================================================
+   TRACKS
+   ============================================================================ */
+
+.timeline-tracks {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+}
+
+.timeline-track {
+  background: var(--timeline-bg-tertiary);
+  border-bottom: 1px solid var(--timeline-border-secondary); /* Thicker border between tracks */
+  position: relative;
+}
+
+.track-label {
+  flex-shrink: 0;
+  padding: var(--timeline-space-md) var(--timeline-space-lg);
+  background: var(--timeline-bg-elevated);
+  border-right: 1px solid var(--timeline-border-primary);
+  border-bottom: 1px solid var(--timeline-border-secondary); /* Match track border */
+  font-size: var(--timeline-font-size-sm);
+  color: var(--timeline-text-secondary);
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.track-content {
+  position: relative;
+  flex: 1;
+}
+
+/* ============================================================================
+   ITEMS
+   ============================================================================ */
+
+.timeline-item {
+  position: absolute;
+  height: 36px;
+  top: 12px;
+  border-radius: var(--timeline-radius-md);
+  cursor: grab;
+  border: 1px solid var(--timeline-border-primary);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--timeline-space-md);
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.timeline-item:hover {
+  filter: brightness(1.15);
+  border-color: var(--timeline-border-tertiary);
+}
+
+.timeline-item.dragging {
+  cursor: grabbing;
+  opacity: 0.8;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.timeline-item.resizing-left,
+.timeline-item.resizing-right {
+  cursor: ew-resize;
+}
+
+.timeline-item.tool-splice {
+  cursor: crosshair;
+}
+
+.item-label {
+  font-size: var(--timeline-font-size-sm);
+  color: rgba(0, 0, 0, 0.75); /* Dark text for light backgrounds */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: var(--timeline-font-weight-semibold);
+  flex: 1;
+  pointer-events: none;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.4); /* Light shadow for depth */
+  letter-spacing: 0.01em; /* Slightly increased spacing for clarity */
+  mix-blend-mode: multiply; /* Better blend with colored backgrounds */
+}
+
+/* Resize handles */
+.timeline-item-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  background: transparent;
+  z-index: 10;
+  transition: background var(--timeline-transition-normal);
+}
+
+.timeline-item-handle-left {
+  left: 0;
+  cursor: ew-resize;
+  border-radius: var(--timeline-radius-md) 0 0 var(--timeline-radius-md);
+}
+
+.timeline-item-handle-left::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 1px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.timeline-item-handle-right {
+  right: 0;
+  cursor: ew-resize;
+  border-radius: 0 var(--timeline-radius-md) var(--timeline-radius-md) 0;
+}
+
+.timeline-item-handle-right::before {
+  content: '';
+  position: absolute;
+  right: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 1px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.timeline-item:hover .timeline-item-handle {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.timeline-item:hover .timeline-item-handle::before {
+  opacity: 1;
+}
+
+.timeline-item-handle:hover {
+  background: rgba(255, 255, 255, 0.4) !important;
+}
+
+.timeline-item-handle:hover::before {
+  background: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* ============================================================================
+   PLAYHEAD
+   ============================================================================ */
+
+.timeline-playhead {
+  position: absolute;
+  pointer-events: auto; /* Allow dragging */
+  z-index: 200; /* Above all timeline content */
+}
+
+.timeline-playhead:hover .timeline-playhead-head {
+  transform: translateX(-50%) scale(1.1);
+}
+
+/* ============================================================================
+   SPLICE INDICATOR
+   ============================================================================ */
+
+@keyframes splice-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scaleX(1.3);
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1759329374178,
+      "tag": "0000_nebulous_roulette",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1759396439870,
+      "tag": "0001_clammy_machine_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1761572389046,
+      "tag": "0002_futuristic_iron_lad",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1762275953483,
+      "tag": "0003_smooth_speedball",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1733846400000,
+      "tag": "0004_add_media_metadata_fields",
+      "breakpoints": true
+    }
+  ]
+}

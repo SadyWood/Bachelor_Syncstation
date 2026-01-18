@@ -1,2 +1,2 @@
-export * from './product';
-export * from './category';
+// Placeholder – legg til etter behov
+export {};

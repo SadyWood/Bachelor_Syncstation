@@ -1,0 +1,1367 @@
+{
+  "info": {
+    "_postman_id": "f3b46e6c-46d9-4858-bcf9-3c252b8da2ce",
+    "name": "Hoolsy Workstation API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "chatgpt"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3333",
+      "type": "string"
+    },
+    {
+      "key": "email",
+      "value": "<paste-email-here>",
+      "type": "string"
+    },
+    {
+      "key": "password",
+      "value": "<paste-password-here>",
+      "type": "string"
+    },
+    {
+      "key": "inviteToken",
+      "value": "<paste-token-here>",
+      "type": "string"
+    },
+    {
+      "key": "tenantId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "lastRoleId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "projectId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "nodeId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "uploadId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "mediaAssetId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/healthz",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "healthz"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', ()=> pm.response.to.have.status(200));",
+                  "let json={}; try{json=pm.response.json();}catch(e){}",
+                  "if(json && json.accessToken){ pm.collectionVariables.set('accessToken', json.accessToken); }",
+                  "if(json && json.currentTenant){ pm.collectionVariables.set('tenantId', json.currentTenant); }",
+                  "pm.test('ok=true', ()=> pm.expect(json.ok).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Me",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "x-ws-tenant",
+                "value": "{{tenantId}}",
+                "disabled": false
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', ()=> pm.response.to.have.status(200));",
+                  "let json={}; try{json=pm.response.json();}catch(e){}",
+                  "if(json && json.currentTenant){ pm.collectionVariables.set('tenantId', json.currentTenant); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Refresh (cookie)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/refresh",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "refresh"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', ()=> pm.response.to.have.status(200));",
+                  "let json={}; try{json=pm.response.json();}catch(e){}",
+                  "if(json && json.accessToken){ pm.collectionVariables.set('accessToken', json.accessToken); }"
+                ]
+              }
+            }
+          ],
+          "description": "Requires the httpOnly refresh cookie set by Login. Postman manages cookies automatically."
+        },
+        {
+          "name": "Invite Preview",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/invite/{{inviteToken}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "invite",
+                "{{inviteToken}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Register (from invite)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"{{inviteToken}}\",\n  \"email\": \"{{email}}\",\n  \"firstName\": \"Demo\",\n  \"lastName\": \"User\",\n  \"displayName\": \"Demo User\",\n  \"password\": \"{{password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', ()=> pm.response.to.have.status(200));",
+                  "let json={}; try{json=pm.response.json();}catch(e){}",
+                  "if(json && json.accessToken){ pm.collectionVariables.set('accessToken', json.accessToken); }",
+                  "if(json && json.currentTenant){ pm.collectionVariables.set('tenantId', json.currentTenant); }"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Workstation NEW (/ws/*)",
+      "item": [
+        {
+          "name": "List members",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "x-ws-tenant",
+                "value": "{{tenantId}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ws/members",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ws",
+                "members"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Invite member",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "x-ws-tenant",
+                "value": "{{tenantId}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"invitee@example.test\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/ws/invite",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ws",
+                "invite"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Deactivate member",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "x-ws-tenant",
+                "value": "{{tenantId}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ws/members/{{userId}}/deactivate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ws",
+                "members",
+                "{{userId}}",
+                "deactivate"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Set a temporary userId to deactivate before running, or duplicate this request and hardcode it in the URL."
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Permissions catalog",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "x-ws-tenant",
+                "value": "{{tenantId}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ws/permissions/catalog",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ws",
+                "permissions",
+                "catalog"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Roles list",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "x-ws-tenant",
+                "value": "{{tenantId}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ws/roles",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ws",
+                "roles"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Roles create (tenant)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "x-ws-tenant",
+                "value": "{{tenantId}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Editors\",\n  \"allow\": [\"content.*\"],\n  \"deny\": []\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/ws/roles",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ws",
+                "roles"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let json={}; try{json=pm.response.json();}catch(e){}",
+                  "if(json && json.role && json.role.roleId){ pm.collectionVariables.set('lastRoleId', json.role.roleId); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Roles patch (tenant)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "x-ws-tenant",
+                "value": "{{tenantId}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"allow\": [\"content.view\"],\n  \"deny\": [\"content.delete\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/ws/roles/{{lastRoleId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ws",
+                "roles",
+                "{{lastRoleId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Roles get (one)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "x-ws-tenant",
+                "value": "{{tenantId}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ws/roles/{{lastRoleId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ws",
+                "roles",
+                "{{lastRoleId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Roles delete (tenant)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "x-ws-tenant",
+                "value": "{{tenantId}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ws/roles/{{lastRoleId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ws",
+                "roles",
+                "{{lastRoleId}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Content API (/ws/projects, /ws/nodes)",
+      "item": [
+        {
+          "name": "List projects",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "x-ws-tenant",
+                "value": "{{tenantId}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ws/projects",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ws",
+                "projects"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', ()=> pm.response.to.have.status(200));",
+                  "let json={}; try{json=pm.response.json();}catch(e){}",
+                  "if(json && json.items && json.items.length > 0){ pm.collectionVariables.set('projectId', json.items[0].nodeId); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create project",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "x-ws-tenant",
+                "value": "{{tenantId}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"My New Project\",\n  \"synopsis\": \"A test project created via Postman\",\n  \"slug\": \"\",\n  \"template\": \"empty\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/ws/projects",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ws",
+                "projects"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', ()=> pm.response.to.have.status(201));",
+                  "let json={}; try{json=pm.response.json();}catch(e){}",
+                  "if(json && json.project && json.project.nodeId){ pm.collectionVariables.set('projectId', json.project.nodeId); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get project",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "x-ws-tenant",
+                "value": "{{tenantId}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ws/projects/{{projectId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ws",
+                "projects",
+                "{{projectId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update project",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "x-ws-tenant",
+                "value": "{{tenantId}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Project Title\",\n  \"synopsis\": \"Updated synopsis\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/ws/projects/{{projectId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ws",
+                "projects",
+                "{{projectId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete project",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "x-ws-tenant",
+                "value": "{{tenantId}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ws/projects/{{projectId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ws",
+                "projects",
+                "{{projectId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Apply template to project",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "x-ws-tenant",
+                "value": "{{tenantId}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"template\": \"series\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/ws/projects/{{projectId}}/template",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ws",
+                "projects",
+                "{{projectId}}",
+                "template"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get project tree",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "x-ws-tenant",
+                "value": "{{tenantId}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ws/projects/{{projectId}}/tree",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ws",
+                "projects",
+                "{{projectId}}",
+                "tree"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create node",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "x-ws-tenant",
+                "value": "{{tenantId}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"parentId\": \"{{projectId}}\",\n  \"nodeType\": \"content\",\n  \"title\": \"Episode 1\",\n  \"synopsis\": \"First episode\",\n  \"mediaKindCode\": \"episode\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/ws/nodes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ws",
+                "nodes"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', ()=> pm.response.to.have.status(201));",
+                  "let json={}; try{json=pm.response.json();}catch(e){}",
+                  "if(json && json.node && json.node.nodeId){ pm.collectionVariables.set('nodeId', json.node.nodeId); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get node",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "x-ws-tenant",
+                "value": "{{tenantId}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ws/nodes/{{nodeId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ws",
+                "nodes",
+                "{{nodeId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update node",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "x-ws-tenant",
+                "value": "{{tenantId}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Episode Title\",\n  \"synopsis\": \"Updated synopsis\",\n  \"mediaKindCode\": \"episode\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/ws/nodes/{{nodeId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ws",
+                "nodes",
+                "{{nodeId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete node",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "x-ws-tenant",
+                "value": "{{tenantId}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ws/nodes/{{nodeId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ws",
+                "nodes",
+                "{{nodeId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Move node",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "x-ws-tenant",
+                "value": "{{tenantId}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"newParentId\": \"{{projectId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/ws/nodes/{{nodeId}}/move",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ws",
+                "nodes",
+                "{{nodeId}}",
+                "move"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Reorder siblings",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "x-ws-tenant",
+                "value": "{{tenantId}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"parentId\": \"{{projectId}}\",\n  \"items\": [\n    {\n      \"nodeId\": \"{{nodeId}}\",\n      \"position\": 0\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/ws/nodes/reorder",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ws",
+                "nodes",
+                "reorder"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Workstation LEGACY (/members,/invite)",
+      "item": [
+        {
+          "name": "List members (legacy)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "x-ws-tenant",
+                "value": "{{tenantId}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/members",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "members"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Invite member (legacy)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "x-ws-tenant",
+                "value": "{{tenantId}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"invitee@example.test\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/invite",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "invite"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Deactivate member (legacy)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "x-ws-tenant",
+                "value": "{{tenantId}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/members/{{userId}}/deactivate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "members",
+                "{{userId}}",
+                "deactivate"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Media API (/ws/media, /ws/nodes/:nodeId/media)",
+      "item": [
+        {
+          "name": "Init upload",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.ok && res.uploadId) {",
+                  "  pm.collectionVariables.set('uploadId', res.uploadId);",
+                  "  console.log('Saved uploadId:', res.uploadId);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "x-ws-tenant",
+                "value": "{{tenantId}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"filename\": \"test-video.mp4\",\n  \"mimeType\": \"video/mp4\",\n  \"sizeBytes\": 5242880\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/ws/nodes/{{nodeId}}/media/init",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ws",
+                "nodes",
+                "{{nodeId}}",
+                "media",
+                "init"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Upload file (multipart)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "x-ws-tenant",
+                "value": "{{tenantId}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "/path/to/your/video.mp4",
+                  "description": "Select a video/audio/image file to upload"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/ws/media/{{uploadId}}/upload",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ws",
+                "media",
+                "{{uploadId}}",
+                "upload"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Complete upload",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.ok && res.asset) {",
+                  "  pm.collectionVariables.set('mediaAssetId', res.asset.mediaAssetId);",
+                  "  console.log('Saved mediaAssetId:', res.asset.mediaAssetId);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "x-ws-tenant",
+                "value": "{{tenantId}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/ws/media/{{uploadId}}/complete",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ws",
+                "media",
+                "{{uploadId}}",
+                "complete"
+              ]
+            }
+          },
+          "description": "Finalizes the upload and creates the media asset. Metadata (duration, dimensions, codecs, etc.) is automatically extracted from the uploaded file using ffprobe."
+        },
+        {
+          "name": "Get media for node",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "x-ws-tenant",
+                "value": "{{tenantId}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ws/nodes/{{nodeId}}/media",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ws",
+                "nodes",
+                "{{nodeId}}",
+                "media"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete media asset",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "x-ws-tenant",
+                "value": "{{tenantId}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ws/media/{{mediaAssetId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ws",
+                "media",
+                "{{mediaAssetId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Stream media",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "description": "Optional if using ?token query param"
+              },
+              {
+                "key": "x-ws-tenant",
+                "value": "{{tenantId}}",
+                "description": "Optional if using ?tenant query param"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ws/media/{{mediaAssetId}}/stream?download=false",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ws",
+                "media",
+                "{{mediaAssetId}}",
+                "stream"
+              ],
+              "query": [
+                {
+                  "key": "download",
+                  "value": "false",
+                  "description": "Set to 'true' to download instead of inline streaming"
+                },
+                {
+                  "key": "filename",
+                  "value": "",
+                  "description": "Optional custom filename for download",
+                  "disabled": true
+                },
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "description": "Alternative to Authorization header (for HTML5 video elements)",
+                  "disabled": true
+                },
+                {
+                  "key": "tenant",
+                  "value": "{{tenantId}}",
+                  "description": "Alternative to x-ws-tenant header",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "description": "Stream media with Range header support for video seeking. Supports both header-based and query-based authentication for HTML5 compatibility."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,162 @@
+[
+  {
+    "id": "P_WW_BB_0",
+    "trackId": "Character",
+    "startMs": 19000,
+    "endMs": 257000,
+    "label": "Walter White (Mr. White)",
+    "color": "#118AB2"
+  },
+  {
+    "id": "P_WW_BB_1",
+    "trackId": "Character",
+    "startMs": 286000,
+    "endMs": 306000,
+    "label": "Walter White (Mr. White)",
+    "color": "#118AB2"
+  },
+  {
+    "id": "P_WW_BB_2",
+    "trackId": "Character",
+    "startMs": 313000,
+    "endMs": 317000,
+    "label": "Walter White (Mr. White)",
+    "color": "#118AB2"
+  },
+  {
+    "id": "P_WW_BB_3",
+    "trackId": "Character",
+    "startMs": 331000,
+    "endMs": 334000,
+    "label": "Walter White (Mr. White)",
+    "color": "#118AB2"
+  },
+  {
+    "id": "P_WW_BB_4",
+    "trackId": "Character",
+    "startMs": 346000,
+    "endMs": 359000,
+    "label": "Walter White (Mr. White)",
+    "color": "#118AB2"
+  },
+  {
+    "id": "P_JP_BB_0",
+    "trackId": "Character",
+    "startMs": 19000,
+    "endMs": 197000,
+    "label": "Jesse Pinkman",
+    "color": "#118AB2"
+  },
+  {
+    "id": "P_JP_BB_1",
+    "trackId": "Character",
+    "startMs": 272000,
+    "endMs": 285000,
+    "label": "Jesse Pinkman",
+    "color": "#118AB2"
+  },
+  {
+    "id": "P_JP_BB_2",
+    "trackId": "Character",
+    "startMs": 307000,
+    "endMs": 312000,
+    "label": "Jesse Pinkman",
+    "color": "#118AB2"
+  },
+  {
+    "id": "P_JP_BB_3",
+    "trackId": "Character",
+    "startMs": 318000,
+    "endMs": 330000,
+    "label": "Jesse Pinkman",
+    "color": "#118AB2"
+  },
+  {
+    "id": "P_JP_BB_4",
+    "trackId": "Character",
+    "startMs": 335000,
+    "endMs": 345000,
+    "label": "Jesse Pinkman",
+    "color": "#118AB2"
+  },
+  {
+    "id": "PA_RV_KC_0",
+    "trackId": "PhysicalArtifact",
+    "startMs": 19000,
+    "endMs": 257000,
+    "label": "The Krystal Ship (RV)",
+    "color": "#EF476F"
+  },
+  {
+    "id": "PA_CHEM_EQ_0",
+    "trackId": "PhysicalArtifact",
+    "startMs": 19000,
+    "endMs": 257000,
+    "label": "Chemical Lab Equipment",
+    "color": "#EF476F"
+  },
+  {
+    "id": "PA_CHEM_EQ_1",
+    "trackId": "PhysicalArtifact",
+    "startMs": 296000,
+    "endMs": 305000,
+    "label": "Chemical Lab Equipment",
+    "color": "#EF476F"
+  },
+  {
+    "id": "PA_PP_HAZMAT_0",
+    "trackId": "Clothing",
+    "startMs": 19000,
+    "endMs": 140000,
+    "label": "Yellow Hazmat Suit (Pilot Version)",
+    "color": "#EF476F"
+  },
+  {
+    "id": "PA_WW_CLOTHES_0",
+    "trackId": "Clothing",
+    "startMs": 19000,
+    "endMs": 359000,
+    "label": "Walter White's Pilot Outfit (Shirt & Jacket)",
+    "color": "#EF476F"
+  },
+  {
+    "id": "DG_METH_0",
+    "trackId": "DigitalArtifact",
+    "startMs": 296000,
+    "endMs": 305000,
+    "label": "Crystal Meth (Blue Meth)",
+    "color": "#EF476F"
+  },
+  {
+    "id": "L_NM_DESERT_0",
+    "trackId": "Location",
+    "startMs": 19000,
+    "endMs": 257000,
+    "label": "New Mexico Desert",
+    "color": "#FFD166"
+  },
+  {
+    "id": "L_NM_DESERT_1",
+    "trackId": "Location",
+    "startMs": 358000,
+    "endMs": 359000,
+    "label": "New Mexico Desert",
+    "color": "#FFD166"
+  },
+  {
+    "id": "C_SYNTH_NAGAI_0",
+    "trackId": "Concept",
+    "startMs": 272000,
+    "endMs": 305000,
+    "label": "Nagai Method (Synthesis)",
+    "color": "#06D6A0"
+  },
+  {
+    "id": "C_TV_MIAMI_0",
+    "trackId": "Concept",
+    "startMs": 335000,
+    "endMs": 339000,
+    "label": "Miami Vice (TV Show)",
+    "color": "#06D6A0"
+  }
+]

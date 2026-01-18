@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "types": ["vite/client", "node"],
+    "lib": ["ES2022", "DOM"],
+    "baseUrl": ".",
+    "paths": {
+      "@workstation/schema": ["packages/schema/src/index.ts"],
+      "@hoolsy/databases": ["packages/databases/src/index.ts"],
+      "@hoolsy/databases/*": ["packages/databases/src/*"]
+    }
+  }
+}

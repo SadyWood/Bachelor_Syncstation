@@ -2,140 +2,104 @@
 
 ## ✅ Correct: Shared Contracts in packages/schema
 
-### Authentication Contract
+### Media Metadata Contract
 
-**Location**: `packages/schema/src/auth/login.ts`
+**Location**: `packages/schema/src/workstation/media.ts`
 
 ```typescript
 import { z } from 'zod';
 
 // Define Zod schema (single source of truth)
-export const loginRequestSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
+export const MediaMetadataSchema = z.object({
+  hasVideo: z.boolean().optional(),
+  hasAudio: z.boolean().optional(),
+  durationMs: z.number().int().optional(),
+  width: z.number().int().optional(),
+  height: z.number().int().optional(),
+  frameRate: z.number().optional(),
+  videoCodec: z.string().optional(),
+  audioCodec: z.string().optional(),
+  // ... etc
 });
 
-export const loginResponseSchema = z.object({
-  accessToken: z.string(),
-  refreshToken: z.string(),
-  user: z.object({
-    id: z.string().uuid(),
-    email: z.string().email(),
-    name: z.string().nullable(),
-    tenantId: z.string().uuid(),
-  }),
-});
-
-// Export inferred TypeScript types
-export type LoginRequest = z.infer<typeof loginRequestSchema>;
-export type LoginResponse = z.infer<typeof loginResponseSchema>;
+// Export inferred TypeScript type
+export type MediaMetadata = z.infer<typeof MediaMetadataSchema>;
 ```
 
-**Usage in backend** (`apps/api/src/routes/auth.ts`):
+**Usage in backend** (`apps/api/src/lib/media-metadata.ts`):
 
 ```typescript
-import { loginRequestSchema, loginResponseSchema } from '@hk26/schema';
+import type { MediaMetadata } from '@hoolsy/schema/workstation/media';
 
-app.post('/auth/login', async (req, reply) => {
-  // Validates and provides types automatically
-  const { email, password } = loginRequestSchema.parse(req.body);
-
-  // ... authentication logic
-
-  const result = {
-    accessToken: 'jwt-token',
-    refreshToken: 'refresh-token',
-    user: { id, email, name, tenantId },
-  };
-
-  // Validates response before sending
-  return loginResponseSchema.parse(result);
-});
-```
-
-**Usage in web frontend** (`apps/web/src/api/auth.ts`):
-
-```typescript
-import { type LoginRequest, type LoginResponse } from '@hk26/schema';
-
-export async function login(data: LoginRequest): Promise<LoginResponse> {
-  const response = await fetch('/auth/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  });
-
-  return response.json();
+export async function extractMediaMetadata(filePath: string): Promise<MediaMetadata> {
+  // ... implementation
 }
 ```
 
-**Usage in mobile frontend** (`apps/mobile/src/api/auth.ts`):
+**Usage in frontend** (`apps/workstation-web/src/widgets/ContentDashboard/MediaPreview.tsx`):
 
 ```typescript
-import { type LoginRequest, type LoginResponse } from '@hk26/schema';
+import type { MediaMetadata } from '@hoolsy/schema/workstation/media';
 
-export async function login(data: LoginRequest): Promise<LoginResponse> {
-  const response = await axios.post<LoginResponse>('/auth/login', data);
-  return response.data;
+function MediaPreview({ metadata }: { metadata: MediaMetadata }) {
+  // ... component
 }
 ```
 
 ---
 
-### Content Node Contract
+### RBAC Contract
 
-**Location**: `packages/schema/src/content/node.ts`
+**Location**: `packages/schema/src/workstation/rbac.ts`
 
 ```typescript
-import { z } from 'zod';
-
-export const contentNodeSchema = z.object({
-  id: z.string().uuid(),
-  type: z.enum(['root', 'group', 'episode', 'scene']),
-  title: z.string(),
-  description: z.string().nullable(),
-  parentId: z.string().uuid().nullable(),
-  tenantId: z.string().uuid(),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
+export const RoleSchema = z.object({
+  roleId: z.string().uuid(),
+  name: z.string(),
+  permissions: z.array(z.string()),
 });
 
-export const contentNodeListResponseSchema = z.object({
+export type Role = z.infer<typeof RoleSchema>;
+
+export const RolesListResponseSchema = z.object({
   ok: z.literal(true),
-  items: z.array(contentNodeSchema),
+  items: z.array(RoleSchema),
 });
 
-export type ContentNode = z.infer<typeof contentNodeSchema>;
-export type ContentNodeListResponse = z.infer<typeof contentNodeListResponseSchema>;
+export type RolesListResponse = z.infer<typeof RolesListResponseSchema>;
 ```
 
-**Used by:**
-- `apps/api/src/routes/content.ts` (backend)
-- `apps/web/src/api/content.ts` (web frontend)
-- `apps/mobile/src/api/content.ts` (mobile frontend)
+**Used by both**:
+- `apps/api/src/routes/ws.roles.ts` (backend)
+- `apps/workstation-web/src/widgets/Admin/Roles.tsx` (frontend)
 
 ---
 
 ## ✅ Correct: Internal Implementation Types
 
-### DB Mapping Type (stays in service)
+### DB Mapping Type (stays in repo)
 
-**Location**: `apps/api/src/services/user.service.ts`
+**Location**: `apps/api/src/repos/media.repo.ts`
 
 ```typescript
-import { users } from '@hk26/postgres';
+// Internal type - maps Drizzle DB rows to API contracts
+type MediaAssetRow = {
+  media_asset_id: string;       // DB: snake_case
+  tenant_id: string;
+  node_id: string;
+  filename: string;
+  mime_type: string;
+  size_bytes: number;
+  // ... etc
+};
 
-// Internal type - Drizzle inferred type from schema
-type UserRow = typeof users.$inferSelect;
-
-// Map DB row to API contract
-function mapUserToDto(row: UserRow) {
-  return {
-    id: row.id,
-    email: row.email,
-    name: row.name,
-    tenantId: row.tenantId,
-  };
+function mapAssetRowToDto(row: MediaAssetRow): MediaAsset {
+  return MediaAssetSchema.parse({
+    mediaAssetId: row.media_asset_id,  // Convert to camelCase
+    tenantId: row.tenant_id,
+    nodeId: row.node_id,
+    // ... etc
+  });
 }
 ```
 
@@ -143,23 +107,23 @@ function mapUserToDto(row: UserRow) {
 - Specific to Drizzle ORM implementation
 - Not part of API contract
 - Frontend never sees this type
-- Internal implementation detail
 
 ---
 
-### Service-Specific Types (stays in service file)
+### Route-Specific Types (stays in route file)
 
-**Location**: `apps/api/src/services/upload.service.ts`
+**Location**: `apps/api/src/routes/ws.media.ts`
 
 ```typescript
-// Internal: tracks upload progress
+// Session state for chunked uploads - internal to this route
 interface UploadSession {
   uploadId: string;
   nodeId: string;
   tenantId: string;
   filename: string;
-  totalChunks: number;
+  storagePath: string;
   uploadedChunks: number;
+  totalChunks: number;
 }
 
 const uploadSessions = new Map<string, UploadSession>();
@@ -174,45 +138,32 @@ const uploadSessions = new Map<string, UploadSession>();
 
 ## ✅ Correct: UI-Only Types
 
-**Location**: `apps/web/src/types/forms.ts`
+**Location**: `apps/workstation-web/src/types/widget.types.ts`
 
 ```typescript
-// Form state - frontend-only
-export interface LoginFormState {
-  email: string;
-  password: string;
-  rememberMe: boolean;
-  errors: Record<string, string>;
-  isSubmitting: boolean;
+// Widget layout configuration - frontend-only
+export interface WidgetLayout {
+  i: string;  // Widget ID
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  minW?: number;
+  minH?: number;
 }
 
-// Generic form field props
-export interface FieldProps {
+// Navigation state - UI-only
+export interface BreadcrumbItem {
   label: string;
-  error?: string;
-  required?: boolean;
+  path: string;
+  icon?: React.ComponentType;
 }
-```
-
-**Location**: `apps/mobile/src/types/navigation.ts`
-
-```typescript
-// React Navigation types - mobile-only
-export type RootStackParamList = {
-  Login: undefined;
-  Home: undefined;
-  Profile: { userId: string };
-  ContentDetail: { nodeId: string };
-};
-
-export type RootStackScreenProps<T extends keyof RootStackParamList> =
-  StackScreenProps<RootStackParamList, T>;
 ```
 
 **Why this stays in frontend:**
-- Backend doesn't care about form state or navigation
+- Backend doesn't care about widget layouts
 - Pure UI state
-- Framework-specific types (React Navigation, React Hook Form)
+- React-specific types
 
 ---
 
@@ -220,49 +171,51 @@ export type RootStackScreenProps<T extends keyof RootStackParamList> =
 
 ### Bad Example 1: Duplicated Response Types
 
-**DON'T DO THIS** (`apps/web/src/lib/api-types.ts`):
+**DON'T DO THIS** (`apps/workstation-web/src/lib/api-types.ts`):
 
 ```typescript
 // ❌ This duplicates backend types
-export interface User {
-  id: string;
-  email: string;
-  name: string | null;
-  tenantId: string;
+export interface MediaAsset {
+  mediaAssetId: string;
+  filename: string;
+  mimeType: string;
+  // ...
 }
 
-export interface LoginResponse {
-  accessToken: string;
-  refreshToken: string;
-  user: User;
+export interface MediaListResponse {
+  ok: true;
+  asset: MediaAsset | null;
+  variants: MediaVariant[];
 }
 ```
 
 **Problem:**
-- Duplicates schemas from `packages/schema`
+- Duplicates `MediaAssetSchema` from `packages/schema`
 - If backend changes schema, frontend breaks silently
 - No single source of truth
-- No runtime validation
 
 **Fix:**
 
 ```typescript
 // ✅ Import from shared schema
-import type { LoginResponse, User } from '@hk26/schema';
+import type {
+  MediaAsset,
+  MediaListResponse
+} from '@hoolsy/schema/workstation/media';
 ```
 
 ---
 
 ### Bad Example 2: Types in lib/ That Should Be Shared
 
-**DON'T DO THIS** (`apps/api/src/lib/content-types.ts`):
+**DON'T DO THIS** (`apps/api/src/lib/media-metadata.ts`):
 
 ```typescript
 // ❌ This should be in packages/schema
-export interface ContentNode {
-  id: string;
-  type: string;
-  title: string;
+export interface MediaMetadata {
+  hasVideo: boolean;
+  hasAudio: boolean;
+  durationMs?: number;
   // ...
 }
 ```
@@ -270,35 +223,11 @@ export interface ContentNode {
 **Problem:**
 - Frontend might need this type too
 - Creates coupling between lib and other modules
-- Can't be imported by frontend (would violate rule #6)
+- Can't be imported by frontend
 
 **Fix:**
 
-Move to `packages/schema/src/content/node.ts` as Zod schema.
-
----
-
-### Bad Example 3: Frontend Importing from API
-
-**DON'T DO THIS** (`apps/web/src/pages/LoginPage.tsx`):
-
-```typescript
-// ❌ Frontend importing from API
-import type { LoginRequest } from '../../../api/src/lib/auth-types';
-```
-
-**Problem:**
-- Violates separation of concerns
-- Frontend depends directly on API internals
-- Breaks if API restructures
-- Can't be validated at runtime
-
-**Fix:**
-
-```typescript
-// ✅ Import from shared schema
-import type { LoginRequest } from '@hk26/schema';
-```
+Move to `packages/schema/src/workstation/media.ts` as Zod schema.
 
 ---
 
@@ -306,74 +235,69 @@ import type { LoginRequest } from '@hk26/schema';
 
 ### Example 1: New API Endpoint
 
-**Scenario**: Adding `GET /api/projects/:id/summary`
+**Scenario**: Adding `GET /ws/projects/:id/analytics`
 
 **Response shape:**
 
 ```typescript
 {
   ok: true,
-  summary: {
-    id: string,
-    title: string,
-    totalNodes: number,
-    createdAt: string,
+  analytics: {
+    totalMedia: number,
+    totalDuration: number,
+    mediaByKind: Record<string, number>,
   }
 }
 ```
 
-**Decision**: Shared contract → `packages/schema/src/content/project.ts`
+**Decision**: Shared contract → `packages/schema/src/workstation/content.ts`
 
 **Why:**
 - Backend returns it
-- Frontend (web/mobile) consumes it
+- Frontend consumes it
 - Part of API contract
 
 **Implementation:**
 
 ```typescript
-// packages/schema/src/content/project.ts
-import { z } from 'zod';
-
-export const projectSummarySchema = z.object({
-  id: z.string().uuid(),
-  title: z.string(),
-  totalNodes: z.number().int(),
-  createdAt: z.string().datetime(),
+// packages/schema/src/workstation/content.ts
+export const ProjectAnalyticsSchema = z.object({
+  totalMedia: z.number(),
+  totalDuration: z.number(),
+  mediaByKind: z.record(z.number()),
 });
 
-export const projectSummaryResponseSchema = z.object({
+export const ProjectAnalyticsResponseSchema = z.object({
   ok: z.literal(true),
-  summary: projectSummarySchema,
+  analytics: ProjectAnalyticsSchema,
 });
 
-export type ProjectSummary = z.infer<typeof projectSummarySchema>;
-export type ProjectSummaryResponse = z.infer<typeof projectSummaryResponseSchema>;
+export type ProjectAnalytics = z.infer<typeof ProjectAnalyticsSchema>;
+export type ProjectAnalyticsResponse = z.infer<typeof ProjectAnalyticsResponseSchema>;
 ```
 
 ---
 
 ### Example 2: Form State
 
-**Scenario**: React form for creating a user
+**Scenario**: React form for creating a role
 
 **State shape:**
 
 ```typescript
 {
-  email: string,
-  password: string,
   name: string,
+  description: string,
+  selectedPermissions: string[],
   errors: Record<string, string>,
-  isSubmitting: boolean,
 }
 ```
 
-**Decision**: UI-only → `apps/web/src/types/forms.ts`
+**Decision**: UI-only → `apps/workstation-web/src/widgets/Admin/Roles.tsx` (or `src/types/forms.ts`)
 
 **Why:**
 - Backend doesn't care about form state
-- React-specific (errors, isSubmitting)
+- React-specific (errors, controlled inputs)
 - Not part of API contract
 
 ---
@@ -383,17 +307,18 @@ export type ProjectSummaryResponse = z.infer<typeof projectSummaryResponseSchema
 **Scenario**: Complex join query result
 
 ```typescript
-const result = await db
+const result = await dbWs
   .select({
-    id: users.id,
-    email: users.email,
-    tenantName: tenants.name,
+    project_id: schema.projects.projectId,
+    project_title: schema.projects.title,
+    media_count: count(schema.mediaAssets.mediaAssetId),
   })
-  .from(users)
-  .leftJoin(tenants, eq(users.tenantId, tenants.id));
+  .from(schema.projects)
+  .leftJoin(schema.contentNodes, ...)
+  .groupBy(...);
 ```
 
-**Decision**: Internal type in service file
+**Decision**: Internal type in repo file
 
 **Why:**
 - Query-specific shape
@@ -403,11 +328,11 @@ const result = await db
 **Implementation:**
 
 ```typescript
-// apps/api/src/services/user.service.ts
-type UserWithTenant = {
-  id: string;
-  email: string;
-  tenantName: string | null;
+// apps/api/src/repos/content.repo.ts
+type ProjectWithMediaCount = {
+  project_id: string;
+  project_title: string;
+  media_count: number;
 };
 ```
 
@@ -417,10 +342,10 @@ type UserWithTenant = {
 
 | Type | Location | Exported? | Example |
 |------|----------|-----------|---------|
-| **Shared API Contract** | `packages/schema/src/**` | ✅ Yes | `LoginRequest`, `ContentNode`, `ProjectSummary` |
-| **App-Specific Types** | `apps/*/src/types/**` | ✅ Yes | `LoginFormState`, `RootStackParamList` |
-| **DB Types** | `apps/api/src/services/*.ts` | ❌ No (internal only) | `UserRow`, Query result types |
-| **Service State** | `apps/api/src/services/*.ts` | ❌ No (internal only) | `UploadSession`, Service state |
-| **Component Props** | Component file | ❌ No (inline only) | `interface Props { ... }` in component files |
+| **Shared API Contract** | `packages/schema/src/**` | ✅ Yes | `MediaMetadata`, `RoleSchema`, `ProjectAnalyticsResponse` |
+| **App-Specific Types** | `apps/*/src/types/**` | ✅ Yes | `WidgetLayout`, `BreadcrumbItem`, Form state |
+| **DB Mapping** | `apps/*/src/repos/*.ts` | ❌ No (internal only) | `MediaAssetRow`, Query result types |
+| **Route-Specific** | `apps/*/src/routes/*.ts` | ❌ No (internal only) | `UploadSession`, Route handler state |
+| **Component Props** | Component file | ❌ No (inline only) | `interface Props { ... }` in `.tsx` files |
 
-**Key Rule:** Types can ONLY be exported from `packages/schema/src/**` or `apps/*/src/types/**`.
+**ESLint Rule:** Types can ONLY be exported from `packages/schema/src/**` or `**/types/**`.

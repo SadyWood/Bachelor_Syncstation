@@ -1,0 +1,39 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)",
+      "Bash(pnpm add:*)",
+      "Bash(pnpm demo:*)",
+      "Bash(timeout 5 bash:*)",
+      "Bash(tree:*)",
+      "Bash(pnpm typecheck:*)",
+      "Bash(pnpm build:*)",
+      "Bash(pnpm dev)",
+      "Bash(nul)",
+      "Bash(git merge:*)",
+      "Bash(git branch:*)",
+      "Bash(pnpm install:*)",
+      "Bash(pnpm -C apps/api typecheck)",
+      "Bash(pnpm docker:up:*)",
+      "Bash(pnpm docker:ps:*)",
+      "Bash(pnpm -r run lint:*)",
+      "Bash(pnpm -C apps/workstation-web run lint:*)",
+      "Bash(pnpm -r --continue-on-error run lint)",
+      "Bash(pnpm run lint:*)",
+      "Bash(pnpm --filter @hoolsy/timeline run lint:*)",
+      "Bash(pnpm -C packages/timeline run lint)",
+      "Bash(pnpm -C apps/api run lint)",
+      "Bash(npx eslint . --fix)",
+      "Bash(npx eslint:*)",
+      "Bash(pnpm -C packages/logger typecheck:*)",
+      "Bash(pnpm -C apps/workstation-web tsc:*)",
+      "Bash(pnpm -C apps/workstation-web typecheck)",
+      "Bash(pnpm:*)",
+      "Bash(cd:*)",
+      "Bash(docker logs:*)",
+      "Bash(chmod:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

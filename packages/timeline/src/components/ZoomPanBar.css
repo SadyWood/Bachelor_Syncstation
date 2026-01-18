@@ -1,0 +1,120 @@
+/* packages/timeline/src/components/ZoomPanBar.css */
+
+.zoom-pan-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-tertiary);
+  padding: 4px;
+  border-radius: var(--radius-sm);
+}
+
+.zoom-pan-bar--horizontal {
+  flex-direction: row;
+}
+
+.zoom-pan-bar--vertical {
+  flex-direction: column;
+}
+
+.zoom-pan-bar__arrow {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-elevated);
+  border: 1px solid var(--bg-overlay);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 10px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  padding: 0;
+}
+
+.zoom-pan-bar__arrow:hover {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+  transform: scale(1.05);
+}
+
+.zoom-pan-bar__arrow:active {
+  transform: scale(0.95);
+}
+
+.zoom-pan-bar__track {
+  position: relative;
+  background: var(--bg-primary);
+  border: 1px solid var(--bg-overlay);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.zoom-pan-bar__handle {
+  position: absolute;
+  background: var(--accent-primary);
+  cursor: grab;
+  transition: background var(--transition-fast);
+  border: 1px solid var(--accent-primary-hover);
+  border-radius: 2px;
+}
+
+.zoom-pan-bar__handle:hover {
+  background: var(--accent-primary-hover);
+}
+
+.zoom-pan-bar__handle--dragging {
+  cursor: grabbing;
+  background: var(--accent-primary-active);
+}
+
+.zoom-pan-bar__resize {
+  position: absolute;
+  background: var(--text-primary);
+  z-index: var(--z-overlay);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.zoom-pan-bar__handle:hover .zoom-pan-bar__resize {
+  opacity: 0.8;
+}
+
+.zoom-pan-bar__resize:hover {
+  opacity: 1 !important;
+}
+
+/* Horizontal orientation */
+.zoom-pan-bar--horizontal .zoom-pan-bar__resize {
+  width: 4px;
+  height: 100%;
+  top: 0;
+  cursor: ew-resize;
+}
+
+.zoom-pan-bar--horizontal .zoom-pan-bar__resize--start {
+  left: 0;
+}
+
+.zoom-pan-bar--horizontal .zoom-pan-bar__resize--end {
+  right: 0;
+}
+
+/* Vertical orientation */
+.zoom-pan-bar--vertical .zoom-pan-bar__resize {
+  width: 100%;
+  height: 4px;
+  left: 0;
+  cursor: ns-resize;
+}
+
+.zoom-pan-bar--vertical .zoom-pan-bar__resize--start {
+  top: 0;
+}
+
+.zoom-pan-bar--vertical .zoom-pan-bar__resize--end {
+  bottom: 0;
+}

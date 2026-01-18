@@ -1,0 +1,23 @@
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: var(--timeline-bg-tertiary);
+  border: 1px solid var(--timeline-border-secondary);
+  border-radius: var(--timeline-radius-md);
+  color: var(--timeline-text-primary);
+  cursor: pointer;
+  transition: all var(--timeline-transition-normal);
+}
+
+.theme-toggle:hover {
+  background: var(--timeline-border-secondary);
+  border-color: var(--timeline-border-tertiary);
+  color: var(--timeline-accent-primary);
+}
+
+.theme-toggle:active {
+  transform: scale(0.95);
+}

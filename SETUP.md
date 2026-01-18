@@ -1,467 +1,612 @@
-# Setup Guide
+# Setup
 
-This guide will help you get the Consumer App running on your machine. Follow the steps in order.
-
----
-
-## Table of Contents
-
-1. [Prerequisites](#prerequisites)
-2. [Project Setup](#project-setup)
-3. [Running the Application](#running-the-application)
-4. [Testing with Postman](#testing-with-postman)
-5. [Next Steps](#next-steps)
-6. [Troubleshooting](#troubleshooting)
-
----
+This guide walks you through first-time setup, seeding, and running the API + web locally.
 
 ## Prerequisites
 
-You need to install the following tools before starting:
+### Required Software
 
-### 1. Node.js
+- **Node.js 20+** and **pnpm 9+**
+- **Docker Desktop** (recommended) - [Download here](https://www.docker.com/products/docker-desktop/)
+  - OR PostgreSQL installed locally (advanced)
 
-**What is it?** Node.js is a JavaScript runtime that runs JavaScript outside of a web browser. The API server and build tools use Node.js.
+### What is Docker Desktop?
 
-**Required version:** 20.0.0 or higher
+**Docker Desktop** is a containerization platform that packages applications and their dependencies into isolated containers. For our project, it provides:
 
-**Download:** https://nodejs.org/
+- **All databases pre-configured** - PostgreSQL, Neo4j, MongoDB, and TimescaleDB
+- **Consistent environment** - Works identically on Windows, Mac, and Linux
+- **Zero database installation** - No need to manually install and configure 4 different databases
+- **Easy reset** - Wipe and rebuild databases with a single command
+- **Isolated from your system** - Databases run in containers without affecting your local machine
 
-1. Go to https://nodejs.org/
-2. Download the **LTS** version (green button)
-3. Run the installer
-4. Verify installation:
+Think of it as a virtual machine, but much lighter and faster. When you run `pnpm docker:up`, Docker Desktop starts all our database containers automatically.
+
+### Common Docker Desktop Installation Issues
+
+#### Windows
+
+**Issue 1: Virtualization not enabled in BIOS**
+
+Docker Desktop requires hardware virtualization (Hyper-V or WSL 2). If you see an error about virtualization:
+
+1. **Restart your computer** and enter BIOS/UEFI settings (usually by pressing F2, F10, F12, or Del during boot)
+2. **Enable virtualization**:
+   - Intel CPUs: Look for "Intel VT-x" or "Intel Virtualization Technology"
+   - AMD CPUs: Look for "AMD-V" or "SVM Mode"
+3. **Save and exit BIOS**
+4. **In Windows**, ensure WSL 2 is installed:
    ```bash
-   node --version
-   # Should show: v20.x.x or higher
+   wsl --install
+   wsl --set-default-version 2
    ```
 
-### 2. pnpm
+**Issue 2: Hyper-V conflicts**
 
-**What is it?** pnpm is a package manager (like npm). It installs JavaScript packages and manages dependencies. We use pnpm because it's faster and handles our monorepo better than npm.
+If you have other virtualization software (VMware, VirtualBox):
+- Docker Desktop uses Hyper-V or WSL 2 backend
+- May conflict with other hypervisors
+- Solution: Use WSL 2 backend instead of Hyper-V (Docker Desktop Settings → General → Use WSL 2)
 
-**Required version:** 8.0.0 or higher
+**Issue 3: "Docker Desktop requires a newer WSL kernel"**
 
-**Installation:** After Node.js is installed, run:
-
+Update WSL:
 ```bash
-npm install -g pnpm
+wsl --update
+wsl --shutdown
 ```
 
-Verify installation:
+#### macOS
+
+**Issue 1: Apple Silicon (M1/M2/M3) compatibility**
+
+Docker Desktop runs natively on Apple Silicon, but some images may need Rosetta 2:
+
 ```bash
-pnpm --version
-# Should show: 8.x.x or higher
+softwareupdate --install-rosetta
 ```
 
-### 3. Docker Desktop
+**Issue 2: Resource allocation**
 
-**What is it?** Docker lets you run applications in "containers" - isolated environments with all their dependencies. We use Docker to run the PostgreSQL database so you don't need to install PostgreSQL directly.
+Docker Desktop may be slow if RAM/CPU allocation is too low:
+1. Open Docker Desktop → Settings → Resources
+2. Increase RAM to at least **4 GB**
+3. Increase CPUs to at least **2 cores**
 
-**Why use it?**
-- No manual PostgreSQL installation needed
-- Everyone uses the exact same database version
-- Easy to reset if something goes wrong
-- Doesn't clutter your system
+**Issue 3: File sharing permissions**
 
-**Download:** https://www.docker.com/products/docker-desktop/
+If containers can't access project files:
+1. Docker Desktop → Settings → Resources → File Sharing
+2. Add your project directory
+3. Restart Docker Desktop
 
-**Installation:**
+#### All Platforms
 
-**macOS:**
-1. Download Docker Desktop from the link above
-2. Choose the correct version:
-   - **Apple Silicon (M1/M2/M3/M4):** Download "Apple Chip"
-   - **Intel Mac:** Download "Intel Chip"
-3. Open the downloaded `.dmg` file
-4. Drag Docker to Applications
-5. Open Docker Desktop from Applications
-6. Wait for it to start (whale icon in menu bar stops animating)
+**Issue: Port conflicts**
 
-**Windows:**
-1. Download Docker Desktop from the link above
-2. Run the installer
-3. Enable WSL 2 if prompted
-4. Restart your computer if asked
-5. Open Docker Desktop
+If ports 5432, 7474, 7687, 27017, or 5433 are already in use:
 
-**Verify installation:**
 ```bash
-docker --version
-# Should show: Docker version 24.x.x or higher
+# Windows: Find process using port
+netstat -ano | findstr :5432
+
+# macOS/Linux: Find process using port
+lsof -i :5432
+
+# Kill the process or change ports in .env and docker-compose.yml
 ```
 
-**Important:** Docker Desktop must be running (whale icon visible) before proceeding.
+**Issue: Docker daemon not running**
 
-### 4. Postman
+Ensure Docker Desktop is actually running:
+- Windows: Check system tray for Docker icon
+- macOS: Check menu bar for Docker icon
+- Should say "Docker Desktop is running"
 
-**What is it?** Postman is a tool for testing APIs. You can send requests to your backend and see the responses without writing code. Think of it as a way to "talk" to your API directly.
+### Port Requirements
 
-**Download:** https://www.postman.com/downloads/
-
-1. Download for your operating system
-2. Install and open Postman
-3. Create a free account or click "Skip and go to app"
-
-### 5. Expo Go (Mobile App)
-
-**What is it?** Expo Go is a mobile app that lets you preview React Native apps on your phone. Scan a QR code and see your app instantly.
-
-**Download:**
-- **iOS:** Search "Expo Go" in App Store
-- **Android:** Search "Expo Go" in Google Play Store
+- **5432** - PostgreSQL
+- **3333** - API server
+- **5173** - Workstation web
+- **7474** - Neo4j browser UI (optional)
+- **7687** - Neo4j Bolt protocol (optional)
+- **27017** - MongoDB (optional)
+- **5433** - TimescaleDB (optional)
 
 ---
 
-## Project Setup
+## Option A: Docker Setup (Recommended)
 
-### Step 1: Clone the Repository
+Docker provides all databases in containers - no local installation needed.
 
-```bash
-git clone <repository-url>
-cd hk26-consumer-app
-```
+### 1) Install Docker Desktop
 
-### Step 2: Create Environment File
+1. **Download and install** - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+2. **Start Docker Desktop** - Open the application
+3. **Verify it's running**:
+   - Windows: Look for Docker icon in system tray
+   - macOS: Look for Docker icon in menu bar
+   - Should show "Docker Desktop is running"
 
-```bash
-cp .env.example .env
-```
+**First time setup?** See [Common Docker Desktop Installation Issues](#common-docker-desktop-installation-issues) above if you encounter problems.
 
-**About the .env file:**
-
-The `.env` file contains configuration (database URLs, secrets, ports). The default values work for local development - you don't need to change anything.
-
-**Note:** In production or cloud deployment, you would change passwords and secrets to secure values. For local development, the defaults are fine.
-
-### Step 3: Install Dependencies
+### 2) Install dependencies
 
 ```bash
 pnpm install
 ```
 
-This installs all packages for the entire project.
+### 3) Build packages
 
-### Step 4: Start Docker
+Build all workspace packages (logger, schema, etc.):
 
-Make sure Docker Desktop is running, then:
+```bash
+pnpm build
+```
+
+This compiles TypeScript packages in `packages/` that the API and apps depend on.
+
+### 4) Create `.env`
+
+Copy `.env.example` → `.env`. The default values work with Docker:
+
+```bash
+# Windows (PowerShell or Command Prompt)
+copy .env.example .env
+
+# macOS/Linux
+cp .env.example .env
+```
+
+### 5) Start databases
 
 ```bash
 pnpm docker:up
 ```
 
-You should see:
-```
-[+] Running 2/2
- ✔ Network consumer-app       Created
- ✔ Container CA-postgres      Started
+This starts **4 database containers**:
+- **PostgreSQL** on port 5432 (main relational database)
+- **Neo4j** on ports 7474/7687 (graph database)
+- **MongoDB** on port 27017 (document store)
+- **TimescaleDB** on port 5433 (time-series database)
+
+**Verify containers are running:**
+```bash
+pnpm docker:ps
 ```
 
-### Step 5: Initialize the Database
+Expected output:
+```
+NAME                IMAGE                         STATUS
+hoolsy-postgres     postgres:16-alpine            Up (healthy)
+hoolsy-neo4j        neo4j:5-community             Up
+hoolsy-mongodb      mongo:7                       Up
+hoolsy-timescaledb  timescale/timescaledb:...     Up
+```
+
+### 6) Run migrations
+
+Apply database schema migrations:
 
 ```bash
-pnpm db:reset
+pnpm db:migrate
 ```
 
-This creates the databases, runs migrations, and adds demo data. You should see output ending with:
+**What this does:**
+- Reads schema definitions from `packages/databases/postgres/src/schema/`
+- Creates tables, indexes, and constraints in each PostgreSQL database:
+  - `users` database - User accounts, sessions, permissions
+  - `workstation` database - Projects, content nodes, media
+  - `marketplace` database - Marketplace listings and transactions
 
-```
-════════════════════════════════════════
-           SEEDING COMPLETE
-════════════════════════════════════════
-```
+The migration files are stored in `packages/databases/postgres/migrations/`.
 
-### Step 6: Verify Setup
+### 7) Seed foundational data
 
 ```bash
-pnpm db:test
+pnpm db:seed
 ```
 
-You should see successful connection messages.
+**What this does:**
+- Seeds reference data that the application needs to function
+- Platform codes (workstation, marketplace, nexus)
+- Permissions catalog (200+ permissions)
+- Global roles (owner, admin, member)
+- Media kinds taxonomy
+- Demo tenant ("Demo Workspace")
 
----
+### 8) Seed demo data (recommended)
 
-## Running the Application
+To test the application with realistic data, you need to enable demo seeding.
 
-### Start the API Server
+**Step 1: Enable demo seeding in `.env`**
 
+Open your `.env` file and change:
+```env
+SEED_DEMO_OK=false
+```
+to:
+```env
+SEED_DEMO_OK=true
+```
+
+> **Why is this required?** Demo seeding is disabled by default as a safety measure to prevent accidentally creating test data in production environments.
+
+**Step 2: Run the demo seed**
+
+```bash
+pnpm db:seed:demo
+```
+
+**What this creates:**
+- **Admin user** - `admin@hoolsy.com` with password `demopassword` (ready to log in immediately)
+- **User invitations** - For additional test users (mathias@hoolsy.com, espen@hoolsy.com, ew@hoolsy.com)
+- **"Streamwave Inc" tenant** - Demo workspace
+- **Breaking Bad project** - Full season/episode structure
+- **Pilot episode (S1.E1) with video** - A short clip from Breaking Bad for testing timeline and streaming
+
+**Note:** The admin user (`admin@hoolsy.com`) has full admin access and won't be restricted in the frontend. The invited users have limited permissions (Manage or Viewer roles) and require registration via invite token.
+
+### 9) Start API and web
+
+Open **two terminal windows**:
+
+**Terminal 1 - API server:**
 ```bash
 pnpm dev:api
 ```
 
-The API starts at http://localhost:3001. You'll see:
+Wait for:
 ```
-Server running at http://localhost:3001
+✅ API server running on http://localhost:3333
 ```
 
-### Start the Mobile App
+**Terminal 2 - Web app:**
+```bash
+pnpm dev:ws
+```
 
-In a **new terminal window**:
+Wait for:
+```
+✅ Workstation web running on http://localhost:5173
+```
+
+### 10) Log in to the Workstation
+
+**Option A: Admin user (recommended for testing)**
+
+The demo seed creates an admin user with full access - no registration needed:
+
+1. **Open the web app** - `http://localhost:5173`
+2. **Log in with admin credentials**:
+   - Email: `admin@hoolsy.com`
+   - Password: `demopassword`
+3. **You're logged in!** Start exploring the Workstation with full admin access
+
+**Option B: Register with invite token (limited permissions)**
+
+If you want to test with limited permissions (Manage or Viewer role):
+
+1. **Copy the registration URL** from step 7 (demo seed output) for one of the invited users
+2. **Open it in your browser** - `http://localhost:5173/register?invite=...`
+3. **Create your account** with the invited email
+4. **You're logged in!** Explore the Workstation with role-based restrictions
+
+### 11) Test the Timeline Editor with Demo Video
+
+The demo seed includes a **Breaking Bad Season 1, Episode 1 (Pilot)** video clip that you can use to test the timeline editor and media streaming.
+
+**To access the demo video:**
+
+1. **Navigate to Content Dashboard** - Click "Content" in the sidebar
+2. **Browse to Breaking Bad project**:
+   - Breaking Bad → SEASON 1 → Pilot S1.E1
+3. **Open the Pilot episode** - Click on "Pilot S1.E1"
+4. **Timeline editor will load** with the video
+
+**Or use direct link format:**
+```
+http://localhost:5173/content/{NODE_ID}
+```
+
+The node ID is generated during seeding and will be different each time. To get the direct link:
+- Navigate to the Pilot episode via Content Dashboard, then copy the URL from your browser
+- Example: `http://localhost:5175/content/019b0d52-e786-7889-a4b9-88e71daa1c42`
+
+**Note:** The port may vary (5173, 5174, 5175) depending on which ports are available. Check your Vite dev server output for the actual port.
+
+**What you can test:**
+- ✅ **Video streaming** - The video streams from the API with range request support
+- ✅ **Timeline scrubbing** - Drag the playhead to seek through the video
+- ✅ **Frame-accurate editing** - Timeline shows frames at different zoom levels
+- ✅ **Playback controls** - Play, pause, and navigate the video
+
+**Without demo seed**, the timeline will be empty and you won't be able to test media playback.
+
+### Quick verification checklist
+
+- [ ] Docker Desktop is running
+- [ ] `pnpm docker:ps` shows 4 containers as "Up"
+- [ ] API server responds: `curl http://localhost:3333/healthz`
+- [ ] Web app loads: Open `http://localhost:5173`
+- [ ] You can log in with your demo user
+- [ ] Breaking Bad project appears in Content Dashboard
+- [ ] Pilot episode streams video in timeline editor
+
+### Docker Commands
+
+| Command | Description |
+|---------|-------------|
+| `pnpm docker:up` | Start all database containers |
+| `pnpm docker:down` | Stop all containers |
+| `pnpm docker:reset` | Stop, wipe all data, and restart |
+| `pnpm docker:logs` | View container logs |
+| `pnpm docker:ps` | Show container status |
+
+---
+
+## Option B: Local PostgreSQL Setup
+
+If you prefer running PostgreSQL locally without Docker.
+
+### 1) Install dependencies
 
 ```bash
-pnpm dev:app
+pnpm install
 ```
 
-A QR code appears in the terminal.
-
-**To run on your phone:**
-1. Download **Expo Go** from App Store (iOS) or Google Play (Android) if you haven't already
-2. Open the Expo Go app
-3. Scan the QR code displayed in your terminal
-4. The app loads on your phone
-
-**To run in simulator:**
-- Press `i` for iOS Simulator (Mac only, needs Xcode)
-- Press `a` for Android Emulator (needs Android Studio)
-
-### Run Both Together
+### 2) Build packages
 
 ```bash
-pnpm dev
+pnpm build
+```
+
+### 3) Create `.env`
+
+Copy `.env.example` → `.env` and update the PostgreSQL connection to match your local setup:
+
+```env
+ADMIN_DATABASE_CONNECTION=postgres://postgres:your-password@localhost:5432
+USERS_DB_URL=postgres://svc_users:change-this-svc-users@localhost:5432/users
+WORKSTATION_DB_URL=postgres://svc_workstation:change-this-svc-workstation@localhost:5432/workstation
+MARKETPLACE_DB_URL=postgres://svc_marketplace:change-this-svc-marketplace@localhost:5432/marketplace
+```
+
+### 4) Bootstrap databases & roles
+
+Creates databases (**users**, **workstation**, **marketplace**), roles, and grants:
+
+```bash
+pnpm db:bootstrap
+```
+
+> If you want custom passwords, edit `packages/databases/postgres/bootstrap/00_cluster_bootstrap.sql` first.
+
+### 5) Run migrations
+
+```bash
+pnpm db:migrate
+```
+
+### 6) Re-run bootstrap for grants
+
+After migrations, run bootstrap again to grant permissions on new tables:
+
+```bash
+pnpm db:bootstrap
+```
+
+### 7) Seed data
+
+```bash
+pnpm db:seed
+```
+
+### 8) Seed demo data (optional)
+
+Enable demo seeding in `.env`:
+```env
+SEED_DEMO_OK=true
+```
+
+Then run:
+```bash
+pnpm db:seed:demo
+```
+
+### 9) Start API and web
+
+```bash
+pnpm dev:api   # API → http://localhost:3333
+pnpm dev:ws    # Web → http://localhost:5173
 ```
 
 ---
 
-## Testing with Postman
+## Seed Demo Data (Optional but Recommended)
 
-### Import the Collection
+The demo seed creates a test user invitation so you can register and log in immediately. **This is the easiest way to get started.**
 
-1. Open Postman
-2. Click **Import** (top-left)
-3. Select the **Folder** tab
-4. Navigate to your project's `postman/` folder
-5. Click **Import**
+### What does `pnpm db:seed:demo` do?
 
-This imports:
-- **Consumer-App-API** - All API endpoints
-- **Consumer-App-Local** - Local environment variables
+Creates:
+- **Demo invite** - A user invitation token
+- **Demo tenant** - "Streamwave Inc" tenant
+- **Breaking Bad project** - Complete season/episode structure with 2 seasons
+- **Pilot episode video** - Breaking Bad S1.E1 (Pilot) with actual video content for testing
+- **Default email** - `admin@hoolsy.com` (customizable)
+- **7-day expiration** - Invite expires after 7 days
+- **Platform access** - Workstation platform
 
-### Select the Environment
+**Note:** Only the Pilot episode includes video. All other episodes are metadata-only (no media files).
 
-1. In the top-right dropdown, select **Consumer-App-Local**
+### Running the demo seed
 
-### Test an Endpoint
+```bash
+# Enable demo seeding (required for safety)
+# Windows (PowerShell):
+$env:SEED_DEMO_OK="true"
 
-1. Expand **Consumer-App-API** in the sidebar
-2. Click **Health > Health Check**
-3. Click **Send**
-4. You should see:
-   ```json
-   { "ok": true, "timestamp": "..." }
-   ```
+# Windows (Command Prompt):
+set SEED_DEMO_OK=true
 
-### Using Authentication
+# macOS/Linux:
+export SEED_DEMO_OK=true
 
-1. Go to **Auth > Register** or **Auth > Login**
-2. Click **Send**
-3. The collection automatically saves the access token
-4. Now authenticated endpoints will work
+# Run the seed
+pnpm db:seed:demo
+```
+
+**Output example:**
+```
+✅ Demo seed complete!
+
+📧 Email: demo@hoolsy.test
+🎫 Invite token: 1a2b3c4d-5e6f-7g8h-9i0j-k1l2m3n4o5p6
+🔗 Registration URL: http://localhost:5173/register?invite=1a2b3c4d-5e6f-7g8h-9i0j-k1l2m3n4o5p6
+⏰ Expires: 2025-12-21T12:00:00Z
+
+Use this invite to create your first user account.
+```
+
+### Logging in
+
+**Option 1: Admin user (recommended)**
+
+The fastest way to start exploring is using the pre-created admin user:
+
+1. **Open the web app** - `http://localhost:5173`
+2. **Log in**:
+   - Email: `admin@hoolsy.com`
+   - Password: `demopassword`
+3. **Done!** You have full admin access to all features
+
+**Option 2: Register with invite token**
+
+If you want to test role-based permissions:
+
+1. **Copy the registration URL** from the seed output
+2. **Open it in your browser** - Should show the registration form
+3. **Fill in your details**:
+   - Email: Use one of the invited emails (mathias@hoolsy.com, espen@hoolsy.com, ew@hoolsy.com)
+   - First name: Your first name
+   - Last name: Your last name
+   - Display name: How you want to appear in the app
+   - Password: Your password (min 8 characters)
+4. **Submit** - You'll be logged in automatically with limited permissions
+
+### Customizing the demo invite
+
+You can customize the demo invite with environment variables:
+
+```bash
+# .env file
+SEED_DEMO_OK=true
+DEMO_INVITE_EMAIL=yourname@example.test
+DEMO_INVITE_TOKEN=custom-token-here  # Optional: auto-generated if not set
+DEMO_INVITE_PLATFORM_ID=1             # 1 = workstation (default)
+```
+
+### Troubleshooting demo seed
+
+**Issue: "Demo seeding is disabled"**
+- Ensure `SEED_DEMO_OK=true` is set
+- This is a safety measure to prevent accidental demo data in production
+
+**Issue: "Invite already exists"**
+- The demo seed is idempotent - safe to run multiple times
+- If invite exists, it will use the existing one
+
+**Issue: "Platform not found"**
+- Run foundational seed first: `pnpm db:seed`
+- The foundational seed creates the platform codes
+
+**Issue: Invite has expired**
+- Run `pnpm db:seed:demo` again to create a new invite
+- Invites expire after 7 days
 
 ---
 
-## Next Steps
+## Accessing Databases
 
-### Understanding the Codebase
+### Neo4j Browser
+Open http://localhost:7474 in your browser.
+- Username: `neo4j`
+- Password: `hoolsy_dev` (or your `NEO4J_PASSWORD`)
 
-| Location | What it is |
-|----------|------------|
-| `apps/api/` | Backend API (Fastify) |
-| `apps/consumer-app/` | Mobile app (React Native + Expo) |
-| `packages/databases/postgres/` | Database schemas and migrations |
-| `packages/schema/` | Shared TypeScript types (API contracts) |
+### MongoDB
+Connect with any MongoDB client:
+```
+mongodb://hoolsy:hoolsy_dev@localhost:27017/hoolsy_subjects?authSource=admin
+```
 
-### Extending the Database
-
-If you need to add tables or columns, read:
-
-**[documents/guides/type-safety-from-database-to-frontend.md](documents/guides/type-safety-from-database-to-frontend.md)**
-
-This explains:
-- How type safety flows through the system
-- How to add new fields or tables
-- How Drizzle ORM and Zod work together
-
-### Adding Demo Data
-
-To add more test data (new shows, products), see:
-
-**[packages/databases/postgres/src/seed-data/README.md](packages/databases/postgres/src/seed-data/README.md)**
-
-### Quality Checks
-
-Before committing code, always run:
-
-```bash
-pnpm typecheck   # Check TypeScript types
-pnpm lint        # Check code quality
+### TimescaleDB
+Connect with any PostgreSQL client:
+```
+postgresql://hoolsy:hoolsy_dev@localhost:5433/hoolsy_analytics
 ```
 
 ---
 
 ## Troubleshooting
 
-### Docker: "Cannot connect to the Docker daemon"
+### Docker containers won't start
+- Ensure Docker Desktop is running
+- Check if ports are already in use: `pnpm docker:logs`
+- Try resetting: `pnpm docker:reset`
 
-Docker Desktop is not running.
+### "Cannot find module '@hoolsy/databases'"
+Run `pnpm install` to link workspace packages.
 
-**Fix:** Open Docker Desktop and wait for it to start (whale icon stops animating).
+### "Failed to fetch" on login
+- Ensure API is running on `http://localhost:3333`
+- Check your `.env` has correct database URLs
 
----
+### "No schema changes" during generate
+- Edits must be in `packages/databases/src/schema/...`
+- Save the file before running generate
 
-### Docker: "Port 5433 is already in use"
-
-Something else is using the database port.
-
-**Fix:**
+### Hard reset everything
 ```bash
-# Find what's using the port
-lsof -i :5433
-
-# Or change the port in .env
-POSTGRES_PORT=5434
-
-# Then restart Docker
-pnpm docker:down
-pnpm docker:up
-```
-
----
-
-### Docker: "Container name CA-postgres is already in use"
-
-Old container exists from a previous run.
-
-**Fix:**
-```bash
-docker rm -f CA-postgres
-pnpm docker:up
-```
-
----
-
-### Database: "duplicate key value violates unique constraint"
-
-Database already has data from a previous seed.
-
-**Fix:**
-```bash
-pnpm db:reset
-```
-
----
-
-### Database: "relation does not exist"
-
-Migrations haven't been run.
-
-**Fix:**
-```bash
+# Docker setup
+pnpm docker:reset
 pnpm db:migrate
+pnpm db:seed
+
+# Local PostgreSQL
+pnpm db:nuke        # Drops all DBs (requires confirmation)
+pnpm db:bootstrap
+pnpm db:migrate
+pnpm db:seed
 ```
 
 ---
 
-### Postman: "Could not get any response"
-
-API is not running.
-
-**Fix:**
-1. Start the API: `pnpm dev:api`
-2. Verify it shows "Server running at http://localhost:3001"
-3. Check Postman environment is set to "Consumer-App-Local"
-
----
-
-### Postman: "401 Unauthorized"
-
-Access token is missing or expired.
-
-**Fix:**
-1. Run "Register" or "Login" in Postman first
-2. Try your request again
-
----
-
-### Expo: "Network request failed"
-
-Phone can't reach your computer.
-
-**Fix:**
-1. Ensure phone and computer are on the same WiFi
-2. Find your computer's IP:
-   ```bash
-   # macOS
-   ipconfig getifaddr en0
-
-   # Windows
-   ipconfig
-   ```
-3. Update `API_URL` in the app to use your IP instead of localhost
-
----
-
-### General: "Command not found: pnpm"
-
-pnpm is not installed.
-
-**Fix:**
-```bash
-npm install -g pnpm
-```
-
----
-
-### General: TypeScript errors after pulling new code
-
-Dependencies are out of sync.
-
-**Fix:**
-```bash
-pnpm install
-pnpm typecheck
-```
-
----
-
-## Useful Commands Reference
-
-### Development
-| Command | Description |
-|---------|-------------|
-| `pnpm dev` | Start API and mobile app |
-| `pnpm dev:api` | Start only API |
-| `pnpm dev:app` | Start only mobile app |
-
-### Docker
-| Command | Description |
-|---------|-------------|
-| `pnpm docker:up` | Start database container |
-| `pnpm docker:down` | Stop database container |
-| `pnpm docker:logs` | View container logs |
-| `pnpm docker:reset` | Reset container and data |
+## Useful Scripts
 
 ### Database
-| Command | Description |
-|---------|-------------|
-| `pnpm db:reset` | Reset and re-seed databases |
-| `pnpm db:migrate` | Run pending migrations |
-| `pnpm db:generate` | Generate migration from schema changes |
-| `pnpm db:seed` | Seed demo data |
-| `pnpm db:test` | Test database connection |
+| Script | Description |
+|--------|-------------|
+| `pnpm db:bootstrap` | Create DBs, roles, grants (local PG only) |
+| `pnpm db:generate` | Generate Drizzle migrations |
+| `pnpm db:migrate` | Run migrations |
+| `pnpm db:rebuild` | Generate + migrate |
+| `pnpm db:seed` | Seed foundational data |
+| `pnpm db:seed:demo` | Seed demo invite/membership |
+| `pnpm db:test` | Verify connections |
+| `pnpm db:nuke` | Drop all DBs & roles (danger!) |
+| `pnpm db:wipe` | Wipe all rows (danger!) |
 
-### Quality
-| Command | Description |
-|---------|-------------|
-| `pnpm typecheck` | Check TypeScript types |
-| `pnpm lint` | Run ESLint |
-| `pnpm lint:fix` | Auto-fix lint issues |
+### Development
+| Script | Description |
+|--------|-------------|
+| `pnpm dev:api` | Run API server |
+| `pnpm dev:ws` | Run Workstation web |
+| `pnpm dev:market` | Run Marketplace web |
+| `pnpm dev:timeline` | Run Timeline demo |
+| `pnpm build` | Build all packages |
+| `pnpm typecheck` | Type-check all packages |
 
 ---
 
-## Getting Help
-
-1. Check this troubleshooting section
-2. Read the relevant guide in `documents/guides/`
-3. Ask a team member or instructor
-
-**Contact:** Mathias Haslien ([mathias@hoolsy.com](mailto:mathias@hoolsy.com))
+Happy hacking! 🚀

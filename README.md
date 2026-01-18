@@ -1,227 +1,297 @@
-# HK26 Syncstation App
+# Hoolsy Platforms Monorepo
 
-A mobile application for on-set logging and data capture during video production. Built with React Native and Expo.
-
----
-
-## What is Syncstation?
-
-Syncstation is an **offline-first companion app** for production teams on set. It allows crew members to:
-- Log events, actions, and observations while filming
-- Capture media (photos, videos, audio) linked to specific scenes
-- Organize data by project, episode, scene hierarchy
-- Sync data to the cloud when connectivity is available
-- Work completely offline during production
-
-This repository is part of the HK26 student project series.
+Welcome to the **Hoolsy** monorepo. This repository contains multiple apps and shared packages that together power the platform.
+If you're setting up the project for the first time, **start with [SETUP.md](./SETUP.md)**. It explains database bootstrap,
+seeding, and how to run the API + web locally.
 
 ---
 
-## Tech Stack
+## What is Hoolsy?
 
-### Mobile App
-- **React Native** - Cross-platform mobile framework
-- **Expo** - Development and build tooling
-- **React Navigation** - Screen navigation
-- **TanStack Query** - Data fetching and caching
-- **Offline-first architecture** - Local storage with background sync
+Hoolsy is building a **"media-to-commerce" engine** that makes content shoppable in real-time. When users watch films, series, podcasts, or livestreams, the system identifies relevant subjects (people, products, places) and makes them explorable and purchasable. This requires AI-detected subjects to be verified, structured, and quality-controlled before reaching end users.
 
-### Backend API
-- **Fastify** - Fast HTTP server
-- **Drizzle ORM** - Type-safe database access
-- **JWT** - Token-based authentication
-- **PostgreSQL** - Database (3 separate databases)
+### Workstation: The Editorial Control Center
 
-### Shared
-- **Zod** - Runtime validation and TypeScript type inference
-- **pnpm** - Monorepo package management
-- **Docker** - PostgreSQL containerization
+**Workstation** is where raw AI results become clean, verified, production-ready data. Think of it as the newsroom and quality control hub combined.
+
+**What Workstation does:**
+
+- **Verify AI detections** - AI tags subjects in media, but humans verify, correct, and approve before data goes live
+- **Timeline precision** - Link subjects to exact moments in content ("jacket appears 12:03-12:27 in this scene")
+- **Collaborative workflow** - Tasks, comments, status tracking, and role-based access control for team collaboration
+- **Hierarchical permissions** - Grant access at series, season, episode, or project level for secure multi-team workflows
+
+**The Workstation flow (3 steps):**
+
+1. **Ingest** - Import media + reference data (with pointers to AI training materials in data lake via Subject Registry)
+2. **Enrich & verify** - Human review and approval of AI-detected subjects
+3. **Export** - Push clean datasets to optimized subject databases (document, graph, time-series) for end-user applications
+
+**Analogy:** Workstation is like an editing suite + fact-checking desk + logistics hub before final publication.
+
+### Marketplace: The Commerce Platform
+
+**Marketplace** (development not yet started) will be the seller-facing platform where brands and vendors:
+
+- Manage product catalogs, descriptions, and pricing
+- Run campaigns and control inventory status
+- Link products to subjects, so they appear when users discover relevant content
+
+**How they work together:**
+
+- **Workstation** ensures "what's in the scene" is accurate (subjects, timeline, relationships, metadata)
+- **Marketplace** ensures "what can be purchased" is available (products, sellers, pricing)
+- Both share a unified subject identity system (via Subject Registry) and polyglot storage for subject data
 
 ---
 
-## Quick Start
+## Tech stack
 
-**For detailed setup instructions, see [SETUP.md](./SETUP.md).**
+- **TypeScript** (workspace-wide)
+- **Web (Workstation)**: React 19 + Vite + TailwindCSS
+- **API**: Node.js (Fastify/Express-style), TypeScript
+- **Database**: PostgreSQL + Drizzle ORM (migrations + seeding), Neo4j, MongoDB, TimescaleDB
+- **Package manager**: pnpm (workspaces/monorepo)
 
-**Prerequisites:**
-- Node.js 20+
-- pnpm 8+
-- Docker Desktop
-- Expo Go on your phone
+### Databases (multi-DB)
+- `users` – identities, invites, platforms, memberships
+- `workstation` – tenant/org domain models for the Workstation app
+- `marketplace` – reserved for Marketplace (not always required in dev)
 
-**Setup:**
+> **Important**: The repo includes scripts to bootstrap roles/DBs and refresh grants. Always read **SETUP.md** for the authoritative steps.
+
+---
+
+## Repository structure
+
+```
+.
+├─ apps/
+│  ├─ api/                  # API server (auth, invites, me/refresh/logout, domain endpoints)
+│  ├─ workstation-web/      # React web app for Workstation (Vite + Tailwind)
+│  └─ marketplace-web/      # (Optional) Marketplace web app
+│
+├─ packages/
+│  ├─ databases/            # Drizzle schemas, migrations, bootstrap SQL, seed/test scripts
+│  │  ├─ src/
+│  │  │  ├─ schema/         # Source-of-truth DB schemas (users/workstation/marketplace)
+│  │  │  └─ scripts/        # seed-demo.ts, seed-db.ts, bootstrap-db.ts, test-db.ts, etc.
+│  │  └─ migrations/        # Generated migration files per database
+│  ├─ schema/               # Shared runtime types & Zod schemas used across API + web
+│  └─ timeline/             # Custom timeline component package
+│
+├─ docker/                  # Docker Compose setup for databases
+│  ├─ docker-compose.yml
+│  ├─ postgres/init/        # PostgreSQL init scripts
+│  ├─ neo4j/                # Neo4j configuration
+│  ├─ mongo/init/           # MongoDB init scripts
+│  └─ timescale/init/       # TimescaleDB init scripts
+│
+├─ .env-example             # Template env file; copy to .env and edit
+├─ pnpm-workspace.yaml      # Monorepo package boundaries
+├─ package.json             # Root scripts (db:* + dev:* helpers)
+├─ SETUP.md                 # **Start here** for local setup (bootstrap, migrate, seed, run)
+└─ README.md                # This file
+```
+
+### `apps/workstation-web/` (React)
+- Routing: React Router
+- Styling: TailwindCSS + a small design system (see `src/styles/ui.css`)
+- Auth: `/auth/login`, `/auth/refresh`, `/auth/me` (access token in memory, refresh cookie via API)
+- State: lightweight context (`src/state/AuthContext.tsx`)
+- Widgets/Grid: `react-grid-layout` based widgets under `src/widgets/*`
+- HTTP client: `src/lib/http.ts` (handles auth header + refresh on 401)
+
+### `apps/api/` (TypeScript)
+- Exposes auth endpoints and Workstation domain endpoints
+- Uses Drizzle ORM for data access
+- Reads DB URLs + JWT/cookie secrets from `.env`
+- Seeds create platforms, permissions catalog, demo tenants/roles, etc.
+
+### `packages/databases/`
+- `bootstrap` SQL: creates databases/roles, grants privileges, enables pgcrypto
+- Migrations generated via **drizzle-kit**
+- Re-run **`pnpm db:bootstrap`** after migrations to ensure grants on new tables/sequences
+- Clients for Neo4j, MongoDB, and TimescaleDB (for subject modeling)
+
+### `packages/schema/`
+- Shared `zod` schemas & TS types consumed by both API and web
+- Keep these canonical; web & api import from here
+
+---
+
+## Scripts (root)
 
 ```bash
-# Clone and enter the project
-git clone <repository-url>
-cd hk26-syncstation-app
-
-# Copy environment file
-cp .env.example .env
-
-# Install, start Docker, and initialize databases
+# Install deps
 pnpm install
-pnpm docker:up
-pnpm db:reset
+
+# Docker (recommended)
+pnpm docker:up      # start all database containers
+pnpm docker:down    # stop containers
+pnpm docker:reset   # wipe data and restart
+
+# Database lifecycle
+pnpm db:bootstrap   # create/refresh DBs + roles + grants (local PG only)
+pnpm db:generate    # generate migrations for all DBs
+pnpm db:migrate     # apply migrations for all DBs
+pnpm db:rebuild     # generate + migrate (recommended)
+pnpm db:seed        # foundational seeds
+pnpm db:seed:demo   # demo invite & membership (prints invite token)
+pnpm db:test        # quick connectivity + table checks
+pnpm db:nuke        # **danger**: drop DBs and roles
+
+# Run services
+pnpm dev:api        # API on http://localhost:3333
+pnpm dev:ws         # Workstation web on http://localhost:5173
 ```
 
-**Development:**
-
-```bash
-# Start API (Terminal 1)
-pnpm dev:api
-
-# Start mobile app (Terminal 2)
-pnpm dev:app
-```
-
-Then scan the QR code with Expo Go.
+> Most developers can jump in with: `pnpm install` → follow **SETUP.md** → `pnpm dev:api` and `pnpm dev:ws`.
 
 ---
 
-## Project Structure
+## Conventions & notes
 
-```
-hk26-syncstation-app/
-├── apps/
-│   ├── api/                      # Backend API (Fastify)
-│   └── syncstation-app/          # Mobile app (React Native + Expo)
-├── packages/
-│   ├── databases/postgres/       # Database schemas, migrations, seed data
-│   └── schema/                   # Shared Zod schemas (API contracts)
-├── docker/                       # Docker Compose for PostgreSQL
-├── postman/                      # API testing collection
-└── documents/                    # Guides and documentation
-```
+- **Tenants/orgs**: The Workstation app shows the user name and current tenant in the side nav; the API returns `me.user` and `currentTenantInfo`.
+- **Auth tokens**: Access token is stored in memory/session scope; refresh is httpOnly cookie (dev: not `secure`, prod: `secure`).
+- **Permissions**: A wildcard-style permissions catalog is seeded; role bindings are per-tenant. Read the seeds for examples.
+- **Type safety**: Shared Zod schemas live in `packages/schema`; both API and web parse/validate against them.
 
 ---
 
-## Databases
+## Getting started
 
-The app uses **three PostgreSQL databases**:
+1. **Read and follow [SETUP.md](./SETUP.md).**
+2. Run `pnpm dev:api` and `pnpm dev:ws`.
+3. **Log in with admin user** - Use `admin@hoolsy.com` / `demopassword` for full access (or register with invite token for role-based testing).
+4. **Test the timeline editor** - The demo seed includes a Breaking Bad Season 1, Episode 1 video clip. Navigate to Content Dashboard → Breaking Bad → SEASON 1 → Pilot S1.E1 to test video streaming and timeline editing.
 
-| Database | Purpose | Source |
-|----------|---------|--------|
-| `user` | Multi-tenant authentication, users, tenants, roles | Hoolsy-platforms (read-only) |
-| `workstation` | Content nodes, project hierarchy (root → group → episode → scene) | Hoolsy-platforms (read-only) |
-| `syncstation` | App-specific data: log entries, media URLs, sync status | This repo (full access) |
+If anything fails, check the *Common issues* section in **SETUP.md**.
 
-**Important:**
-- `user` and `workstation` databases are **read-only** copies from hoolsy-platforms
-- Only `syncstation` database can be modified by this app
-- Multi-tenant architecture: all data isolated per tenant (production company)
+### Demo Video
 
----
+When you run `pnpm db:seed:demo`, it creates a Breaking Bad project with seasons and episodes. Only the **Pilot episode (S1.E1)** includes actual video content - a short clip from Breaking Bad Season 1, Episode 1.
 
-## Available Commands
+**Use this to test:**
+- Video streaming with range request support
+- Timeline editor with frame-accurate scrubbing
+- Media playback controls
+- Content preview in the dashboard
 
-| Command | Description |
-|---------|-------------|
-| `pnpm dev` | Start API and mobile app together |
-| `pnpm dev:api` | Start only the API |
-| `pnpm dev:app` | Start only the mobile app |
-| `pnpm docker:up` | Start PostgreSQL container |
-| `pnpm docker:down` | Stop PostgreSQL container |
-| `pnpm db:reset` | Reset databases and re-seed |
-| `pnpm db:migrate` | Run pending migrations |
-| `pnpm typecheck` | Check TypeScript types |
-| `pnpm lint` | Run ESLint |
+**Without the demo seed**, you'll have an empty content tree and won't be able to test media functionality.
 
 ---
 
-## Demo Data
+## Workstation Pages & Workflow
 
-After running `pnpm db:seed`, the database contains:
+The Workstation web app is currently under active development. Here's what's functional and how to use the system:
 
-**Users (multi-tenant):**
-- Production companies (tenants)
-- Users with different roles (admin, editor, viewer)
+### Functional Pages
 
-**Content Hierarchy:**
-- Projects (root nodes)
-- Groups (seasons, collections)
-- Episodes
-- Scenes
+#### 1. **Authentication (Login/Register)**
+- **Login page** - Log in with email and password (`admin@hoolsy.com` / `demopassword` for admin access)
+- **Registration page** - Register new users via invite tokens (supports role-based access control)
+- Token-based auth with automatic refresh and session management
 
-**Syncstation Log Data:**
-- Example log entries
-- Media references (photos, videos)
-- Sync status examples (local, pending, synced, failed)
+#### 2. **Admin Page**
+- **Member management** - View all members in your workspace, see their roles and permissions
+- **Role management** - Create custom roles, assign granular permissions, and manage the permissions catalog
+- **User invitations** - Invite new team members with specific roles and expiration dates
+- **Multi-role support** - Users can have multiple roles simultaneously (like Discord)
 
-See [packages/databases/postgres/src/seed-data/README.md](packages/databases/postgres/src/seed-data/README.md) for details.
+**Purpose:** This is your team management hub. Use it to control who has access to what in your workspace.
+
+#### 3. **Content Dashboard**
+- **Content tree navigation** - Browse projects, series, seasons, and episodes in a hierarchical tree
+- **Media preview** - Preview video content with thumbnail generation
+- **Node management** - View metadata, status, and relationships for content nodes
+- **Timeline integration** - Click on episodes to open the timeline editor
+
+**Purpose:** Your content overview and navigation center. See all media in your workspace at a glance.
+
+#### 4. **Project Structure**
+- **Create projects** - Set up new content projects (films, series, podcasts)
+- **Hierarchical organization** - Build season/episode structures or custom content hierarchies
+- **Media ingestion** - Upload and link media files to content nodes
+- **Metadata management** - Add titles, descriptions, slugs, and custom metadata
+
+**Purpose:** Structure your content before enrichment. Think of this as your content library setup.
+
+### The Workstation Workflow
+
+Here's the recommended workflow for using Workstation:
+
+**1. Team Setup (Admin Page)**
+- Start by creating roles for your team (e.g., "Editor", "Reviewer", "Content Manager")
+- Invite team members and assign appropriate roles
+- Configure permissions to control who can do what
+
+**2. Content Setup (Project Structure)**
+- Create a new project (e.g., a TV series or film)
+- Build the content hierarchy (seasons, episodes, or custom structure)
+- Upload media files or link to external media storage
+- Add metadata (titles, descriptions, air dates, etc.)
+
+**3. Content Enrichment (Content Dashboard)**
+- Navigate the content tree to find episodes or media nodes
+- Click on a content node to open it
+- Use the timeline editor to add subjects, annotations, and timecodes
+- Review and verify AI-detected subjects
+- Mark content as reviewed/approved when ready
+
+**4. Quality Control & Export**
+- Review enriched content in the dashboard
+- Verify all subjects are correctly tagged and timed
+- Export clean data to production databases when ready
+
+### Pages Under Development
+
+The following pages have **placeholder widgets** and are not yet fully functional:
+
+- **Dashboard** - Will show workspace analytics and overview metrics
+- **Tasks** - Task management and workflow tracking (coming soon)
+- **Subjects** - Subject registry and verification interface (coming soon)
+- **Media Library** - Advanced media management and search (coming soon)
+
+These pages exist in the navigation but contain dummy widgets to demonstrate the widget system architecture. They will be fully implemented in future iterations.
+
+### Current Limitations
+
+- **Timeline editor** - Currently only works with the demo Breaking Bad video
+- **Media upload** - Backend upload API exists but frontend integration is incomplete
+- **Search** - Global search not yet implemented
+- **Batch operations** - Bulk actions on content nodes coming soon
+- **AI integration** - Subject detection and auto-tagging not yet connected
+
+Despite these limitations, you can explore the core workflow: team setup → content structure → manual enrichment → export.
 
 ---
 
 ## Documentation
 
-### Setup & Guides
+Detailed documentation is available for each component of the monorepo:
 
-| Document | Description |
-|----------|-------------|
-| [SETUP.md](./SETUP.md) | Step-by-step setup guide with tool explanations |
-| [documents/guides/type-safety-from-database-to-frontend.md](documents/guides/type-safety-from-database-to-frontend.md) | How to extend the database and maintain type safety |
-| [packages/databases/postgres/src/seed-data/README.md](packages/databases/postgres/src/seed-data/README.md) | How to add demo data |
+### Applications
 
-### Hoolsy Platform Documentation
+- **[API Backend](apps/api/README.md)** - Fastify-based REST API with authentication, multi-tenancy, content management, media handling, and RBAC
+- **[Workstation Web](apps/workstation-web/README.md)** - React 19 frontend with widget system, timeline editor, and content management
+- **[Marketplace Web](apps/marketplace-web/README.md)** - Future marketplace application (scaffolding only)
 
-| Document | Description |
-|----------|-------------|
-| [documents/hoolsy-platforms/README.md](documents/hoolsy-platforms/README.md) | Overview of all Hoolsy platforms and their relationships |
-| [documents/hoolsy-platforms/consumer-app.md](documents/hoolsy-platforms/consumer-app.md) | Consumer App platform specification |
-| [documents/hoolsy-platforms/marketplace.md](documents/hoolsy-platforms/marketplace.md) | Marketplace platform overview |
-| [documents/hoolsy-platforms/marketplace-storefront.md](documents/hoolsy-platforms/marketplace-storefront.md) | Marketplace Storefront specification |
-| [documents/hoolsy-platforms/marketplace-vendors.md](documents/hoolsy-platforms/marketplace-vendors.md) | Marketplace Vendors specification |
-| [documents/hoolsy-platforms/nexus.md](documents/hoolsy-platforms/nexus.md) | Nexus platform specification |
-| [documents/hoolsy-platforms/syncstation.md](documents/hoolsy-platforms/syncstation.md) | Syncstation platform specification |
-| [documents/hoolsy-platforms/workstation.md](documents/hoolsy-platforms/workstation.md) | Workstation platform specification |
+### Packages
 
-### Claude Code Skills
+- **[Schema](packages/schema/README.md)** - Shared TypeScript/Zod schemas for API and frontend type safety
+- **[Databases](packages/databases/postgres/README.md)** - PostgreSQL schemas, Drizzle ORM, migrations, and seeding
+- **[Logger](packages/logger/README.md)** - Environment-aware structured logging package
+- **[Timeline](packages/timeline/README.md)** - Timeline editor component for video editing
 
-This project includes custom Claude Code skills for common tasks:
+### Infrastructure
 
-| Skill | Command | Description |
-|-------|---------|-------------|
-| Code Quality Check | `/code-quality-check` | Run typecheck + eslint, enforces fixing issues |
-| Hoolsy Context | `/hoolsy-context` | Understand Hoolsy's platform ecosystem and architecture |
-| Postman Update | `/postman-update` | Update Postman collections after adding new API endpoints |
-| Skill Writer | `/skill-writer` | Guide for creating new Agent Skills |
-| Type Safety Schema | `/type-safety-schema` | Enforce type safety and schema centralization |
-| useEffect vs useSWR | `/useeffect-vs-useswr` | Guide for choosing between useEffect and useSWR |
+- **[Docker](docker/README.md)** - Multi-database Docker Compose setup (PostgreSQL, Neo4j, MongoDB, TimescaleDB)
 
-See [.claude/skills/index.md](.claude/skills/index.md) for full documentation.
+### Tools
 
-### GitHub Copilot Instructions
-
-If you use GitHub Copilot, install the Hoolsy coding standards:
-
-1. Open VS Code settings (Ctrl+,)
-2. Search for "GitHub Copilot: Prompt Instructions"
-3. Copy contents from [.github/instructions/hoolsy.instructions.md](.github/instructions/hoolsy.instructions.md)
-4. Paste into the prompt instructions field
-
-This ensures Copilot follows Hoolsy's coding conventions, architecture patterns, and best practices.
+- **[Postman Collection](postman/README.md)** - API testing collection with auto-populated variables and test scripts
 
 ---
 
-## API Testing
-
-Import the Postman collection from `postman/` folder:
-
-1. Open Postman
-2. Click **Import** → **Folder** → Select `postman/`
-3. Set environment to **Syncstation-Local**
-4. Start with **Health Check** to verify the API is running
-
-For detailed Postman usage and authentication flow, see [postman/README.md](postman/README.md).
-
----
-
-## Support
-
-**Contact:** Mathias Haslien ([mathias@hoolsy.com](mailto:mathias@hoolsy.com))
-
----
-
-## License
-
-Private repository for Hoolsy student teams.
+Happy hacking! 🚀

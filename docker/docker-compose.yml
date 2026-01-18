@@ -1,35 +1,94 @@
-# Consumer App - Docker Services
-# Naming convention: consumer-app, CA-<service>
+# docker/docker-compose.yml
+# Hoolsy Development Database Stack
+#
+# Start:  pnpm docker:up
+# Stop:   pnpm docker:down
+# Reset:  pnpm docker:reset (wipes all data)
+# Logs:   pnpm docker:logs
 
-name: consumer-app-stack
+name: hoolsy-platforms
 
 services:
+  # ============================================================================
+  # PostgreSQL - Main relational database (users, workstation, marketplace)
+  # ============================================================================
   postgres:
     image: postgres:16-alpine
-    container_name: CA-postgres
-    env_file:
-      - ../.env
+    container_name: hoolsy-postgres
+    restart: unless-stopped
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      POSTGRES_DB: postgres
-    ports:
-      - "${POSTGRES_PORT:-5433}:5432"
     volumes:
-      - CA-postgres-data:/var/lib/postgresql/data
-      - ./postgres/init:/docker-entrypoint-initdb.d
+      - postgres_data:/var/lib/postgresql/data
+      # Mount init wrapper script
+      - ./postgres/init:/docker-entrypoint-initdb.d:ro
+      # Mount canonical bootstrap scripts from packages/
+      - ../packages/databases/postgres/bootstrap:/bootstrap-scripts:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
-      interval: 10s
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
       timeout: 5s
       retries: 5
-    networks:
-      - consumer-app
 
-networks:
-  consumer-app:
-    name: consumer-app
-    driver: bridge
+  # ============================================================================
+  # Neo4j - Graph database for subject relationships
+  # Browser: http://localhost:7474
+  # ============================================================================
+  neo4j:
+    image: neo4j:5-community
+    container_name: hoolsy-neo4j
+    restart: unless-stopped
+    ports:
+      - "${NEO4J_HTTP_PORT:-7474}:7474"   # HTTP browser
+      - "${NEO4J_BOLT_PORT:-7687}:7687"   # Bolt protocol
+    environment:
+      NEO4J_AUTH: ${NEO4J_USER:-neo4j}/${NEO4J_PASSWORD:-hoolsy_dev}
+      NEO4J_PLUGINS: '["apoc"]'
+      NEO4J_dbms_security_procedures_unrestricted: apoc.*
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+
+  # ============================================================================
+  # MongoDB - Document store for flexible subject metadata
+  # ============================================================================
+  mongo:
+    image: mongo:7
+    container_name: hoolsy-mongodb
+    restart: unless-stopped
+    ports:
+      - "${MONGO_PORT:-27017}:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER:-hoolsy}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-hoolsy_dev}
+      MONGO_INITDB_DATABASE: hoolsy_subjects
+    volumes:
+      - mongo_data:/data/db
+      - ./mongo/init:/docker-entrypoint-initdb.d:ro
+
+  # ============================================================================
+  # TimescaleDB - Time-series tracking for subject appearances timeline
+  # ============================================================================
+  timescaledb:
+    image: timescale/timescaledb:latest-pg16
+    container_name: hoolsy-timescaledb
+    restart: unless-stopped
+    ports:
+      - "${TIMESCALE_PORT:-5433}:5432"
+    environment:
+      POSTGRES_USER: ${TIMESCALE_USER:-hoolsy}
+      POSTGRES_PASSWORD: ${TIMESCALE_PASSWORD:-hoolsy_dev}
+      POSTGRES_DB: hoolsy_subjects
+    volumes:
+      - timescale_data:/var/lib/postgresql/data
+      - ./timescale/init:/docker-entrypoint-initdb.d:ro
 
 volumes:
-  CA-postgres-data:
+  postgres_data:
+  neo4j_data:
+  neo4j_logs:
+  mongo_data:
+  timescale_data:

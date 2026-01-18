@@ -1,0 +1,125 @@
+/* Design Tokens - Light and Dark themes */
+
+:root[data-theme="dark"],
+:root {
+  /* Colors - Background */
+  --timeline-bg-primary: #0a0a0a;
+  --timeline-bg-secondary: #1a1a1a;
+  --timeline-bg-tertiary: #2a2a2a;
+  --timeline-bg-elevated: #111;
+
+  /* Colors - Borders */
+  --timeline-border-primary: #333;
+  --timeline-border-secondary: #3a3a3a;
+  --timeline-border-tertiary: #4a4a4a;
+
+  /* Colors - Text */
+  --timeline-text-primary: #ffffff;
+  --timeline-text-secondary: #aaaaaa;
+  --timeline-text-tertiary: #888888;
+  --timeline-text-muted: #666666;
+  --timeline-text-subtle: #555555;
+
+  /* Colors - Accent - Less intense blue */
+  --timeline-accent-primary: #4a90e2;
+  --timeline-accent-primary-hover: #5a9eec;
+  --timeline-accent-primary-active: #357abd;
+
+  /* Colors - Interactive */
+  --timeline-interactive-hover: #252525;
+  --timeline-interactive-active: #1a1a1a;
+  --timeline-interactive-selected: #2a2a2a;
+
+  /* Colors - Status */
+  --timeline-status-success: #22c55e;
+  --timeline-status-error: #ef4444;
+  --timeline-status-warning: #f59e0b;
+  --timeline-status-info: #3b82f6;
+
+  /* Shadows */
+  --timeline-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --timeline-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+  --timeline-shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.5);
+
+  /* Border Radius */
+  --timeline-radius-sm: 2px;
+  --timeline-radius-md: 4px;
+  --timeline-radius-lg: 6px;
+  --timeline-radius-xl: 8px;
+
+  /* Spacing */
+  --timeline-space-xs: 2px;
+  --timeline-space-sm: 4px;
+  --timeline-space-md: 8px;
+  --timeline-space-lg: 12px;
+  --timeline-space-xl: 16px;
+  --timeline-space-2xl: 20px;
+  --timeline-space-3xl: 24px;
+
+  /* Typography */
+  --timeline-font-family: system-ui, -apple-system, sans-serif;
+  --timeline-font-mono: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  --timeline-font-size-xs: 8px;
+  --timeline-font-size-sm: 9px;
+  --timeline-font-size-md: 12px;
+  --timeline-font-size-lg: 14px;
+  --timeline-font-size-xl: 18px;
+  --timeline-font-size-2xl: 24px;
+  --timeline-font-weight-normal: 400;
+  --timeline-font-weight-medium: 500;
+  --timeline-font-weight-semibold: 600;
+  --timeline-font-weight-bold: 700;
+
+  /* Transitions */
+  --timeline-transition-fast: 0.1s ease;
+  --timeline-transition-normal: 0.15s ease;
+  --timeline-transition-slow: 0.3s ease;
+
+  /* Z-index */
+  --timeline-z-base: 0;
+  --timeline-z-dropdown: 100;
+  --timeline-z-overlay: 200;
+  --timeline-z-modal: 300;
+  --timeline-z-tooltip: 400;
+}
+
+:root[data-theme="light"] {
+  /* Colors - Background - Professional Workstation theme */
+  --timeline-bg-primary: #fafbfc;      /* Very light background */
+  --timeline-bg-secondary: #ffffff;    /* Pure white for track area */
+  --timeline-bg-tertiary: #f3f4f6;     /* Slightly darker for alternating tracks */
+  --timeline-bg-elevated: #ffffff;     /* Pure white for elevated elements */
+
+  /* Colors - Borders - Subtle but defined */
+  --timeline-border-primary: #e5e7eb;  /* Lighter main borders */
+  --timeline-border-secondary: #d1d5db; /* Secondary borders */
+  --timeline-border-tertiary: #9ca3af;  /* Stronger emphasis borders */
+
+  /* Colors - Text - Optimized for readability */
+  --timeline-text-primary: #111827;    /* Almost black for maximum contrast */
+  --timeline-text-secondary: #4b5563;  /* Clear secondary text */
+  --timeline-text-tertiary: #6b7280;   /* Tertiary information */
+  --timeline-text-muted: #9ca3af;      /* Muted text */
+  --timeline-text-subtle: #d1d5db;     /* Very subtle text */
+
+  /* Colors - Accent - Muted professional blue */
+  --timeline-accent-primary: #5b8dd9;      /* Softer blue */
+  --timeline-accent-primary-hover: #4a7cc8; /* Hover state */
+  --timeline-accent-primary-active: #3968b4; /* Active/pressed */
+
+  /* Colors - Interactive - Refined feedback */
+  --timeline-interactive-hover: #f9fafb;   /* Subtle hover */
+  --timeline-interactive-active: #e5e7eb;  /* Active state */
+  --timeline-interactive-selected: #e0e7ff; /* Selected with hint of blue */
+
+  /* Colors - Status - Professional tones */
+  --timeline-status-success: #10b981;  /* Balanced green */
+  --timeline-status-error: #ef4444;    /* Clear error red */
+  --timeline-status-warning: #f59e0b;  /* Warning amber */
+  --timeline-status-info: #5b8dd9;     /* Info blue matching accent */
+
+  /* Shadows - Minimal depth for clean look */
+  --timeline-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+  --timeline-shadow-md: 0 2px 4px -1px rgba(0, 0, 0, 0.06), 0 4px 6px -1px rgba(0, 0, 0, 0.04);
+  --timeline-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.06), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+}
