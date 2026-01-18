@@ -23,14 +23,14 @@ import type {
  */
 export async function getLogEntriesForNode(
   nodeId: string,
-  status?: SyncStatusT
+  status?: SyncStatusT,
 ): Promise<LogEntrySummary[]> {
   const params = new URLSearchParams();
   params.append('nodeId', nodeId);
   if (status) params.append('status', status);
 
   const response = await apiClient.get<LogEntriesListResponseData>(
-    `/syncstation/log-entries?${params.toString()}`
+    `/syncstation/log-entries?${params.toString()}`,
   );
 
   return response.data.items;
@@ -41,7 +41,7 @@ export async function getLogEntriesForNode(
  */
 export async function getLogEntry(id: string): Promise<LogEntry> {
   const response = await apiClient.get<LogEntryResponseData>(
-    `/syncstation/log-entries/${id}`
+    `/syncstation/log-entries/${id}`,
   );
 
   return response.data.entry;
@@ -51,11 +51,11 @@ export async function getLogEntry(id: string): Promise<LogEntry> {
  * Create a new log entry
  */
 export async function createLogEntry(
-  data: CreateLogEntryRequestBody
+  data: CreateLogEntryRequestBody,
 ): Promise<LogEntry> {
   const response = await apiClient.post<LogEntryResponseData>(
     '/syncstation/log-entries',
-    data // ✅ Type-safe: matches CreateLogEntryRequestBody
+    data, // ✅ Type-safe: matches CreateLogEntryRequestBody
   );
 
   return response.data.entry;
@@ -66,11 +66,11 @@ export async function createLogEntry(
  */
 export async function updateLogEntry(
   id: string,
-  data: UpdateLogEntryRequestBody
+  data: UpdateLogEntryRequestBody,
 ): Promise<LogEntry> {
   const response = await apiClient.patch<LogEntryResponseData>(
     `/syncstation/log-entries/${id}`,
-    data // ✅ Type-safe: matches UpdateLogEntryRequestBody
+    data, // ✅ Type-safe: matches UpdateLogEntryRequestBody
   );
 
   return response.data.entry;

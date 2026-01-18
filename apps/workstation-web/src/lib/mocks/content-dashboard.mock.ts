@@ -4,8 +4,8 @@
  * Breaking Bad S01E01 scene data.
  */
 
-import type { Marker } from '@hoolsy/timeline';
 import type { Subject, SubjectAppearance } from '@hk26/schema';
+import type { Marker } from '@hoolsy/timeline';
 
 // ============================================================================
 // MOCK SUBJECTS - Metadata only

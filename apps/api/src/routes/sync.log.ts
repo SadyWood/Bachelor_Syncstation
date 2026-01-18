@@ -80,7 +80,7 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
         if (!entry) {
           return reply.code(404).send(ErrorResponse.parse({
             ok: false,
-            error: `Log entry '${logEntryId}' not found. Check that the ID is correct and belongs to your tenant.`
+            error: `Log entry '${logEntryId}' not found. Check that the ID is correct and belongs to your tenant.`,
           }));
         }
 
@@ -130,7 +130,7 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
           const body = CreateLogEntryRequest.shape.body.parse(req.body);
           return reply.code(400).send(ErrorResponse.parse({
             ok: false,
-            error: `Content node '${body.nodeId}' not found. Make sure the node exists and belongs to your tenant.`
+            error: `Content node '${body.nodeId}' not found. Make sure the node exists and belongs to your tenant.`,
           }));
         }
 
@@ -168,7 +168,7 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
         if (!entry) {
           return reply.code(404).send(ErrorResponse.parse({
             ok: false,
-            error: `Log entry '${logEntryId}' not found. Check that the ID is correct and belongs to your tenant.`
+            error: `Log entry '${logEntryId}' not found. Check that the ID is correct and belongs to your tenant.`,
           }));
         }
 
@@ -201,7 +201,7 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
         if (!deleted) {
           return reply.code(404).send(ErrorResponse.parse({
             ok: false,
-            error: `Log entry '${logEntryId}' not found. It may have already been deleted or doesn't belong to your tenant.`
+            error: `Log entry '${logEntryId}' not found. It may have already been deleted or doesn't belong to your tenant.`,
           }));
         }
 

@@ -1,5 +1,4 @@
 // apps/workstation-web/src/lib/media-client.ts
-import { createLogger } from '@hoolsy/logger';
 import {
   InitUploadRequestSchema,
   InitUploadResponseSchema,
@@ -10,6 +9,7 @@ import {
   type MediaAsset,
   type MediaVariant,
 } from '@hk26/schema';
+import { createLogger } from '@hoolsy/logger';
 import { httpTyped, getAccessToken, getCurrentTenantId } from './http';
 import type { z } from 'zod';
 

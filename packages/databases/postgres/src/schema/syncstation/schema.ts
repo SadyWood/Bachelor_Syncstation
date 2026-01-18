@@ -1,7 +1,7 @@
 // packages/databases/postgres/src/schema/syncstation/schema.ts
 // Syncstation database schema - On-set logging MVP
-import { pgTable, uuid, text, timestamp, varchar, integer, pgEnum } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
+import { pgTable, uuid, text, timestamp, varchar, integer, pgEnum } from 'drizzle-orm/pg-core';
 
 /* ========================================
    ENUMS
