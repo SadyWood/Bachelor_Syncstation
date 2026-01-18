@@ -9,6 +9,7 @@ import {
   type SyncStatusT,
 } from '@hk26/schema';
 import { and, eq, sql, desc } from 'drizzle-orm';
+import { v7 as uuidv7 } from 'uuid';
 import { dbSync, schema } from '../db.js';
 
 /* ========================================
@@ -180,9 +181,12 @@ export async function createLogEntry(data: {
   title: string;
   description?: string;
 }): Promise<LogEntry> {
+  const now = new Date();
+
   const rows = await dbSync
     .insert(schema.logEntries)
     .values({
+      id: uuidv7(), // Generate UUID in application
       tenantId: data.tenantId,
       userId: data.userId,
       contentNodeId: data.nodeId,
@@ -190,8 +194,23 @@ export async function createLogEntry(data: {
       notes: data.description ?? null,
       syncStatus: 'local', // Default status
       syncError: null,
+      createdAt: now,
+      updatedAt: now,
     })
-    .returning();
+    .returning({
+      id: schema.logEntries.id,
+      tenant_id: schema.logEntries.tenantId,
+      user_id: schema.logEntries.userId,
+      content_node_id: schema.logEntries.contentNodeId,
+      title: schema.logEntries.title,
+      notes: schema.logEntries.notes,
+      metadata: schema.logEntries.metadata,
+      sync_status: schema.logEntries.syncStatus,
+      sync_error: schema.logEntries.syncError,
+      created_at: schema.logEntries.createdAt,
+      updated_at: schema.logEntries.updatedAt,
+      synced_at: schema.logEntries.syncedAt,
+    });
 
   const row = rows[0] as unknown as LogEntryRow;
   return mapLogEntryToDto(row);
@@ -226,7 +245,20 @@ export async function updateLogEntry(
     .update(schema.logEntries)
     .set(updates)
     .where(and(eq(schema.logEntries.id, id), eq(schema.logEntries.tenantId, tenantId)))
-    .returning();
+    .returning({
+      id: schema.logEntries.id,
+      tenant_id: schema.logEntries.tenantId,
+      user_id: schema.logEntries.userId,
+      content_node_id: schema.logEntries.contentNodeId,
+      title: schema.logEntries.title,
+      notes: schema.logEntries.notes,
+      metadata: schema.logEntries.metadata,
+      sync_status: schema.logEntries.syncStatus,
+      sync_error: schema.logEntries.syncError,
+      created_at: schema.logEntries.createdAt,
+      updated_at: schema.logEntries.updatedAt,
+      synced_at: schema.logEntries.syncedAt,
+    });
 
   if (rows.length === 0) return null;
 

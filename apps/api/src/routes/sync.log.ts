@@ -5,6 +5,7 @@ import {
   LogEntryResponse,
   LogEntriesListResponse,
   SyncStatusResponse,
+  SuccessResponse,
   ErrorResponse,
   SyncStatus,
 } from '@hk26/schema';
@@ -77,7 +78,10 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
       try {
         const entry = await syncLogRepo.getLogEntry(logEntryId, tenantId);
         if (!entry) {
-          return reply.code(404).send(ErrorResponse.parse({ ok: false, error: 'Log entry not found' }));
+          return reply.code(404).send(ErrorResponse.parse({
+            ok: false,
+            error: `Log entry '${logEntryId}' not found. Check that the ID is correct and belongs to your tenant.`
+          }));
         }
 
         return reply.send(LogEntryResponse.parse({ ok: true, entry }));
@@ -118,8 +122,18 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
         });
 
         return reply.code(201).send(LogEntryResponse.parse({ ok: true, entry }));
-      } catch (error) {
+      } catch (error: unknown) {
         app.log.error(error, 'Failed to create log entry');
+
+        // Check for foreign key constraint error (invalid nodeId)
+        if (error instanceof Error && error.message.includes('foreign key constraint')) {
+          const body = CreateLogEntryRequest.shape.body.parse(req.body);
+          return reply.code(400).send(ErrorResponse.parse({
+            ok: false,
+            error: `Content node '${body.nodeId}' not found. Make sure the node exists and belongs to your tenant.`
+          }));
+        }
+
         return reply.code(500).send(ErrorResponse.parse({ ok: false, error: 'Failed to create log entry' }));
       }
     },
@@ -152,7 +166,10 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
       try {
         const entry = await syncLogRepo.updateLogEntry(logEntryId, tenantId, body);
         if (!entry) {
-          return reply.code(404).send(ErrorResponse.parse({ ok: false, error: 'Log entry not found' }));
+          return reply.code(404).send(ErrorResponse.parse({
+            ok: false,
+            error: `Log entry '${logEntryId}' not found. Check that the ID is correct and belongs to your tenant.`
+          }));
         }
 
         return reply.send(LogEntryResponse.parse({ ok: true, entry }));
@@ -182,10 +199,13 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
       try {
         const deleted = await syncLogRepo.deleteLogEntry(logEntryId, tenantId);
         if (!deleted) {
-          return reply.code(404).send(ErrorResponse.parse({ ok: false, error: 'Log entry not found' }));
+          return reply.code(404).send(ErrorResponse.parse({
+            ok: false,
+            error: `Log entry '${logEntryId}' not found. It may have already been deleted or doesn't belong to your tenant.`
+          }));
         }
 
-        return reply.code(204).send();
+        return reply.send(SuccessResponse.parse({ ok: true }));
       } catch (error) {
         app.log.error(error, 'Failed to delete log entry');
         return reply.code(500).send(ErrorResponse.parse({ ok: false, error: 'Failed to delete log entry' }));
