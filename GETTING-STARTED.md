@@ -371,7 +371,15 @@ If you want to test with a **specific episode** instead of the root project:
 
 **Step 4: Test Syncstation API** 🎬
 
-Now you can test the Syncstation endpoints:
+The Syncstation API provides these endpoints for managing on-set log entries:
+- `GET /syncstation/sync-status` - Get sync statistics (pending, failed counts)
+- `GET /syncstation/log-entries` - List all log entries (with optional filters)
+- `GET /syncstation/log-entries/:id` - Get a single log entry with attachments
+- `POST /syncstation/log-entries` - Create a new log entry
+- `PATCH /syncstation/log-entries/:id` - Update an existing log entry
+- `DELETE /syncstation/log-entries/:id` - Delete a log entry
+
+Let's test each one:
 
 **4a. Get Sync Status**
 1. Open: `Syncstation API` → `Sync status`
@@ -391,7 +399,11 @@ Now you can test the Syncstation endpoints:
 2. Notice query params are **disabled** by default (shows all entries)
 3. Click **Send**
 4. Response shows all log entries for your tenant
-5. If you want to **filter by content node**, enable the `nodeId` query param
+
+**Optional filters:**
+- Enable `nodeId` query param to show only entries for a specific content node
+- Enable `status` query param to filter by sync status (`local`, `pending`, `synced`, `failed`)
+- You can combine both filters
 
 **4c. Create a Log Entry**
 1. Open: `Syncstation API` → `Create log entry`
@@ -429,14 +441,25 @@ Now you can test the Syncstation endpoints:
 **4f. Delete Log Entry**
 1. Open: `Syncstation API` → `Delete log entry`
 2. Click **Send**
-3. Response: `204 No Content` (success)
+3. Response: `{ "ok": true }` (success)
 
-#### Tips for Testing
+#### Error Handling
 
+The API returns helpful error messages to help you debug issues:
+
+**Common Errors:**
+- `401 Unauthorized` - Auth token expired, run Login again
+- `400 TENANT_HEADER_MISSING` - Missing `x-ws-tenant` header, check that `tenantId` variable is set
+- `400 Content node '{id}' not found` - The `nodeId` doesn't exist or doesn't belong to your tenant
+- `404 Log entry '{id}' not found` - The log entry doesn't exist or doesn't belong to your tenant
+- `404 ... may have already been deleted` - Trying to delete a log entry that's already gone
+
+**Testing Tips:**
 - **Auth Token Expires:** If you get `401 Unauthorized`, run Login again
-- **Wrong Tenant:** If you get `400 TENANT_HEADER_MISSING`, check that `tenantId` variable is set
+- **Wrong Tenant:** Check that `tenantId` variable is set in collection variables
 - **Node Not Found:** Verify `nodeId` exists by listing projects first
 - **Variables Not Updating:** Check the **Tests** tab in each request - they contain scripts that save variables
+- **Invalid UUIDs:** Make sure IDs are valid UUID format
 
 #### What's Next?
 
