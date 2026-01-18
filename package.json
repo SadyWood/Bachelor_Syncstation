@@ -1,0 +1,52 @@
+{
+  "name": "hk26-syncstation-app",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev:api": "pnpm --filter @hk26/api dev",
+    "dev:app": "pnpm --filter @hk26/syncstation-app start",
+    "dev": "pnpm dev:api & pnpm dev:app",
+    "build": "pnpm --recursive build",
+    "build:api": "pnpm --filter @hk26/api build",
+    "docker:up": "docker compose -f docker/docker-compose.yml up -d",
+    "docker:down": "docker compose -f docker/docker-compose.yml down",
+    "docker:logs": "docker compose -f docker/docker-compose.yml logs -f",
+    "docker:reset": "docker compose -f docker/docker-compose.yml down -v && pnpm docker:up",
+    "db:bootstrap": "pnpm --filter @hk26/postgres db:bootstrap",
+    "db:generate": "pnpm --filter @hk26/postgres db:generate",
+    "db:generate:catalog": "DRIZZLE_DB=catalog pnpm --filter @hk26/postgres db:generate",
+    "db:migrate": "pnpm --filter @hk26/postgres db:migrate",
+    "db:seed": "pnpm --filter @hk26/postgres db:seed",
+    "db:reset": "pnpm --filter @hk26/postgres db:reset",
+    "db:test": "pnpm --filter @hk26/postgres db:test",
+    "setup": "pnpm install && pnpm docker:up && pnpm db:reset",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "pnpm --recursive typecheck",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "clean": "pnpm --recursive clean"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.2.0",
+    "@eslint/js": "^9.18.0",
+    "@types/node": "^22.10.0",
+    "@typescript-eslint/eslint-plugin": "^8.20.0",
+    "@typescript-eslint/parser": "^8.20.0",
+    "eslint": "^9.18.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-airbnb-typescript": "^18.0.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-import-resolver-typescript": "^3.7.0",
+    "eslint-plugin-import": "^2.31.0",
+    "prettier": "^3.4.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0",
+    "typescript-eslint": "^8.53.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=8.0.0"
+  }
+}

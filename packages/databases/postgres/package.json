@@ -1,0 +1,29 @@
+{
+  "name": "@hk26/postgres",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "db:bootstrap": "tsx src/scripts/bootstrap-db.ts",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx src/scripts/migrate.ts",
+    "db:seed": "tsx src/scripts/seed-users-public.ts && tsx src/scripts/seed-catalog-demo.ts",
+    "db:reset": "tsx src/scripts/reset-db.ts",
+    "db:test": "tsx src/scripts/test-db.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.37.0",
+    "postgres": "^3.4.5",
+    "dotenv": "^16.4.0"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.29.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0",
+    "@types/node": "^22.10.0"
+  }
+}

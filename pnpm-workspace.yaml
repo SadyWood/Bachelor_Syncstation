@@ -1,0 +1,8 @@
+packages:
+  - apps/*
+  - packages/*
+  - packages/databases/*
+
+ignoredBuiltDependencies:
+  - esbuild
+  - unrs-resolver

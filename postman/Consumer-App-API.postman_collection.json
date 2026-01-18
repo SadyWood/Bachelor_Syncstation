@@ -1,0 +1,782 @@
+{
+	"info": {
+		"_postman_id": "consumer-app-api",
+		"name": "Consumer App API",
+		"description": "Complete API collection for Consumer App with authentication and CRUD operations",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{accessToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"item": [
+		{
+			"name": "Health",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/health",
+							"host": ["{{baseUrl}}"],
+							"path": ["health"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('userId', jsonData.user.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"newuser@example.com\",\n  \"password\": \"SecurePass123!\",\n  \"fullName\": \"New User\",\n  \"birthdate\": \"1995-05-15\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/register",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "register"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('accessToken', jsonData.accessToken);",
+									"    pm.collectionVariables.set('refreshToken', jsonData.refreshToken);",
+									"    pm.collectionVariables.set('userId', jsonData.user.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"demo@consumer-app.com\",\n  \"password\": \"Demo1234!\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "login"]
+						},
+						"description": "Login with demo user credentials. Password: Demo1234!"
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('accessToken', jsonData.accessToken);",
+									"    pm.collectionVariables.set('refreshToken', jsonData.refreshToken);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/refresh",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "refresh"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/auth/logout",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "logout"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Subjects",
+			"item": [
+				{
+					"name": "Get All Subjects",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/subjects",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "subjects"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Subject by ID",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/subjects/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "subjects", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Content",
+			"item": [
+				{
+					"name": "Get All Content",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/content",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "content"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Content by ID",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/content/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "content", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Content Timeline (Full)",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/content/:id/timeline",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "content", ":id", "timeline"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{contentId}}"
+								}
+							]
+						},
+						"description": "Returns the complete timeline with all subjects for a content piece."
+					},
+					"response": []
+				},
+				{
+					"name": "Sync Timeline (Fake Ultrasound)",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Auto-initialize syncCurrentTime if not set",
+									"let currentTime = pm.collectionVariables.get('syncCurrentTime');",
+									"if (!currentTime) {",
+									"    pm.collectionVariables.set('syncCurrentTime', '0');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/content/:id/timeline?currentTime={{syncCurrentTime}}&lookahead={{syncLookahead}}&includeActive=true",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "content", ":id", "timeline"],
+							"query": [
+								{
+									"key": "currentTime",
+									"value": "{{syncCurrentTime}}",
+									"description": "Current playback position in seconds"
+								},
+								{
+									"key": "lookahead",
+									"value": "{{syncLookahead}}",
+									"description": "Seconds ahead to fetch (default: 30)"
+								},
+								{
+									"key": "includeActive",
+									"value": "true",
+									"description": "Include currently visible subjects"
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{contentId}}"
+								}
+							]
+						},
+						"description": "FAKE ULTRASOUND TRIGGER\n\nSimulates what the app receives when ultrasound is detected.\n\nReturns:\n- Subjects visible NOW (isActive: true)\n- Subjects appearing within lookahead window\n- secondsUntilVisible: countdown for scheduling UI\n\nSet variables:\n- contentId: ID from Get All Content\n- syncCurrentTime: playback position (seconds)\n- syncLookahead: buffer window (default: 30)"
+					},
+					"response": []
+				},
+				{
+					"name": "Sync Timeline (Upcoming Only)",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/content/:id/timeline?currentTime={{syncCurrentTime}}&lookahead={{syncLookahead}}&includeActive=false",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "content", ":id", "timeline"],
+							"query": [
+								{
+									"key": "currentTime",
+									"value": "{{syncCurrentTime}}"
+								},
+								{
+									"key": "lookahead",
+									"value": "{{syncLookahead}}"
+								},
+								{
+									"key": "includeActive",
+									"value": "false",
+									"description": "Only upcoming, not currently visible"
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{contentId}}"
+								}
+							]
+						},
+						"description": "Pre-fetch only UPCOMING subjects (not currently visible). Useful for preloading product images."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Products",
+			"item": [
+				{
+					"name": "Get Products for Subject",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/subjects/:subjectId/products",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "subjects", ":subjectId", "products"],
+							"variable": [
+								{
+									"key": "subjectId",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Product by ID",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/products/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "products", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Favorites",
+			"item": [
+				{
+					"name": "Get My Favorites",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/favorites",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "favorites"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Favorite",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"subjectId\": \"\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/favorites",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "favorites"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove Favorite",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/favorites/:subjectId",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "favorites", ":subjectId"],
+							"variable": [
+								{
+									"key": "subjectId",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Cart",
+			"item": [
+				{
+					"name": "Get My Cart",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/cart",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "cart"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Item to Cart",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"productId\": \"\",\n  \"quantity\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/cart/items",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "cart", "items"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Cart Item",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"quantity\": 2\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/cart/items/:productId",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "cart", "items", ":productId"],
+							"variable": [
+								{
+									"key": "productId",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove Item from Cart",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/cart/items/:productId",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "cart", "items", ":productId"],
+							"variable": [
+								{
+									"key": "productId",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Orders",
+			"item": [
+				{
+					"name": "Get My Orders",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/orders",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "orders"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Order by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/orders/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "orders", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Order from Cart",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"shippingAddressId\": \"\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/orders",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "orders"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Addresses",
+			"item": [
+				{
+					"name": "Get My Addresses",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/addresses",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "addresses"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Address by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/addresses/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "addresses", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Address",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"fullName\": \"John Doe\",\n  \"addressLine1\": \"123 Main St\",\n  \"addressLine2\": \"Apt 4B\",\n  \"postalCode\": \"0123\",\n  \"city\": \"Oslo\",\n  \"countryCode\": \"NO\",\n  \"phone\": \"+47 12345678\",\n  \"isDefault\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/addresses",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "addresses"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Address",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"city\": \"Bergen\",\n  \"isDefault\": false\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/addresses/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "addresses", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Address",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/addresses/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "addresses", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3333",
+			"type": "string"
+		},
+		{
+			"key": "accessToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "refreshToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "userId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "contentId",
+			"value": "",
+			"type": "string",
+			"description": "Content ID from Get All Content - used for timeline sync"
+		},
+		{
+			"key": "syncCurrentTime",
+			"value": "0",
+			"type": "string",
+			"description": "Simulated playback position in seconds"
+		},
+		{
+			"key": "syncLookahead",
+			"value": "30",
+			"type": "string",
+			"description": "How many seconds ahead to fetch subjects (adjustable)"
+		}
+	]
+}
