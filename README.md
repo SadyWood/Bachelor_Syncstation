@@ -399,7 +399,7 @@ Detailed documentation is available for each component:
 
 - **[Postman Collection](postman/README.md)** - HK26 API testing collection with environment variables
 - **[Setup Guide](SETUP.md)** - Complete setup instructions for first-time developers
-- **[Getting Started](GETTING-STARTED.md)** - Comprehensive guide for students to understand the architecture and start coding
+- **[Getting Started](GETTING-STARTED.md)** - Comprehensive guide for students to understand the architecture and start coding.
 
 ---
 
