@@ -295,6 +295,55 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
     },
   );
 
+  // GET /syncstation/attachments/:attachmentId/download - Download attachment
+  app.get(
+    '/syncstation/attachments/:attachmentId/download',
+    {
+      schema: {
+        params: z.object({ attachmentId: z.string().uuid() }),
+      },
+    },
+    async (req: FastifyRequest<{ Params: { attachmentId: string } }>,
+      reply: FastifyReply,
+    ) => {
+      // 1. Verify tenant header
+      const tenantId = requireTenant(req);
+      if (!tenantId) {
+        return reply.code(400).send(
+          ErrorResponse.parse({ ok: false, error: 'TENANT_HEADER_MISSING' }),
+        );
+      }
+
+      const { attachmentId } = req.params;
+
+      // 2. Get attachment record with tenant verification - repo method joins through log-entries to check tenant ownership
+      const attachment = await syncLogRepo.getAttachment(attachmentId, tenantId);
+      if (!attachment) {
+        return reply.code(404).send(
+          ErrorResponse.parse({ ok: false, error: 'Attachment not found.' }),
+        );
+      }
+
+      // 3. Check the file actually exists on disk before stream
+      const exists = await fileStorage.fileExists(attachment.storagePath);
+      if (!exists) {
+        return reply.code(404).send(
+          ErrorResponse.parse({ ok: false, error: 'File not found on filesystem.' }),
+        );
+      }
+
+      // 4. Stream file back with correct headers
+      const stream = fileStorage.getFileStream(attachment.storagePath);
+      return reply
+        .header('Content-Type', attachment.mimeType)
+        .header(
+          'Content-Disposition',
+          `attachment; filename="${attachment.filename}"`,
+        )
+        .send(stream);
+    },
+  );
+
   /* ========================================
      SYNC STATUS
      ======================================== */
