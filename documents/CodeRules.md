@@ -261,6 +261,21 @@ introduces the code.
 Do not merge code without its corresponding documentation. Delayed
 documentation is forgotten documentation.
 
+### Documentation structure
+
+```
+/documents
+  API.md                 # API endpoint documentation
+  CodeRules.md           # Coding standards (this file)
+  /guides                # Architecture docs and guides
+  /hoolsy-platforms      # Hoolsy platform context (reference)
+/postman
+  HK26-API.postman_collection.json
+  HK26-Local.postman_environment.json
+README.md                # Quick start, links to docs
+SETUP.md                 # How to run the project
+```
+
 ### **What to document:**
 
 ![Documentation_priorities.png](shared-images/Documentation_priorities.png)

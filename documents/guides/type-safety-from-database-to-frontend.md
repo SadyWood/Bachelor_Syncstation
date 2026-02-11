@@ -155,7 +155,7 @@ The function is automatically called when inserting new records:
 const [newLog] = await db.insert(logEntries).values({
   tenantId: '...',
   userId: '...',
-  nodeId: '...',
+  contentNodeId: '...',
   title: 'Costume issue on set',
   // No need to specify ID - uuidv7() is called automatically!
 }).returning();
@@ -1579,6 +1579,6 @@ To learn more, see:
 - `.claude/skills/code-quality-check/SKILL.md` - ESLint and quality standards
 - `packages/schema/src/syncstation/` - Syncstation Zod schemas
 - `apps/api/src/routes/sync.log.ts` - Syncstation API routes
-- `GETTING-STARTED.md` - Getting started guide for Syncstation
+- `documents/guides/architecture.md` - Architecture overview for Syncstation
 
 **Good luck with HK26 Syncstation!** 🚀
