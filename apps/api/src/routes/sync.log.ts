@@ -230,7 +230,7 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
 
   // POST /syncstation/log-entries/:logEntryId/attachments - Upload attachment
   app.post(
-    'syncstation/log-entries/_logEntryID/attachments',
+    '/syncstation/log-entries/:logEntryId/attachments',
     {
       schema: {
         params: LogEntryIdParamsSchema,
@@ -256,7 +256,7 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
         return reply.code(404).send(
           ErrorResponse.parse({
             ok: false,
-            error: 'Log entry \'${logEntryId}\' not found.',
+            error: `Log entry '${logEntryId}' not found.`,
           }),
         );
       }
@@ -265,7 +265,7 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
       // req.file() is provided by @fastify/multipart (registered in server.ts)
       const file = await req.file();
       if (!file) {
-        return reply.code(404).send(ErrorResponse.parse({ ok: false, error: 'No file uploaded' }),
+        return reply.code(400).send(ErrorResponse.parse({ ok: false, error: 'No file uploaded' }),
         );
       }
 
