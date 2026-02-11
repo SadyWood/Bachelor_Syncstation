@@ -344,6 +344,53 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
     },
   );
 
+  // DELETE /syncstation/attachments/:attachmentId - Delete attachment
+  app.delete(
+    '/syncstation/attachments/:attachmentId',
+    {
+      schema: {
+        params: z.object({ attachmentId: z.string().uuid() }),
+      },
+    },
+    async (
+      req: FastifyRequest<{ Params: { attachmentId: string } }>,
+      reply: FastifyReply,
+    ) => {
+      // 1. Verify tenant header
+      const tenantId = requireTenant(req);
+      if (!tenantId) {
+        return reply.code(400).send(
+          ErrorResponse.parse({ ok: false, error: 'TENANT_HEADER_MISSING' }),
+        );
+      }
+
+      const { attachmentId } = req.params;
+
+      // 2. Get attachment record with tenant verification
+      const attachment = await syncLogRepo.getAttachment(attachmentId, tenantId);
+      if (!attachment) {
+        return reply.code(404).send(
+          ErrorResponse.parse({ ok: false, error: 'Attachment not found.' }),
+        );
+      }
+
+      try {
+        // 3. Delete file from filesystem first - deleteFile is idempotent — if the file is already gone it succeeds
+        await fileStorage.deleteFile(attachment.storagePath);
+
+        // 4. Delete the database record
+        await syncLogRepo.deleteAttachment(attachmentId);
+
+        return reply.send(SuccessResponse.parse({ ok: true }));
+      } catch (error) {
+        app.log.error(error, 'Failed to delete attachment');
+        return reply.code(500).send(
+          ErrorResponse.parse({ ok: false, error: 'Failed to delete attachment.' }),
+        );
+      }
+    },
+  );
+
   /* ========================================
      SYNC STATUS
      ======================================== */
