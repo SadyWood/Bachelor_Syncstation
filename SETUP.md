@@ -67,6 +67,20 @@ If something breaks, or you want to nuke the database and start clean:
 
 This stops Docker, deletes the database volume, and re-runs everything from scratch.
 
+### Reset (back to fresh clone)
+
+Strips the project back to a clean `git clone` state. Removes node_modules, dist folders, Docker containers/volumes, caches, uploads, and .env. Does **not** run setup after — just cleans.
+
+```powershell
+# Windows
+.\setup.ps1 -Reset
+
+# Mac / Linux
+./setup.sh --reset
+```
+
+Useful when you want to start completely over, hand the project to someone else, or reduce disk usage.
+
 ### After setup
 
 Start the API and your app in separate terminals:
@@ -242,9 +256,11 @@ Admin access: `postgres:hoolsy_dev`
 | Script | Description |
 |--------|-------------|
 | `.\setup.ps1` | One-command setup (Windows) |
-| `.\setup.ps1 -Fresh` | Nuke everything and start clean (Windows) |
+| `.\setup.ps1 -Fresh` | Nuke DB and start clean (Windows) |
+| `.\setup.ps1 -Reset` | Back to fresh clone state (Windows) |
 | `./setup.sh` | One-command setup (Mac/Linux) |
-| `./setup.sh --fresh` | Nuke everything and start clean (Mac/Linux) |
+| `./setup.sh --fresh` | Nuke DB and start clean (Mac/Linux) |
+| `./setup.sh --reset` | Back to fresh clone state (Mac/Linux) |
 
 ### Docker
 
