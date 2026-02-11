@@ -1,5 +1,37 @@
 # Setup Guide
 
+## Quick Start
+
+### One-command setup
+
+**Windows (PowerShell):**
+```powershell
+.\setup.ps1
+```
+
+**Mac/Linux:**
+```bash
+chmod +x setup.sh
+./setup.sh
+```
+
+This handles everything: dependencies, build, Docker, migrations, seeds, and permissions. If something goes wrong or you want a completely clean slate:
+
+**Windows:** `.\setup.ps1 -Fresh`
+**Mac/Linux:** `./setup.sh --fresh`
+
+### After setup
+
+| Command | Description |
+|---|---|
+| `pnpm dev:api` | Start API server (http://localhost:3333) |
+| `pnpm dev:sync` | Start Syncstation mobile app |
+| `pnpm dev:ws` | Start Workstation web app |
+
+**Login:** `admin@hoolsy.com` / `demopassword`
+
+## MANUAL STARTUP/TROUBLESHOOTING PAST THIS POINT - ONLY DO THIS IF THE SCRIPT FAILS OR FOR TROUBLESHOOTING ##
+
 This guide walks you through first-time setup of the HK26 project repository.
 
 **What you'll set up:**

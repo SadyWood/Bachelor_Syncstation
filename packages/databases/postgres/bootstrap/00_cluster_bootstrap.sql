@@ -60,3 +60,42 @@ CREATE DATABASE marketplace OWNER marketplace_owner ENCODING 'UTF8' TEMPLATE tem
 CREATE DATABASE syncstation OWNER syncstation_owner ENCODING 'UTF8' TEMPLATE template1;
 \echo ok
 \set ON_ERROR_STOP on
+
+-- ============================================================================
+-- GRANTS - Service accounts need access to tables in their databases
+-- Run after migrations have created tables
+-- ============================================================================
+
+\echo
+\echo [Grants] Granting service account permissions ...
+
+\echo -n ' - users ... '
+\connect users
+GRANT USAGE ON SCHEMA public TO svc_users;
+GRANT ALL ON ALL TABLES IN SCHEMA public TO svc_users;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO svc_users;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO svc_users;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO svc_users;
+\echo ok
+
+\echo -n ' - workstation ... '
+\connect workstation
+GRANT USAGE ON SCHEMA public TO svc_workstation;
+GRANT ALL ON ALL TABLES IN SCHEMA public TO svc_workstation;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO svc_workstation;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO svc_workstation;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO svc_workstation;
+\echo ok
+
+\echo -n ' - syncstation ... '
+\connect syncstation
+GRANT USAGE ON SCHEMA public TO svc_syncstation;
+GRANT ALL ON ALL TABLES IN SCHEMA public TO svc_syncstation;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO svc_syncstation;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO svc_syncstation;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO svc_syncstation;
+\echo ok
+
+\echo
+\echo ========================= Bootstrap complete =========================
+```

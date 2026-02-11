@@ -341,14 +341,15 @@ export const logEntries = pgTable('log_entries', {
   // Foreign keys - link to other databases
   tenantId: uuid('tenant_id').notNull(),
   userId: uuid('user_id').notNull(),
-  nodeId: uuid('node_id').notNull(), // Content node from workstation DB
+  contentNodeId: uuid('content_node_id').notNull(),
 
   // Log entry data
   title: varchar('title', { length: 255 }).notNull(),
   description: text('description'),
+  metadata: jsonb('metadata').$type<Record<string, unknown>>(),
 
   // Sync status tracking
-  status: syncStatusEnum('status').notNull().default('local'),
+  syncStatus: syncStatusEnum('sync_status').notNull().default('local'),
   syncAttempts: integer('sync_attempts').notNull().default(0),
   lastSyncError: text('last_sync_error'),
 

@@ -15,11 +15,42 @@ Welcome to the HK26 Syncstation project! This document helps you understand the 
 
 ## Quick Start
 
-**Read this first!**
+### One-command setup
 
-1. **Setup:** Follow [SETUP.md](./SETUP.md) to set up databases and run API + app
-2. **Architecture:** Read [README.md](./README.md) to understand the project structure and multi-database architecture
-3. **Type Safety:** Read [documents/guides/type-safety-from-database-to-frontend.md](./documents/guides/type-safety-from-database-to-frontend.md) to understand data flow
+**Windows (PowerShell):**
+```powershell
+.\setup.ps1
+```
+
+**Mac/Linux:**
+```bash
+chmod +x setup.sh
+./setup.sh
+```
+
+This handles everything: dependencies, build, Docker, migrations, seeds, and permissions. If something goes wrong or you want a completely clean slate:
+
+**Windows:** `.\setup.ps1 -Fresh`
+**Mac/Linux:** `./setup.sh --fresh`
+
+### After setup
+
+| Command | Description |
+|---|---|
+| `pnpm dev:api` | Start API server (http://localhost:3333) |
+| `pnpm dev:sync` | Start Syncstation mobile app |
+| `pnpm dev:ws` | Start Workstation web app |
+
+**Login:** `admin@hoolsy.com` / `demopassword`
+
+
+**If Scrip fails please review the old manual startup in SETUP.MD**
+
+    **Read this first!**
+
+    1. **Setup:** Follow [SETUP.md](./SETUP.md) to set up databases and run API + app
+    2. **Architecture:** Read [README.md](./README.md) to understand the project structure and multi-database architecture
+    3. **Type Safety:** Read [documents/guides/type-safety-from-database-to-frontend.md](./documents/guides/type-safety-from-database-to-frontend.md) to understand data flow
 
 **Then you can:**
 - Start the mobile app: `pnpm dev:sync`
@@ -27,6 +58,7 @@ Welcome to the HK26 Syncstation project! This document helps you understand the 
 - Explore the codebase: Start by reading the files mentioned below
 
 ---
+
 
 ## Understanding the Architecture
 
@@ -83,21 +115,20 @@ You have your own database with two tables (but you can change this!):
 ```typescript
 {
   id: string (UUID)
-  tenantId: string (UUID)         // Which tenant (organization)
-  userId: string (UUID)           // Who logged this
-  contentNodeId: string (UUID)    // Which content node (project/episode)
-  title: string | null
-  notes: string | null            // Description/notes (mapped to 'description' in API)
-  metadata: Record<string, unknown> | null  // JSON metadata
+  tenantId: string (UUID)              // Which tenant (organization)
+  userId: string (UUID)                // Who logged this
+  contentNodeId: string (UUID)         // Which content node (project/episode)
+  title: string (varchar 255)          // Log entry title (required)
+  description: string | null           // Optional description text
+  metadata: Record | null  // Flexible JSON data (jsonb)
   syncStatus: 'local' | 'pending' | 'synced' | 'failed'
-  syncError: string | null        // Last sync error message
+  syncAttempts: number                 // Retry count for offline sync
+  lastSyncError: string | null         // Last sync error message
   createdAt: string
   updatedAt: string
   syncedAt: string | null
 }
 ```
-
-> **Note:** The API uses different field names for compatibility (e.g., `description` in API → `notes` in database, `nodeId` in API → `contentNodeId` in database). This mapping happens in the repository layer.
 
 **log_attachments** - Attachments (images, videos, files)
 ```typescript

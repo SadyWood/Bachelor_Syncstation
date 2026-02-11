@@ -18,6 +18,7 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "postgres" <<-EOSQL
 	\i $BOOTSTRAP_DIR/10_users_db.sql
 	\i $BOOTSTRAP_DIR/10_workstation_db.sql
 	\i $BOOTSTRAP_DIR/10_marketplace_db.sql
+	\i $BOOTSTRAP_DIR/10_syncstation_db.sql
 EOSQL
 
 echo "=============================================="
