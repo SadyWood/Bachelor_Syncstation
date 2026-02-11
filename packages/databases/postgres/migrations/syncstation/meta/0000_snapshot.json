@@ -1,5 +1,5 @@
 {
-  "id": "11ef822f-9add-496e-87aa-6deb0fae9dce",
+  "id": "541e77ba-a550-4630-968d-eb0dd82a8d74",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -105,8 +105,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "node_id": {
-          "name": "node_id",
+        "content_node_id": {
+          "name": "content_node_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
@@ -123,8 +123,14 @@
           "primaryKey": false,
           "notNull": false
         },
-        "status": {
-          "name": "status",
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sync_status": {
+          "name": "sync_status",
           "type": "sync_status",
           "typeSchema": "public",
           "primaryKey": false,

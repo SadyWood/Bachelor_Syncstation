@@ -21,11 +21,11 @@ type LogEntryRow = {
   tenant_id: string;
   user_id: string;
   content_node_id: string;
-  title: string | null;
-  notes: string | null;
+  title: string;
+  description: string | null;
   metadata: Record<string, unknown> | null;
   sync_status: 'local' | 'pending' | 'synced' | 'failed';
-  sync_error: string | null;
+  last_sync_error: string | null;
   created_at: Date;
   updated_at: Date;
   synced_at: Date | null;
@@ -49,10 +49,9 @@ function mapLogEntryToDto(row: LogEntryRow): LogEntry {
     userId: row.user_id,
     nodeId: row.content_node_id,
     title: row.title ?? '',
-    description: row.notes,
+    description: row.description,
     status: row.sync_status,
-    syncAttempts: 0, // Not in database anymore
-    lastSyncError: row.sync_error,
+    lastSyncError: row.last_sync_error,
     createdAt: row.created_at.toISOString(),
     updatedAt: row.updated_at.toISOString(),
     syncedAt: row.synced_at?.toISOString() ?? null,
@@ -114,10 +113,10 @@ export async function listLogEntries(
       user_id: schema.logEntries.userId,
       content_node_id: schema.logEntries.contentNodeId,
       title: schema.logEntries.title,
-      notes: schema.logEntries.notes,
+      description: schema.logEntries.description,
       metadata: schema.logEntries.metadata,
       sync_status: schema.logEntries.syncStatus,
-      sync_error: schema.logEntries.syncError,
+      last_sync_error: schema.logEntries.lastSyncError,
       created_at: schema.logEntries.createdAt,
       updated_at: schema.logEntries.updatedAt,
       synced_at: schema.logEntries.syncedAt,
@@ -146,10 +145,10 @@ export async function getLogEntry(id: string, tenantId: string): Promise<LogEntr
       user_id: schema.logEntries.userId,
       content_node_id: schema.logEntries.contentNodeId,
       title: schema.logEntries.title,
-      notes: schema.logEntries.notes,
+      description: schema.logEntries.description,
       metadata: schema.logEntries.metadata,
       sync_status: schema.logEntries.syncStatus,
-      sync_error: schema.logEntries.syncError,
+      last_sync_error: schema.logEntries.lastSyncError,
       created_at: schema.logEntries.createdAt,
       updated_at: schema.logEntries.updatedAt,
       synced_at: schema.logEntries.syncedAt,
@@ -186,14 +185,15 @@ export async function createLogEntry(data: {
   const rows = await dbSync
     .insert(schema.logEntries)
     .values({
-      id: uuidv7(), // Generate UUID in application
+      id: uuidv7(),
       tenantId: data.tenantId,
       userId: data.userId,
       contentNodeId: data.nodeId,
       title: data.title,
-      notes: data.description ?? null,
-      syncStatus: 'local', // Default status
-      syncError: null,
+      description: data.description ?? null,
+      syncStatus: 'local',
+      syncAttempts: 0,
+      lastSyncError: null,
       createdAt: now,
       updatedAt: now,
     })
@@ -203,10 +203,10 @@ export async function createLogEntry(data: {
       user_id: schema.logEntries.userId,
       content_node_id: schema.logEntries.contentNodeId,
       title: schema.logEntries.title,
-      notes: schema.logEntries.notes,
+      description: schema.logEntries.description,
       metadata: schema.logEntries.metadata,
       sync_status: schema.logEntries.syncStatus,
-      sync_error: schema.logEntries.syncError,
+      last_sync_error: schema.logEntries.lastSyncError,
       created_at: schema.logEntries.createdAt,
       updated_at: schema.logEntries.updatedAt,
       synced_at: schema.logEntries.syncedAt,
@@ -233,7 +233,7 @@ export async function updateLogEntry(
   };
 
   if (data.title !== undefined) updates.title = data.title;
-  if (data.description !== undefined) updates.notes = data.description;
+  if (data.description !== undefined) updates.description = data.description;
   if (data.status !== undefined) {
     updates.syncStatus = data.status;
     if (data.status === 'synced') {
@@ -251,10 +251,10 @@ export async function updateLogEntry(
       user_id: schema.logEntries.userId,
       content_node_id: schema.logEntries.contentNodeId,
       title: schema.logEntries.title,
-      notes: schema.logEntries.notes,
+      description: schema.logEntries.description,
       metadata: schema.logEntries.metadata,
       sync_status: schema.logEntries.syncStatus,
-      sync_error: schema.logEntries.syncError,
+      last_sync_error: schema.logEntries.lastSyncError,
       created_at: schema.logEntries.createdAt,
       updated_at: schema.logEntries.updatedAt,
       synced_at: schema.logEntries.syncedAt,

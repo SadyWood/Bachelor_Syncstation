@@ -1,7 +1,7 @@
 // packages/databases/postgres/src/schema/syncstation/schema.ts
 // Syncstation database schema - On-set logging MVP
 import { relations } from 'drizzle-orm';
-import { pgTable, uuid, text, timestamp, varchar, integer, pgEnum } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, text, timestamp, varchar, integer, jsonb, pgEnum } from 'drizzle-orm/pg-core';
 
 /* ========================================
    ENUMS
@@ -21,13 +21,14 @@ export const logEntries = pgTable('log_entries', {
   contentNodeId: uuid('content_node_id').notNull(), // References content_nodes.node_id from workstation DB
 
   // Content
-  title: text('title'),
-  notes: text('notes'),
-  metadata: text('metadata').$type<Record<string, unknown>>(),
+  title: varchar('title', { length: 255 }).notNull(),
+  description: text('description'),
+  metadata: jsonb('metadata').$type<Record<string, unknown>>(),
 
   // Sync tracking
   syncStatus: syncStatusEnum('sync_status').notNull().default('local'),
-  syncError: text('sync_error'),
+  syncAttempts: integer('sync_attempts').notNull().default(0),
+  lastSyncError: text('last_sync_error'),
 
   // Timestamps
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
