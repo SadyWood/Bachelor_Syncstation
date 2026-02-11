@@ -20,6 +20,7 @@ const EnvSchema = z.object({
 
   JWT_SECRET: z.string().min(16),
   COOKIE_SECRET: z.string().min(16),
+  UPLOAD_DIR: z.string().default('./uploads/syncstation'),
 
   ACCESS_TOKEN_TTL: z.string().default('15m'),
   REFRESH_TOKEN_TTL: z.string().default('30d'),

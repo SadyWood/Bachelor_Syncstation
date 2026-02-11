@@ -73,6 +73,8 @@ export type LogEntrySummary = z.infer<typeof LogEntrySummarySchema>;
  */
 export const CreateLogEntryRequest = z.object({
   body: z.object({
+    // Optional client-generated UUID for idempotent sync - to avoid duplicates if entry already exists, server returns existing entry
+    id: z.string().uuid().optional(),
     nodeId: z.string().uuid(),
     title: z.string().min(1).max(255),
     description: z.string().optional(),

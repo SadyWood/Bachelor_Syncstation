@@ -2,17 +2,80 @@
 # setup.sh
 # Syncstation - One-command project setup
 # Usage: ./setup.sh           (normal setup)
-#        ./setup.sh --fresh   (nuke everything and start clean)
+#        ./setup.sh --fresh   (nuke DB and start clean)
+#        ./setup.sh --reset   (back to fresh clone state — removes all generated files)
 
 set -e
 
 FRESH=false
+RESET=false
 if [ "$1" = "--fresh" ]; then FRESH=true; fi
+if [ "$1" = "--reset" ]; then RESET=true; fi
 
 step()  { printf "\n\033[36m==> %s\033[0m\n" "$1"; }
 ok()    { printf "  \033[32mOK\033[0m %s\n" "$1"; }
 warn()  { printf "  \033[33m!!\033[0m %s\n" "$1"; }
 fail()  { printf "  \033[31mFAIL\033[0m %s\n" "$1"; exit 1; }
+
+# ── Reset mode ─────────────────────────────────────────────────────
+# Strips everything back to a fresh git clone. Does NOT run setup after.
+if [ "$RESET" = true ]; then
+    echo ""
+    echo "========================================"
+    echo "  Syncstation - Reset to clean state"
+    echo "========================================"
+
+    # Stop and remove Docker containers + volumes
+    step "Stopping Docker containers..."
+    docker compose --env-file .env -f docker/docker-compose.yml down 2>/dev/null || true
+    docker volume rm syncstation_sync_postgres_data 2>/dev/null || true
+    ok "Docker cleaned"
+
+    # Remove node_modules
+    step "Removing node_modules..."
+    rm -rf node_modules
+    find apps packages -type d -name "node_modules" -exec rm -rf {} + 2>/dev/null || true
+    ok "node_modules removed"
+
+    # Remove dist/ build output
+    step "Removing build artifacts..."
+    rm -rf apps/api/dist
+    rm -rf apps/marketplace-web/dist
+    rm -rf apps/workstation-web/dist
+    rm -rf packages/databases/postgres/dist
+    rm -rf packages/logger/dist
+    rm -rf packages/schema/dist
+    rm -rf packages/timeline/dist
+    find . -name "*.tsbuildinfo" -delete 2>/dev/null || true
+    ok "Build artifacts removed"
+
+    # Remove caches and IDE config
+    step "Removing caches..."
+    rm -rf .turbo .cache .vite coverage .nyc_output .idea
+    find apps packages -type d \( -name ".turbo" -o -name ".cache" -o -name ".vite" -o -name "coverage" \) -exec rm -rf {} + 2>/dev/null || true
+    ok "Caches removed"
+
+    # Remove uploads
+    step "Removing uploads..."
+    rm -rf apps/api/uploads
+    ok "Uploads removed"
+
+    # Remove .env
+    step "Removing .env..."
+    rm -f .env
+    ok ".env removed"
+
+    echo ""
+    echo "========================================"
+    echo "  Reset complete — fresh clone state"
+    echo "========================================"
+    echo ""
+    echo "  To set up again:  ./setup.sh"
+    echo ""
+    exit 0
+fi
+
+# ── Normal setup continues below ──────────────────────────────────
 
 echo ""
 echo "========================================"

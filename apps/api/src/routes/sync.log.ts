@@ -8,9 +8,11 @@ import {
   SuccessResponse,
   ErrorResponse,
   SyncStatus,
+  AttachmentUploadResponse,
 } from '@hk26/schema';
 import { z } from 'zod';
 import * as syncLogRepo from '../repos/sync.log.repo.js';
+import * as fileStorage from '../services/file-storage.service.js';
 import { requireTenant } from '../utils/tenant.js';
 import type { FastifyRequest, FastifyReply } from 'fastify';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
@@ -112,8 +114,17 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
         const userId = decoded.sub;
 
         const body = CreateLogEntryRequest.shape.body.parse(req.body);
+        if (body.id) {
+          const existing = await syncLogRepo.getLogEntry(body.id, tenantId);
+          if (existing) {
+            return reply.code(200).send(
+              LogEntryResponse.parse({ ok: true, entry: existing }),
+            );
+          }
+        }
 
         const entry = await syncLogRepo.createLogEntry({
+          id: body.id,
           tenantId,
           userId,
           nodeId: body.nodeId,
@@ -209,6 +220,182 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
       } catch (error) {
         app.log.error(error, 'Failed to delete log entry');
         return reply.code(500).send(ErrorResponse.parse({ ok: false, error: 'Failed to delete log entry' }));
+      }
+    },
+  );
+
+  /* ========================================
+     ATTACHMENTS
+     ======================================== */
+
+  // POST /syncstation/log-entries/:logEntryId/attachments - Upload attachment
+  app.post(
+    '/syncstation/log-entries/:logEntryId/attachments',
+    {
+      schema: {
+        params: LogEntryIdParamsSchema,
+      },
+    },
+    async (
+      req: FastifyRequest<{ Params: z.infer<typeof LogEntryIdParamsSchema> }>,
+      reply: FastifyReply,
+    ) => {
+    // 1. Verify tenant header
+      const tenantId = requireTenant(req);
+      if (!tenantId) {
+        return reply.code(400).send(
+          ErrorResponse.parse({ ok: false, error: 'TENANT_HEADER_MISSING' }),
+        );
+      }
+
+      const { logEntryId } = req.params;
+
+      // 2. Verify long entry exists and belongs to this tenant - checked before file processing
+      const logEntry = await syncLogRepo.getLogEntry(logEntryId, tenantId);
+      if (!logEntry) {
+        return reply.code(404).send(
+          ErrorResponse.parse({
+            ok: false,
+            error: `Log entry '${logEntryId}' not found.`,
+          }),
+        );
+      }
+
+      // 3. Get the uploaded file from the multipart request
+      // req.file() is provided by @fastify/multipart (registered in server.ts)
+      const file = await req.file();
+      if (!file) {
+        return reply.code(400).send(ErrorResponse.parse({ ok: false, error: 'No file uploaded' }),
+        );
+      }
+
+      try {
+        // 4. Save file to disk using our storage service - file.file is the readable stream, we never load it all into memory
+        const { storagePath, fileSize } = await fileStorage.saveFile(
+          file.file,
+          tenantId,
+          file.filename,
+        );
+
+        // 5. Determine the attachment type from the MIME type
+        const attachmentType = fileStorage.getAttachmentType(
+          file.mimetype || 'application/octet-stream',
+        );
+
+        // 6. Create the attachment record in the database
+        const attachment = await syncLogRepo.createAttachment({
+          logEntryId,
+          filename: file.filename,
+          mimeType: file.mimetype || 'application/octet-stream',
+          fileSize,
+          storagePath,
+          attachmentType,
+        });
+
+        // 7. Return the created attachment
+        return reply.code(201).send(
+          AttachmentUploadResponse.parse({ ok: true, attachment }),
+        );
+      } catch (error) {
+        app.log.error(error, 'Failed to upload attachment');
+        return reply.code(500).send(ErrorResponse.parse({ ok: false, error: 'Failed to upload attachment' }),
+        );
+      }
+    },
+  );
+
+  // GET /syncstation/attachments/:attachmentId/download - Download attachment
+  app.get(
+    '/syncstation/attachments/:attachmentId/download',
+    {
+      schema: {
+        params: z.object({ attachmentId: z.string().uuid() }),
+      },
+    },
+    async (req: FastifyRequest<{ Params: { attachmentId: string } }>,
+      reply: FastifyReply,
+    ) => {
+      // 1. Verify tenant header
+      const tenantId = requireTenant(req);
+      if (!tenantId) {
+        return reply.code(400).send(
+          ErrorResponse.parse({ ok: false, error: 'TENANT_HEADER_MISSING' }),
+        );
+      }
+
+      const { attachmentId } = req.params;
+
+      // 2. Get attachment record with tenant verification - repo method joins through log-entries to check tenant ownership
+      const attachment = await syncLogRepo.getAttachment(attachmentId, tenantId);
+      if (!attachment) {
+        return reply.code(404).send(
+          ErrorResponse.parse({ ok: false, error: 'Attachment not found.' }),
+        );
+      }
+
+      // 3. Check the file actually exists on disk before stream
+      const exists = await fileStorage.fileExists(attachment.storagePath);
+      if (!exists) {
+        return reply.code(404).send(
+          ErrorResponse.parse({ ok: false, error: 'File not found on filesystem.' }),
+        );
+      }
+
+      // 4. Stream file back with correct headers
+      const stream = fileStorage.getFileStream(attachment.storagePath);
+      return reply
+        .header('Content-Type', attachment.mimeType)
+        .header(
+          'Content-Disposition',
+          `attachment; filename="${attachment.filename}"`,
+        )
+        .send(stream);
+    },
+  );
+
+  // DELETE /syncstation/attachments/:attachmentId - Delete attachment
+  app.delete(
+    '/syncstation/attachments/:attachmentId',
+    {
+      schema: {
+        params: z.object({ attachmentId: z.string().uuid() }),
+      },
+    },
+    async (
+      req: FastifyRequest<{ Params: { attachmentId: string } }>,
+      reply: FastifyReply,
+    ) => {
+      // 1. Verify tenant header
+      const tenantId = requireTenant(req);
+      if (!tenantId) {
+        return reply.code(400).send(
+          ErrorResponse.parse({ ok: false, error: 'TENANT_HEADER_MISSING' }),
+        );
+      }
+
+      const { attachmentId } = req.params;
+
+      // 2. Get attachment record with tenant verification
+      const attachment = await syncLogRepo.getAttachment(attachmentId, tenantId);
+      if (!attachment) {
+        return reply.code(404).send(
+          ErrorResponse.parse({ ok: false, error: 'Attachment not found.' }),
+        );
+      }
+
+      try {
+        // 3. Delete file from filesystem first - deleteFile is idempotent — if the file is already gone it succeeds
+        await fileStorage.deleteFile(attachment.storagePath);
+
+        // 4. Delete the database record
+        await syncLogRepo.deleteAttachment(attachmentId);
+
+        return reply.send(SuccessResponse.parse({ ok: true }));
+      } catch (error) {
+        app.log.error(error, 'Failed to delete attachment');
+        return reply.code(500).send(
+          ErrorResponse.parse({ ok: false, error: 'Failed to delete attachment.' }),
+        );
       }
     },
   );

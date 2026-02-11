@@ -1,8 +1,8 @@
 # Syncstation API Documentation
 ### Eliminating waiting time for frontend development by providing a mock API server overview with realistic data and behavior. This allows frontend developers to work in parallel with backend development, ensuring faster iteration and delivery.
 
-**Version:** 1.0
-**Last updated:** 2026-02-08
+**Version:** 1.1
+**Last updated:** 2026-02-11
 
   ---
 
@@ -134,9 +134,60 @@ Returns a single log entry with full details including attachments.
 
   ---
 
-# POST /syncstation/log-entries
+## POST /syncstation/log-entries
 
-Creates a new log entry.
+Creates a new log entry. Supports client-generated UUIDs for idempotent sync.
+
+**Auth:** Required (Bearer token)
+
+**Headers:**
+
+| Header          | Required | Description            |
+|-----------------|----------|------------------------|
+| Authorization   | Yes      | Bearer `<accessToken>` |
+| x-ws-tenant     | Yes      | Tenant UUID            |
+
+**Request Body:**
+
+| Field       | Type          | Required | Description                          |
+|-------------|---------------|----------|--------------------------------------|
+| id          | string (UUID) | No       | Client-generated UUID for idempotent sync. If omitted, server generates one. |
+| nodeId      | string (UUID) | Yes      | Content node to attach the log to    |
+| title       | string        | Yes      | Log title (1-255 characters)         |
+| description | string        | No       | Optional description text            |
+
+**Idempotent Sync Behavior:**
+
+If `id` is provided and a log entry with that ID already exists for the tenant, the existing entry is returned with status `200` instead of creating a duplicate. New entries return `201`.
+
+**Success Response (201 — created / 200 — already exists):**
+
+```json
+{
+  "ok": true,
+  "entry": {
+    "id": "uuid",
+    "tenantId": "uuid",
+    "userId": "uuid",
+    "nodeId": "uuid",
+    "title": "Watch on left wrist",
+    "description": "Scene 4, continuity note",
+    "status": "local",
+    "lastSyncError": null,
+    "createdAt": "2026-02-11T12:00:00.000Z",
+    "updatedAt": "2026-02-11T12:00:00.000Z",
+    "syncedAt": null
+  }
+}
+```
+
+**Error Responses:**
+
+| Status | Error                    | When                              |
+|--------|--------------------------|-----------------------------------|
+| 400    | TENANT_HEADER_MISSING    | Missing x-ws-tenant header        |
+| 400    | Content node not found   | nodeId doesn't exist              |
+| 500    | Failed to create         | Unexpected error                  |
 
   ---
 
@@ -158,21 +209,141 @@ Returns the sync queue status for the authenticated user within the current tena
 
   ---
 
-# POST /syncstation/log-entries/:logEntryId/attachments
+## POST /syncstation/log-entries/:logEntryId/attachments
 
 Uploads a file and attaches it to a log entry.
 
+**Auth:** Required (Bearer token)
+
+**Headers:**
+
+| Header          | Required | Description            |
+|-----------------|----------|------------------------|
+| Authorization   | Yes      | Bearer `<accessToken>` |
+| x-ws-tenant     | Yes      | Tenant UUID            |
+| Content-Type    | Yes      | multipart/form-data    |
+
+**URL Params:**
+
+| Param      | Type         | Required | Description               |
+|------------|--------------|----------|---------------------------|
+| logEntryId | string (UUID)| Yes      | ID of the log entry       |
+
+**Request Body:**
+
+Multipart form-data with a single file field. Max file size: 500 MB.
+
+**Success Response (201):**
+
+```json
+{
+  "ok": true,
+  "attachment": {
+    "id": "uuid",
+    "logEntryId": "uuid",
+    "filename": "photo.jpg",
+    "mimeType": "image/jpeg",
+    "fileSize": 245000,
+    "storagePath": "tenant-uuid/2026/02/unique-uuid.jpg",
+    "attachmentType": "image",
+    "createdAt": "2026-02-11T12:00:00.000Z"
+  }
+}
+```
+
+**Attachment type is determined automatically from MIME type:**
+
+| MIME type pattern | attachmentType |
+|-------------------|----------------|
+| image/*           | `image`        |
+| video/*           | `video`        |
+| everything else   | `document`     |
+
+**Error Responses:**
+
+| Status | Error                    | When                              |
+|--------|--------------------------|-----------------------------------|
+| 400    | TENANT_HEADER_MISSING    | Missing x-ws-tenant header        |
+| 400    | No file uploaded         | Request has no file field          |
+| 404    | Log entry not found      | logEntryId doesn't exist or wrong tenant |
+| 500    | Failed to upload         | File save or DB error             |
+
   ---
 
-# GET /syncstation/attachments/:attachmentId/download
+## GET /syncstation/attachments/:attachmentId/download
 
 Downloads a previously uploaded attachment. Returns the file as a binary stream.
 
+**Auth:** Required (Bearer token)
+
+**Headers:**
+
+| Header          | Required | Description            |
+|-----------------|----------|------------------------|
+| Authorization   | Yes      | Bearer `<accessToken>` |
+| x-ws-tenant     | Yes      | Tenant UUID            |
+
+**URL Params:**
+
+| Param        | Type         | Required | Description               |
+|--------------|--------------|----------|---------------------------|
+| attachmentId | string (UUID)| Yes      | ID of the attachment      |
+
+**Success Response (200):**
+
+Returns the raw file as a binary stream.
+
+| Response Header      | Value                                       |
+|----------------------|---------------------------------------------|
+| Content-Type         | Original MIME type (e.g. `image/jpeg`)       |
+| Content-Disposition  | `attachment; filename="original-filename.ext"` |
+
+**Error Responses:**
+
+| Status | Error                      | When                                    |
+|--------|----------------------------|-----------------------------------------|
+| 400    | TENANT_HEADER_MISSING      | Missing x-ws-tenant header              |
+| 404    | Attachment not found       | ID doesn't exist or wrong tenant        |
+| 404    | File not found on filesystem | DB record exists but file is missing   |
+
   ---
 
-# DELETE /syncstation/attachments/:attachmentId
+## DELETE /syncstation/attachments/:attachmentId
 
 Deletes an attachment (both the database record and the file from the filesystem).
+
+**Auth:** Required (Bearer token)
+
+**Headers:**
+
+| Header          | Required | Description            |
+|-----------------|----------|------------------------|
+| Authorization   | Yes      | Bearer `<accessToken>` |
+| x-ws-tenant     | Yes      | Tenant UUID            |
+
+**URL Params:**
+
+| Param        | Type         | Required | Description               |
+|--------------|--------------|----------|---------------------------|
+| attachmentId | string (UUID)| Yes      | ID of the attachment      |
+
+**Success Response (200):**
+
+```json
+{
+  "ok": true
+}
+```
+
+**Note:** Succeeds even if the file is already missing from the filesystem (idempotent).
+
+**Error Responses:**
+
+| Status | Error                    | When                              |
+|--------|--------------------------|-----------------------------------|
+| 400    | TENANT_HEADER_MISSING    | Missing x-ws-tenant header        |
+| 404    | Attachment not found     | ID doesn't exist or wrong tenant  |
+| 500    | Failed to delete         | Unexpected error during deletion  |
 
  ---
 
