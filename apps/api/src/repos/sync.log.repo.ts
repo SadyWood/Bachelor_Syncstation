@@ -174,6 +174,7 @@ export async function getLogEntry(id: string, tenantId: string): Promise<LogEntr
  * Create a new log entry
  */
 export async function createLogEntry(data: {
+  id?: string; // Client-generated UUID for idempotent sync
   tenantId: string;
   userId: string;
   nodeId: string;
@@ -185,7 +186,8 @@ export async function createLogEntry(data: {
   const rows = await dbSync
     .insert(schema.logEntries)
     .values({
-      id: uuidv7(),
+      // Use client-provided ID if given, otherwise generate server-side
+      id: data.id ?? uuidv7(),
       tenantId: data.tenantId,
       userId: data.userId,
       contentNodeId: data.nodeId,

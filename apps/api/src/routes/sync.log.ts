@@ -114,8 +114,17 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
         const userId = decoded.sub;
 
         const body = CreateLogEntryRequest.shape.body.parse(req.body);
+        if (body.id) {
+          const existing = await syncLogRepo.getLogEntry(body.id, tenantId);
+          if (existing) {
+            return reply.code(200).send(
+              LogEntryResponse.parse({ ok: true, entry: existing }),
+            );
+          }
+        }
 
         const entry = await syncLogRepo.createLogEntry({
+          id: body.id,
           tenantId,
           userId,
           nodeId: body.nodeId,
