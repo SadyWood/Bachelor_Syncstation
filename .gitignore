@@ -56,3 +56,14 @@ docs-build/
 # API uploads (user-uploaded files)
 apps/api/uploads/
 nul
+/.claude/skills/type-safety-schema/checklist.md
+/.claude/skills/type-safety-schema/examples.md
+/.claude/skills/index.md
+/.claude/skills/type-safety-schema/package-setup.md
+/.claude/skills/code-quality-check/SKILL.md
+/.claude/skills/hoolsy-context/SKILL.md
+/.claude/skills/logger-usage/SKILL.md
+/.claude/skills/postman-update/SKILL.md
+/.claude/skills/skill-writer/SKILL.md
+/.claude/skills/type-safety-schema/SKILL.md
+/.claude/skills/useeffect-vs-useswr/SKILL.md
