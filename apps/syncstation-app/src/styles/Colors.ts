@@ -1,37 +1,49 @@
-// Shared color palette for Syncstation app
+// Shared color palette for Syncstation app based on Figma prototype
 
 export const Colors = {
   // Primary
-  primary: '#8B1A1A',
-  primaryLight: '#A52A2A',
-  primaryDark: '#6B1414',
+  primary: '#9D0202',
 
   // Background
-  background: '#F5E6D3',
-  backgroundLight: '#FDF8F3',
+  background: '#FFF5D7',
+  backgroundSecondary: '#F5E0E0', // Rosa bakgrunn på FAB-meny
   cardBackground: '#FFFFFF',
 
   // Text
-  text: '#1A1A1A',
-  textSecondary: '#666666',
-  textMuted: '#999999',
+  text: '#000000',
+  textSecondary: '#6B6B6B',
   textOnPrimary: '#FFFFFF',
 
   // Status
-  success: '#4CAF50',
-  error: '#8B1A1A',
+  success: '#4CAF50', // Grønn checkbox
+  warning: '#FCC21B',
+  error: '#9D0202',
 
-  // UI Elements
-  border: '#E0E0E0',
-  borderLight: '#F0F0F0',
-  overlay: 'rgba(0, 0, 0, 0.5)',
+  // Scene icons
+  sceneBlue: '#1F4E79',
+  folderGray: '#6B6B6B',
+  locationRed: '#9D0202',
 
   // Notice Board
-  noticeBackground: '#8B1A1A',
+  noticeBackground: '#9D0202',
   noticeText: '#FFFFFF',
+
+  // Agenda
+  agendaComplete: '#4CAF50', // Grønn
+  agendaPending: '#9D0202', // Rød
 
   // Tab Bar
   tabBarBackground: '#FFFFFF',
-  tabBarActive: '#8B1A1A',
-  tabBarInactive: '#999999',
+  tabBarActive: '#9D0202',
+  tabBarInactive: '#6B6B6B',
+
+  // Divider
+  divider: '#9D0202',
+
+  // Border
+  border: '#9D0202',
+  borderLight: '#E0E0E0',
+
+  // Overlay
+  overlay: 'rgba(0, 0, 0, 0.5)',
 };

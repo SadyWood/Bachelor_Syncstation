@@ -7,7 +7,7 @@ import type { AgendaItem, NoticeItem } from '@/components';
 import { ActiveSceneCard, AgendaCard, ContextCard } from '@/components';
 import { Colors } from '@/styles';
 
-// Mock data - will be replaced with real data later
+// Mock data will be replaced with real data after
 const MOCK_NOTICES: NoticeItem[] = [
   { id: '1', time: '13.45', message: 'Lunch extended due to weather, resume 15.00' },
   { id: '2', time: '13.45', message: 'Lunch extended due to weather, resume 15.00' },
