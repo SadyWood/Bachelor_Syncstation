@@ -174,6 +174,7 @@ export async function getLogEntry(id: string, tenantId: string): Promise<LogEntr
  * Create a new log entry
  */
 export async function createLogEntry(data: {
+  id?: string; // Client-generated UUID for idempotent sync
   tenantId: string;
   userId: string;
   nodeId: string;
@@ -185,7 +186,8 @@ export async function createLogEntry(data: {
   const rows = await dbSync
     .insert(schema.logEntries)
     .values({
-      id: uuidv7(),
+      // Use client-provided ID if given, otherwise generate server-side
+      id: data.id ?? uuidv7(),
       tenantId: data.tenantId,
       userId: data.userId,
       contentNodeId: data.nodeId,
@@ -322,6 +324,40 @@ export async function deleteAttachment(id: string): Promise<boolean> {
     .returning({ id: schema.logAttachments.id });
 
   return result.length > 0;
+}
+
+/**
+ * Gets a single attachment by ID with tenant verification - By joining through log_entries to confirm attachment belongs to the correct tenant
+ */
+export async function getAttachment(
+  attachmentId: string,
+  tenantId: string,
+): Promise<LogAttachment | null> {
+  const rows = await dbSync
+    .select({
+      id: schema.logAttachments.id,
+      log_entry_id: schema.logAttachments.logEntryId,
+      filename: schema.logAttachments.filename,
+      mime_type: schema.logAttachments.mimeType,
+      file_size: schema.logAttachments.fileSize,
+      storage_path: schema.logAttachments.storagePath,
+      attachment_type: schema.logAttachments.attachmentType,
+      created_at: schema.logAttachments.createdAt,
+    }).from(schema.logAttachments)
+  // Join to log entries so we can check tenant ownership
+    .innerJoin(
+      schema.logEntries, eq(schema.logAttachments.logEntryId, schema.logEntries.id),
+    )
+    .where(
+      and(
+        eq(schema.logAttachments.id, attachmentId),
+        eq(schema.logEntries.tenantId, tenantId),
+      ),
+    )
+    .limit(1);
+
+  if (rows.length === 0) return null;
+  return mapAttachmentToDto(rows[0] as unknown as LogAttachmentRow);
 }
 
 /* ========================================
