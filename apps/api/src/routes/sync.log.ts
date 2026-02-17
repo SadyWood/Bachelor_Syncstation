@@ -31,9 +31,9 @@ const LogEntriesQuerySchema = z.object({
 });
 
 export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
-  /* ========================================
-     LOG ENTRIES
-     ======================================== */
+
+  // All routes require authentication
+  app.addHook('preHandler', app.authenticate);
 
   // GET /syncstation/log-entries?nodeId=xxx&status=pending - List log entries
   app.get(
@@ -109,10 +109,9 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
       }
 
       // Get user ID from JWT (authenticated user)
-      try {
-        const decoded = await req.jwtVerify<{ sub: string }>();
-        const userId = decoded.sub;
+      const userId = (req.user as { sub: string }).sub;
 
+      try {
         const body = CreateLogEntryRequest.shape.body.parse(req.body);
         if (body.id) {
           const existing = await syncLogRepo.getLogEntry(body.id, tenantId);
@@ -411,9 +410,8 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
       return reply.code(400).send(ErrorResponse.parse({ ok: false, error: 'TENANT_HEADER_MISSING' }));
     }
 
+    const userId = (req.user as { sub: string }).sub;
     try {
-      const decoded = await req.jwtVerify<{ sub: string }>();
-      const userId = decoded.sub;
 
       const status = await syncLogRepo.getSyncStatus(tenantId, userId);
 
