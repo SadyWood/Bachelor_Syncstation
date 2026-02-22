@@ -1,10 +1,10 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
-import { LogEntryScreen } from '../screens/ExploreScreen';
-import { ProjectsScreen } from '../screens/HomeScreen';
-import { SettingsScreen } from '../screens/ProfileScreen';
-import { WelcomeScreen } from '../screens/welcome-screen';
+import { LogEntryScreen } from '@/screens/ExploreScreen';
+import { ProjectsScreen } from '@/screens/HomeScreen';
+import { SettingsScreen } from '@/screens/ProfileScreen';
+import { WelcomeScreen } from '@/screens/welcome-screen';
 import { useAuthStore} from "@/stores/authStore";
 
 const Tab = createBottomTabNavigator();
