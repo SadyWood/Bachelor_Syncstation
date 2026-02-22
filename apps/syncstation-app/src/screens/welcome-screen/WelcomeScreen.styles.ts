@@ -17,18 +17,17 @@ export const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
   center: {
-    position: 'absolute',
-    top: '38%',
+    top: '40%',
     alignItems: 'center',
   },
   title: {
-    fontSize: 20,
+    fontSize: 40,
     fontWeight: "900",
     color: Colors.text,
     letterSpacing: 0.5,
   },
   powered: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: "400",
     color: Colors.primary,
     letterSpacing: 0.3,
@@ -54,7 +53,7 @@ export const styles = StyleSheet.create({
   loginBtnText: {
     fontSize: 18,
     fontWeight: '600',
-    color: Colors.text,
+    color: Colors.primary,
   },
 
 
