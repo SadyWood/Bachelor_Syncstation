@@ -11,12 +11,12 @@ import { styles } from './WelcomeScreen.styles';
 const { width, height } = Dimensions.get('window');
 
 const BUBBLES = [
-  { top: 0.06, left: 0.08, size: 0.22, delay: 0 },
-  { top: 0.10, left: 0.42, size: 0.26, delay: 100 },
-  { top: 0.06, left: 0.72, size: 0.20, delay: 200 },
-  { top: 0.62, left: 0.02, size: 0.28, delay: 150 },
+  { top: 0.19, left: 0.08, size: 0.22, delay: 0 },
+  { top: 0.09, left: 0.38, size: 0.40, delay: 100 },
+  { top: 0.24, left: 0.78, size: 0.20, delay: 200 },
+  { top: 0.62, left: 0.02, size: 0.38, delay: 150 },
   { top: 0.60, left: 0.44, size: 0.22, delay: 50 },
-  { top: 0.66, left: 0.78, size: 0.20, delay: 250 }
+  { top: 0.76, left: 0.68, size: 0.28, delay: 250 }
 ];
 
 type BubbleProps = {
