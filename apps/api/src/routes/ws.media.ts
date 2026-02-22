@@ -85,6 +85,8 @@ export const wsMediaRoutes: FastifyPluginAsyncZod = async (app) => {
      POST /ws/nodes/:nodeId/media/init
      ======================================== */
 
+  app.addHook('preHandler', app.authenticate);
+
   app.post(
     '/ws/nodes/:nodeId/media/init',
     {
