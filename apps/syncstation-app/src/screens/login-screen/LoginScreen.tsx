@@ -8,10 +8,11 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Dimensions,
+  Dimensions, ActivityIndicator,
 } from 'react-native';
 import { styles } from './LoginScreen.styles';
 import { useAuthStore } from "@/stores/authStore";
+import {Colors} from "@/styles";
 
 
 const { width, height } = Dimensions.get('window');
@@ -108,6 +109,46 @@ export function LoginScreen({ onBack }: Props) {
     <Text style={styles.title}>Set On Sync</Text>
     <Text style={styles.powered}>Powered by Hoolsy</Text>
   </Animated.View>
+      <Animated.View
+      style={[ styles.form, { opacity: fadeAnimated, transform: [{ translateY: slideAnimated }] },
+    ]}
+      >
+        <Text style={styles.label}>Brukernavn/Mail</Text>
+        <TextInput
+          style={styles.input}
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+          keyboardType="email-address"
+          placeholderTextColor={Colors.primary}
+          />
+        <Text style={styles.label}>Passord</Text>
+        <TextInput
+          style={styles.input}
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          placeholderTextColor={Colors.primary}
+        />
+
+        {error ? <Text style={styles.error}>{error}</Text> : null}
+
+        <TouchableOpacity
+          style={styles.loginBtn}
+          onPress={handleLogin}
+          disabled={loading}
+          activeOpacity={0.85}
+          >
+          {loading
+            ? <ActivityIndicator color={Colors.text} />
+            : <Text style={styles.loginBtnText}>Log in</Text>
+          }
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.forgotPassword} activeOpacity={0.7}>
+          <Text style={styles.forgotPasswordText}>Forgot password?</Text>
+        </TouchableOpacity>
+      </Animated.View>
   </ScrollView>
   </KeyboardAvoidingView>
   )
