@@ -81,5 +81,12 @@ export const styles = StyleSheet.create({
     fontWeight: '600',
     color: Colors.text,
   },
-
+  forgotPassword: {
+    marginTop: Spacing.md,
+    alignItems: 'center',
+  },
+  forgotPasswordText: {
+    fontSize: 14,
+    color: Colors.text,
+  },
 })
