@@ -19,8 +19,8 @@ const { width, height } = Dimensions.get('window');
 
 const CIRCLES = [
   { top: 0.04, left: 0.10, size: 0.22, delay: 0 },
-  { top: 0.09, left: 0.38, size: 0.40, delay: 100 },
-  { top: 0.24, left: 0.78, size: 0.20, delay: 200 },
+  { top: 0.09, left: 0.18, size: 0.40, delay: 100 },
+  { top: 0.05, left: 0.78, size: 0.20, delay: 200 },
 ];
 
 type CircleProps = {
