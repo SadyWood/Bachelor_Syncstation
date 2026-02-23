@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useRef} from "react";
+import React, { useRef, useEffect, useState} from "react";
 import {
   View,
   Text,
@@ -70,13 +70,13 @@ export function LoginScreen({ onBack }: Props) {
   const [error, setError] = useState('');
   const login = useAuthStore((s) => s.login);
 
-  const slideButton = useRef(new Animated.Value(40)).current;
-  const fadeButton = useRef(new Animated.Value(0)).current;
+  const slideAnimated = useRef(new Animated.Value(40)).current;
+  const fadeAnimated = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.parallel([
-      Animated.timing(fadeButton, { toValue: 1, duration: 400, useNativeDriver: true }),
-      Animated.timing(slideButton, { toValue: 0, duration: 400, useNativeDriver: true }),
+      Animated.timing(fadeAnimated, { toValue: 1, duration: 400, useNativeDriver: true }),
+      Animated.timing(slideAnimated, { toValue: 0, duration: 400, useNativeDriver: true }),
     ]).start();
   }, []);
 
@@ -90,4 +90,25 @@ export function LoginScreen({ onBack }: Props) {
     await login(email, password);
     setLoading(false);
   }
+  return (
+    <KeyboardAvoidingView
+    style={styles.flex}
+  behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+  >
+    <ScrollView contentContainerStyle={styles.container}
+  keyboardShouldPersistTaps="handled"
+  >
+    {CIRCLES.map((c, i) => (
+      <AnimatedCircle key={i} {...c} />
+      ))}
+  <Animated.View style={[ styles.titleBlock, {
+    opacity: fadeAnimated, transform: [{ translateY: slideAnimated }] },
+  ]}
+    >
+    <Text style={styles.title}>Set On Sync</Text>
+    <Text style={styles.powered}>Powered by Hoolsy</Text>
+  </Animated.View>
+  </ScrollView>
+  </KeyboardAvoidingView>
+  )
 }
