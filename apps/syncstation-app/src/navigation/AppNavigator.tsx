@@ -1,22 +1,13 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import React from 'react';
-import { LogEntryScreen } from '@/screens/ExploreScreen';
-import { ProjectsScreen } from '@/screens/HomeScreen';
-import { SettingsScreen } from '@/screens/ProfileScreen';
+import React, { Fragment, useState } from 'react';
+import {FabMenu, FabMenuOption, TabBar, TabName} from "@/components/TabBar";
+import { HomeScreen } from "@/screens";
 import { WelcomeScreen } from '@/screens/welcome-screen';
 import { LoginScreen } from '@/screens/login-screen';
 import { useAuthStore} from '@/stores/authStore';
+import {tabNavigatorScreenOptions} from "@/navigation/AppNavigator.styles";
 
-const Tab = createBottomTabNavigator();
-const Stack = createNativeStackNavigator();
-
-function AppTabs() {
-import React, { Fragment, useState } from 'react';
-import { FabMenu, TabBar } from '@/components/TabBar';
-import { HomeScreen } from '@/screens';
-import { tabNavigatorScreenOptions } from './AppNavigator.styles';
-import type { FabMenuOption, TabName } from '@/components/TabBar/TabBar.types';
 
 type AppTabsParamList = {
   Home: undefined;
@@ -26,8 +17,9 @@ type AppTabsParamList = {
 };
 
 const Tab = createBottomTabNavigator<AppTabsParamList>();
+const Stack = createNativeStackNavigator();
 
-export function AppNavigator() {
+export function AppTabs() {
   const [isFabMenuVisible, setIsFabMenuVisible] = useState<boolean>(false);
 
   function handleFabPress() {
