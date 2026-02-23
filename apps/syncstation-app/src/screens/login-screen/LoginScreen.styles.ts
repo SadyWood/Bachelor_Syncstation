@@ -12,4 +12,22 @@ export const styles = StyleSheet.create({
     padding: Spacing.lg,
     backgroundColor: Colors.background,
   },
+  imageRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    marginBottom: Spacing.lg,
+    paddingHorizontal: Spacing.sm,
+    height: 110,
+  },
+  circle: {
+    borderWidth: 2.5,
+    borderColor: Colors.primary,
+    overflow: 'hidden',
+  },
+  circlePlaceholder: {
+    flex: 1,
+    backgroundColor: Colors.text,
+  },
+
 })
