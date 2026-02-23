@@ -13,6 +13,10 @@
     "lint:fix": "eslint src/**/*.{ts,tsx} --fix"
   },
   "dependencies": {
+    "@hk26/schema": "workspace:*",
+    "@react-navigation/bottom-tabs": "^7.1.0",
+    "@react-navigation/native": "^7.0.0",
+    "@react-navigation/native-stack": "^7.13.0",
     "@expo/vector-icons": "^15.0.3",
     "@hk26/schema": "workspace:*",
     "@react-navigation/bottom-tabs": "^7.1.0",
@@ -27,6 +31,8 @@
     "react-native": "0.81.5",
     "react-native-safe-area-context": "~5.6.0",
     "react-native-screens": "~4.16.0",
+    "zod": "^3.24.0",
+    "zustand": "^5.0.11"
     "zod": "^3.24.0"
   },
   "devDependencies": {
