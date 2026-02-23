@@ -36,7 +36,7 @@ export const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: '700',
-    color: Colors.primary,
+    color: Colors.text,
     letterSpacing: 0.5,
   },
   powered: {
