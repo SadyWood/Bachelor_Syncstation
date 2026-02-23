@@ -5,7 +5,8 @@ import { LogEntryScreen } from '@/screens/ExploreScreen';
 import { ProjectsScreen } from '@/screens/HomeScreen';
 import { SettingsScreen } from '@/screens/ProfileScreen';
 import { WelcomeScreen } from '@/screens/welcome-screen';
-import { useAuthStore} from "@/stores/authStore";
+import { LoginScreen } from '@/screens/login-screen';
+import { useAuthStore} from '@/stores/authStore';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -49,22 +50,28 @@ function AppTabs() {
   );
 }
 
+function AuthStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Welcome">
+        {({ navigation }) => (
+          <WelcomeScreen onLoginPress={() => navigation.navigate('Login')} />
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="Login" component={LoginScreen} />
+    </Stack.Navigator>
+  );
+}
+
 export function AppNavigator() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   return (
-    <Stack.Navigator screenOptions={{headerShown: false}}>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
       {isAuthenticated ? (
         <Stack.Screen name="App" component={AppTabs}/>
       ) : (
-        <Stack.Screen name="Welcome">
-          {() => (
-            <WelcomeScreen onLoginPress={() => {
-              useAuthStore.getState().login('test@test.com', 'password');
-            }}
-            />
-          )}
-        </Stack.Screen>
+        <Stack.Screen name="Auth" component={AuthStack} />
       )}
     </Stack.Navigator>
   );
