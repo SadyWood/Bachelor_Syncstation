@@ -22,11 +22,11 @@ export const useAuthStore = create<AuthState>((set) => ({
   login: async (email, _password) => {
     await new Promise((r) => setTimeout(r, 600));
     set({
-      user: { id:'1', email, name: 'Mock User' },
+      user: { id: '1', email, name: 'Mock User' },
       token: 'mock-token-123',
       isAuthenticated: true,
     });
   },
-  logout: () => set ({ user: null, token: null, isAuthenticated: false }) ,
+  logout: () => set({ user: null, token: null, isAuthenticated: false }),
 
 }));

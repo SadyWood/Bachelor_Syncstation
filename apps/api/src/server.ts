@@ -3,7 +3,12 @@ import cors from '@fastify/cors';
 import jwt from '@fastify/jwt';
 import multipart from '@fastify/multipart';
 import Fastify from 'fastify';
-import { jsonSchemaTransform, serializerCompiler, validatorCompiler, type ZodTypeProvider } from 'fastify-type-provider-zod';
+import {
+  jsonSchemaTransform,
+  serializerCompiler,
+  validatorCompiler,
+  type ZodTypeProvider,
+} from 'fastify-type-provider-zod';
 import { env } from './config/env.js';
 import { jsonEmptyBodyPlugin } from './plugins/json-empty-body.js';
 import { authRoutes } from './routes/auth.js';
@@ -18,7 +23,6 @@ import { wsRolesRoutes } from './routes/ws.roles.js';
 import { evaluateEffectivePerms } from './services/perm.service.js';
 import type { FastifyRequest, FastifyReply } from 'fastify';
 
-
 export async function build() {
   const app = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>();
 
@@ -32,7 +36,6 @@ export async function build() {
   });
   await app.register(jsonEmptyBodyPlugin);
 
-
   app.setValidatorCompiler(validatorCompiler);
   app.setSerializerCompiler(serializerCompiler);
   void jsonSchemaTransform;
@@ -40,12 +43,15 @@ export async function build() {
   // Error handler for better debugging of schema mismatches
   app.setErrorHandler((err, req, reply) => {
     // Log detailed error information for schema validation failures
-    app.log.error({
-      err,
-      url: req.url,
-      method: req.method,
-      statusCode: err.statusCode,
-    }, 'Request failed');
+    app.log.error(
+      {
+        err,
+        url: req.url,
+        method: req.method,
+        statusCode: err.statusCode,
+      },
+      'Request failed',
+    );
 
     reply.status(err.statusCode ?? 500).send({
       ok: false,
@@ -54,7 +60,9 @@ export async function build() {
     });
   });
 
-  app.decorate('authenticate', async (req: FastifyRequest) => { await req.jwtVerify(); });
+  app.decorate('authenticate', async (req: FastifyRequest) => {
+    await req.jwtVerify();
+  });
 
   // Permission evaluator bound to tenant header
   app.decorate('can', async (req: FastifyRequest, perm: string) => {
@@ -113,5 +121,5 @@ export async function build() {
 
 if (env.NODE_ENV !== 'test') {
   const host = env.NODE_ENV === 'development' ? 'localhost' : '0.0.0.0';
-  build().then(app => app.listen({ port: env.PORT, host }));
+  build().then((app) => app.listen({ port: env.PORT, host }));
 }

@@ -9,12 +9,12 @@ import type { RoleResponse } from '@hk26/schema';
 export type Membership = {
   tenantId?: string;
   nodeId?: string;
-  role: string;            // "Admin" | "Manage" | "Viewer"
+  role: string; // "Admin" | "Manage" | "Viewer"
 };
 
 export type RolePerms = {
-  allow: string[];         // e.g. ["**"] or ["content.read", "task.manage"]
-  deny?: string[];         // optional deny-list
+  allow: string[]; // e.g. ["**"] or ["content.read", "task.manage"]
+  deny?: string[]; // optional deny-list
 };
 
 export type EffectivePerms = {

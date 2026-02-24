@@ -6,7 +6,11 @@ import { useContentStore } from '../../lib/use-content-store';
 import { slugify } from '../../utils/slugify';
 import type { WidgetProps } from '../../components/WidgetBase/WidgetTypes';
 
-export default function ProjectList({ title, onClose, titleIcon }: WidgetProps & { titleIcon?: React.ComponentType<{ size?: number; className?: string }> }) {
+export default function ProjectList({
+  title,
+  onClose,
+  titleIcon,
+}: WidgetProps & { titleIcon?: React.ComponentType<{ size?: number; className?: string }> }) {
   const { projects, isLoading, error, loadProjects, createProject } = useContentStore();
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -15,9 +19,12 @@ export default function ProjectList({ title, onClose, titleIcon }: WidgetProps &
     loadProjects();
   }, [loadProjects]);
 
-  const filtered = useMemo(() =>
-    projects.filter(r => !searchQuery || r.title.toLowerCase().includes(searchQuery.toLowerCase())),
-  [projects, searchQuery],
+  const filtered = useMemo(
+    () =>
+      projects.filter(
+        (r) => !searchQuery || r.title.toLowerCase().includes(searchQuery.toLowerCase()),
+      ),
+    [projects, searchQuery],
   );
 
   const handleCreateNew = async () => {
@@ -28,7 +35,7 @@ export default function ProjectList({ title, onClose, titleIcon }: WidgetProps &
     await loadProjects();
   };
 
-  const handleSelect = (project: typeof projects[0]) => {
+  const handleSelect = (project: (typeof projects)[0]) => {
     window.dispatchEvent(new CustomEvent('project:selected', { detail: project }));
   };
 
@@ -36,16 +43,15 @@ export default function ProjectList({ title, onClose, titleIcon }: WidgetProps &
     <BaseWidget title={title || 'Projects'} onClose={onClose} titleIcon={titleIcon || FolderTree}>
       <div className="p-3 h-full flex flex-col gap-3">
         {/* Error display */}
-        {error && (
-          <div className="ws-alert ws-alert-danger text-xs">
-            {error}
-          </div>
-        )}
+        {error && <div className="ws-alert ws-alert-danger text-xs">{error}</div>}
 
         {/* Search + New button */}
         <div className="flex gap-2">
           <div className="relative flex-1">
-            <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
+            <Search
+              size={14}
+              className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400"
+            />
             <input
               className="ws-input w-full pl-8 text-sm"
               placeholder="Search projects..."
@@ -102,9 +108,7 @@ export default function ProjectList({ title, onClose, titleIcon }: WidgetProps &
           )}
         </div>
 
-        <div className="ws-alert ws-alert-info text-xs">
-          Click a project to edit its structure
-        </div>
+        <div className="ws-alert ws-alert-info text-xs">Click a project to edit its structure</div>
       </div>
     </BaseWidget>
   );

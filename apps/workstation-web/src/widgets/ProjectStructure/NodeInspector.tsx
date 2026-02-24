@@ -1,10 +1,21 @@
 // apps/workstation-web/src/widgets/ProjectStructure/NodeInspector.tsx
-import { type ContentNodeSchema, type MediaAsset, MEDIA_KIND_OPTIONS, getMediaClassFromKind } from '@hk26/schema';
+import {
+  type ContentNodeSchema,
+  type MediaAsset,
+  MEDIA_KIND_OPTIONS,
+  getMediaClassFromKind,
+} from '@hk26/schema';
 import { Save, Trash2, FileText, Upload, Film, Image, Music, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { BaseWidget } from '../../components/WidgetBase/BaseWidget';
 import { updateNode as updateNodeAPI, deleteNode as deleteNodeAPI } from '../../lib/content-client';
-import { getMediaForNode, initUpload, uploadFile, completeUpload, deleteMedia } from '../../lib/media-client';
+import {
+  getMediaForNode,
+  initUpload,
+  uploadFile,
+  completeUpload,
+  deleteMedia,
+} from '../../lib/media-client';
 import { useContentStore } from '../../lib/use-content-store';
 import { slugify } from '../../utils/slugify';
 import type { WidgetProps } from '../../types';
@@ -30,7 +41,11 @@ const getAcceptedMimeTypes = (mediaClass: 'video' | 'audio' | 'image'): string =
   }
 };
 
-function NodeInspector({ title, onClose, titleIcon }: WidgetProps & { titleIcon?: React.ComponentType<{ size?: number; className?: string }> }) {
+function NodeInspector({
+  title,
+  onClose,
+  titleIcon,
+}: WidgetProps & { titleIcon?: React.ComponentType<{ size?: number; className?: string }> }) {
   const { loadProjectTree } = useContentStore();
   const [node, setNode] = useState<ContentNode | null>(null);
   const [nodeName, setNodeName] = useState('');
@@ -195,7 +210,7 @@ function NodeInspector({ title, onClose, titleIcon }: WidgetProps & { titleIcon?
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return `${Math.round((bytes / Math.pow(k, i)) * 100) / 100  } ${  sizes[i]}`;
+    return `${Math.round((bytes / Math.pow(k, i)) * 100) / 100} ${sizes[i]}`;
   };
 
   const getNodeTypeLabel = () => {
@@ -210,7 +225,11 @@ function NodeInspector({ title, onClose, titleIcon }: WidgetProps & { titleIcon?
   const acceptTypes = getAcceptedMimeTypes(mediaClass);
 
   return (
-    <BaseWidget title={title || 'Node Inspector'} onClose={onClose} titleIcon={titleIcon || FileText}>
+    <BaseWidget
+      title={title || 'Node Inspector'}
+      onClose={onClose}
+      titleIcon={titleIcon || FileText}
+    >
       <div className="h-full flex flex-col">
         <div className="flex-1 overflow-y-auto p-3 md:p-4 space-y-3">
           {!node ? (
@@ -254,7 +273,9 @@ function NodeInspector({ title, onClose, titleIcon }: WidgetProps & { titleIcon?
                 {/* Content Type Dropdown (only for content nodes) */}
                 {!isGroup ? (
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Content Type</label>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">
+                      Content Type
+                    </label>
                     <select
                       className="ws-input w-full text-sm cursor-pointer"
                       value={mediaKind}
@@ -387,7 +408,8 @@ function NodeInspector({ title, onClose, titleIcon }: WidgetProps & { titleIcon?
                       ℹ️ Groups cannot have media content
                     </p>
                     <p className="text-[11px] text-blue-600 mt-1">
-                      Use groups to organize content nodes. Media can only be linked to content nodes.
+                      Use groups to organize content nodes. Media can only be linked to content
+                      nodes.
                     </p>
                   </div>
                 </div>
@@ -400,11 +422,7 @@ function NodeInspector({ title, onClose, titleIcon }: WidgetProps & { titleIcon?
         {node && (
           <div className="border-t border-gray-200 bg-white p-3 md:p-4">
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2">
-              <button
-                className="ws-btn ws-btn-sm ws-btn-solid"
-                onClick={save}
-                disabled={isSaving}
-              >
+              <button className="ws-btn ws-btn-sm ws-btn-solid" onClick={save} disabled={isSaving}>
                 <Save size={14} />
                 <span>{isSaving ? 'Saving...' : 'Save Changes'}</span>
               </button>

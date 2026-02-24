@@ -34,7 +34,9 @@ export const wsRolesRoutes: FastifyPluginAsyncZod = async (app) => {
         const roles = await rolesRepo.listRolesForTenant(tenantId);
         return reply.send({ ok: true, items: roles });
       } catch (error) {
-        return reply.code(500).send({ ok: false, code: 'INTERNAL_ERROR', message: 'Failed to fetch roles' });
+        return reply
+          .code(500)
+          .send({ ok: false, code: 'INTERNAL_ERROR', message: 'Failed to fetch roles' });
       }
     },
   );
@@ -55,10 +57,15 @@ export const wsRolesRoutes: FastifyPluginAsyncZod = async (app) => {
       const body = RolePayload.parse(req.body ?? {});
 
       try {
-        const role = await rolesRepo.createRole(tenantId, body.name, { allow: body.allow, deny: body.deny });
+        const role = await rolesRepo.createRole(tenantId, body.name, {
+          allow: body.allow,
+          deny: body.deny,
+        });
         return reply.send({ ok: true, role });
       } catch (error) {
-        return reply.code(500).send({ ok: false, code: 'INTERNAL_ERROR', message: 'Failed to create role' });
+        return reply
+          .code(500)
+          .send({ ok: false, code: 'INTERNAL_ERROR', message: 'Failed to create role' });
       }
     },
   );
@@ -85,9 +92,13 @@ export const wsRolesRoutes: FastifyPluginAsyncZod = async (app) => {
         return reply.send({ ok: true, role });
       } catch (error) {
         if (error instanceof Error && error.message === 'Role not found or not in tenant') {
-          return reply.code(404).send({ ok: false, code: 'ROLE_NOT_FOUND_OR_NOT_IN_TENANT', message: error.message });
+          return reply
+            .code(404)
+            .send({ ok: false, code: 'ROLE_NOT_FOUND_OR_NOT_IN_TENANT', message: error.message });
         }
-        return reply.code(500).send({ ok: false, code: 'INTERNAL_ERROR', message: 'Failed to update role' });
+        return reply
+          .code(500)
+          .send({ ok: false, code: 'INTERNAL_ERROR', message: 'Failed to update role' });
       }
     },
   );
@@ -113,16 +124,22 @@ export const wsRolesRoutes: FastifyPluginAsyncZod = async (app) => {
       } catch (error) {
         if (error instanceof Error) {
           if (error.message === 'Role not found') {
-            return reply.code(404).send({ ok: false, code: 'ROLE_NOT_FOUND', message: error.message });
+            return reply
+              .code(404)
+              .send({ ok: false, code: 'ROLE_NOT_FOUND', message: error.message });
           }
           if (error.message === 'Role not in tenant') {
-            return reply.code(404).send({ ok: false, code: 'ROLE_NOT_IN_TENANT', message: error.message });
+            return reply
+              .code(404)
+              .send({ ok: false, code: 'ROLE_NOT_IN_TENANT', message: error.message });
           }
           if (error.message === 'Cannot delete role: still has members') {
             return reply.code(409).send({ ok: false, code: 'ROLE_IN_USE', message: error.message });
           }
         }
-        return reply.code(500).send({ ok: false, code: 'INTERNAL_ERROR', message: 'Failed to delete role' });
+        return reply
+          .code(500)
+          .send({ ok: false, code: 'INTERNAL_ERROR', message: 'Failed to delete role' });
       }
     },
   );
@@ -148,13 +165,19 @@ export const wsRolesRoutes: FastifyPluginAsyncZod = async (app) => {
       } catch (error) {
         if (error instanceof Error) {
           if (error.message === 'Role not found') {
-            return reply.code(404).send({ ok: false, code: 'ROLE_NOT_FOUND', message: error.message });
+            return reply
+              .code(404)
+              .send({ ok: false, code: 'ROLE_NOT_FOUND', message: error.message });
           }
           if (error.message === 'Role not in tenant') {
-            return reply.code(404).send({ ok: false, code: 'ROLE_NOT_IN_TENANT', message: error.message });
+            return reply
+              .code(404)
+              .send({ ok: false, code: 'ROLE_NOT_IN_TENANT', message: error.message });
           }
         }
-        return reply.code(500).send({ ok: false, code: 'INTERNAL_ERROR', message: 'Failed to fetch role' });
+        return reply
+          .code(500)
+          .send({ ok: false, code: 'INTERNAL_ERROR', message: 'Failed to fetch role' });
       }
     },
   );

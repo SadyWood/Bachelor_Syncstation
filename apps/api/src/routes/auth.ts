@@ -1,20 +1,40 @@
 // apps/api/src/routes/auth.ts
 import '@fastify/jwt';
 import {
-  LoginRequest, LoginResponse,
-  RegisterRequest, RegisterResponse,
-  InvitePreviewResponse, RefreshResponse, MeResponse,
-  ErrorResponse, CanResponse,
+  LoginRequest,
+  LoginResponse,
+  RegisterRequest,
+  RegisterResponse,
+  InvitePreviewResponse,
+  RefreshResponse,
+  MeResponse,
+  ErrorResponse,
+  CanResponse,
 } from '@hk26/schema';
 import { z } from 'zod';
 import { env } from '../config/env.js';
 import { getTenantById } from '../repos/workstation.repo.js';
 import {
-  getUserByEmail, getUserByIdService, verifyPassword, signAccess,
-  newRefreshToken, storeRefresh, createUser, publicUser, rotateRefresh,
-  findUserIdByRefreshToken, getAccessSummary, grantAccess, getWsMemberships,
-  resolveCurrentTenant, completeInvitedUser, activateTenantMembershipsAfterRegister,
-  findInvite, markInviteConsumed, getPlatformCodeById, revokeAllUserRefresh,
+  getUserByEmail,
+  getUserByIdService,
+  verifyPassword,
+  signAccess,
+  newRefreshToken,
+  storeRefresh,
+  createUser,
+  publicUser,
+  rotateRefresh,
+  findUserIdByRefreshToken,
+  getAccessSummary,
+  grantAccess,
+  getWsMemberships,
+  resolveCurrentTenant,
+  completeInvitedUser,
+  activateTenantMembershipsAfterRegister,
+  findInvite,
+  markInviteConsumed,
+  getPlatformCodeById,
+  revokeAllUserRefresh,
 } from '../services/auth.service.js';
 import { evaluateEffectivePerms } from '../services/perm.service.js';
 import { err } from '../utils/errors.js';
@@ -64,7 +84,7 @@ export const authRoutes: FastifyPluginAsyncZod = async (app) => {
       }
 
       const valid = await verifyPassword(req.body.password, user.passwordHash);
-      if (!valid) return reply.code(401).send(err('INVALID_CREDENTIALS', 'Invalid email or password.'));
+      if (!valid) { return reply.code(401).send(err('INVALID_CREDENTIALS', 'Invalid email or password.')); }
 
       const userId = user.id;
 
@@ -94,17 +114,22 @@ export const authRoutes: FastifyPluginAsyncZod = async (app) => {
 
       const t1 = currentTenant ? await getTenantById(currentTenant) : null;
       const currentTenantInfo = t1
-        ? { id: t1.id, code: t1.code, name: t1.name, createdAt: t1.createdAt?.toISOString() ?? null }
+        ? {
+          id: t1.id,
+          code: t1.code,
+          name: t1.name,
+          createdAt: t1.createdAt?.toISOString() ?? null,
+        }
         : null;
 
       // Build response object and validate with Zod before sending
       const responseData = {
         ok: true as const,
         user: publicUser(user),
-        access: access.map(a => ({ ...a, updatedAt: a.updatedAt ?? null })),
+        access: access.map((a) => ({ ...a, updatedAt: a.updatedAt ?? null })),
         memberships: memberships
-          .filter(m => m.nodeId !== null && m.tenantId !== null) // Filter out null values for schema compliance
-          .map(m => ({
+          .filter((m) => m.nodeId !== null && m.tenantId !== null) // Filter out null values for schema compliance
+          .map((m) => ({
             tenantId: m.tenantId as string, // Safe cast since we filtered nulls
             role: m.role,
             createdAt: m.createdAt ?? undefined, // Convert null to undefined for schema compliance
@@ -112,10 +137,12 @@ export const authRoutes: FastifyPluginAsyncZod = async (app) => {
           })),
         accessToken,
         // Only include tenant fields if we have a valid tenant
-        ...(currentTenant && currentTenantInfo ? {
-          currentTenant,
-          currentTenantInfo,
-        } : {}),
+        ...(currentTenant && currentTenantInfo
+          ? {
+            currentTenant,
+            currentTenantInfo,
+          }
+          : {}),
         // Do NOT send refreshToken in JSON - only as httpOnly cookie
       };
 
@@ -133,17 +160,28 @@ export const authRoutes: FastifyPluginAsyncZod = async (app) => {
     {
       schema: {
         body: RegisterRequest,
-        response: { 200: RegisterResponse, 400: ErrorResponse, 401: ErrorResponse, 409: ErrorResponse },
+        response: {
+          200: RegisterResponse,
+          400: ErrorResponse,
+          401: ErrorResponse,
+          409: ErrorResponse,
+        },
       },
     },
     async (req: FastifyRequest<{ Body: RegisterBody }>, reply: FastifyReply) => {
       const { token } = req.body;
 
       const inv = await findInvite(token);
-      if (!inv) return reply.code(400).send(err('INVITE_NOT_FOUND_OR_AVAILABLE', 'Invite not found or unavailable.'));
+      if (!inv) {
+        return reply
+          .code(400)
+          .send(err('INVITE_NOT_FOUND_OR_AVAILABLE', 'Invite not found or unavailable.'));
+      }
 
       if (inv.email.toLowerCase() !== req.body.email.toLowerCase()) {
-        return reply.code(400).send(err('INVITE_EMAIL_MISMATCH', 'Email does not match the invite.'));
+        return reply
+          .code(400)
+          .send(err('INVITE_EMAIL_MISMATCH', 'Email does not match the invite.'));
       }
 
       const existing = await getUserByEmail(req.body.email.toLowerCase());
@@ -155,12 +193,12 @@ export const authRoutes: FastifyPluginAsyncZod = async (app) => {
         }
         const completed = await completeInvitedUser({
           email: req.body.email,
-          firstName: req.body.firstName,     // kan være undefined → service normaliserer
-          lastName: req.body.lastName,       // kan være undefined → service normaliserer
+          firstName: req.body.firstName, // kan være undefined → service normaliserer
+          lastName: req.body.lastName, // kan være undefined → service normaliserer
           displayName: req.body.displayName, // kan være undefined → service normaliserer
           password: req.body.password,
         });
-        if (!completed) return reply.code(400).send(err('INVITE_USER_NOT_FOUND', 'Invited user was not found.'));
+        if (!completed) { return reply.code(400).send(err('INVITE_USER_NOT_FOUND', 'Invited user was not found.')); }
         userId = completed.id;
       } else {
         const created = await createUser({
@@ -197,7 +235,7 @@ export const authRoutes: FastifyPluginAsyncZod = async (app) => {
       const responseData = {
         ok: true as const,
         user: publicUser(fullUser),
-        access: access.map(a => ({ ...a, updatedAt: a.updatedAt ?? null })),
+        access: access.map((a) => ({ ...a, updatedAt: a.updatedAt ?? null })),
         accessToken,
         // Do NOT send refreshToken in JSON - only as httpOnly cookie
       };
@@ -216,7 +254,8 @@ export const authRoutes: FastifyPluginAsyncZod = async (app) => {
       const inv = await findInvite(req.params.token);
       if (!inv) return reply.code(404).send(err('INVITE_NOT_FOUND', 'Invite does not exist.'));
 
-      const platformCode = inv.platformId != null ? await getPlatformCodeById(inv.platformId) : undefined;
+      const platformCode =
+        inv.platformId != null ? await getPlatformCodeById(inv.platformId) : undefined;
       const now = new Date();
 
       let state: 'revoked' | 'consumed' | 'expired' | 'available';
@@ -251,9 +290,9 @@ export const authRoutes: FastifyPluginAsyncZod = async (app) => {
   // ---------- POST/GET /auth/refresh ----------
   const handleRefresh = async (req: FastifyRequest, reply: FastifyReply) => {
     const current = req.cookies[cookieName];
-    if (!current) return reply.code(401).send(err('NO_REFRESH_COOKIE', 'Refresh cookie is missing.'));
+    if (!current) { return reply.code(401).send(err('NO_REFRESH_COOKIE', 'Refresh cookie is missing.')); }
     const userId = await findUserIdByRefreshToken(current);
-    if (!userId) return reply.code(401).send(err('INVALID_REFRESH', 'Refresh token is invalid or expired.'));
+    if (!userId) { return reply.code(401).send(err('INVALID_REFRESH', 'Refresh token is invalid or expired.')); }
 
     const { refreshPlain, exp } = await rotateRefresh(userId, current, env.REFRESH_TOKEN_TTL);
     reply.setCookie(cookieName, refreshPlain, {
@@ -267,8 +306,16 @@ export const authRoutes: FastifyPluginAsyncZod = async (app) => {
     return reply.send({ ok: true, accessToken });
   };
 
-  app.post('/refresh', { schema: { response: { 200: RefreshResponse, 401: ErrorResponse } } }, handleRefresh);
-  app.get('/refresh', { schema: { response: { 200: RefreshResponse, 401: ErrorResponse } } }, handleRefresh);
+  app.post(
+    '/refresh',
+    { schema: { response: { 200: RefreshResponse, 401: ErrorResponse } } },
+    handleRefresh,
+  );
+  app.get(
+    '/refresh',
+    { schema: { response: { 200: RefreshResponse, 401: ErrorResponse } } },
+    handleRefresh,
+  );
 
   // ---------- GET /auth/me ----------
   app.get<{ Reply: z.infer<typeof MeResponse> | ErrorReply }>(
@@ -299,7 +346,12 @@ export const authRoutes: FastifyPluginAsyncZod = async (app) => {
 
         const t2 = currentTenant ? await getTenantById(currentTenant) : null;
         const currentTenantInfo = t2
-          ? { id: t2.id, code: t2.code, name: t2.name, createdAt: t2.createdAt?.toISOString() ?? null }
+          ? {
+            id: t2.id,
+            code: t2.code,
+            name: t2.name,
+            createdAt: t2.createdAt?.toISOString() ?? null,
+          }
           : null;
 
         let effectivePermissions: unknown;
@@ -311,32 +363,40 @@ export const authRoutes: FastifyPluginAsyncZod = async (app) => {
         // Build response object and validate with Zod before sending
         const responseData = {
           user: publicUser(user),
-          access: access.map(a => ({ ...a, updatedAt: a.updatedAt ?? null })),
+          access: access.map((a) => ({ ...a, updatedAt: a.updatedAt ?? null })),
           memberships: memberships
-            .filter((m): m is typeof m & { nodeId: string; tenantId: string } =>
-              m.nodeId !== null && m.tenantId !== null)
-            .map(m => ({
+            .filter(
+              (m): m is typeof m & { nodeId: string; tenantId: string } =>
+                m.nodeId !== null && m.tenantId !== null,
+            )
+            .map((m) => ({
               tenantId: m.tenantId,
               role: m.role,
               createdAt: m.createdAt ?? undefined,
               nodeId: m.nodeId,
             })),
           // Only include tenant fields if we have a valid tenant
-          ...(currentTenant && currentTenantInfo ? {
-            currentTenant,
-            currentTenantInfo,
-          } : {}),
+          ...(currentTenant && currentTenantInfo
+            ? {
+              currentTenant,
+              currentTenantInfo,
+            }
+            : {}),
           // Only include effectivePermissions if available
-          ...(effectivePermissions !== undefined ? {
-            effectivePermissions,
-          } : {}),
+          ...(effectivePermissions !== undefined
+            ? {
+              effectivePermissions,
+            }
+            : {}),
         };
 
         // Explicit validation before sending
         const validated = MeResponse.parse(responseData);
         return reply.send(validated);
       } catch {
-        return reply.code(401).send(err('INVALID_ACCESS_TOKEN', 'Access token is missing or invalid.'));
+        return reply
+          .code(401)
+          .send(err('INVALID_ACCESS_TOKEN', 'Access token is missing or invalid.'));
       }
     },
   );
@@ -351,6 +411,10 @@ export const authRoutes: FastifyPluginAsyncZod = async (app) => {
       }
     }
     reply.clearCookie(cookieName, { path: '/' });
-    return reply.send({ ok: true, code: 'LOGOUT_SUCCESS', message: 'Logged out and refresh tokens revoked.' });
+    return reply.send({
+      ok: true,
+      code: 'LOGOUT_SUCCESS',
+      message: 'Logged out and refresh tokens revoked.',
+    });
   });
 };

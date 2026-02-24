@@ -282,12 +282,7 @@ export async function getMediaAssetByNodeId(
       updated_at: schema.mediaAssets.updatedAt,
     })
     .from(schema.mediaAssets)
-    .where(
-      and(
-        eq(schema.mediaAssets.nodeId, nodeId),
-        eq(schema.mediaAssets.tenantId, tenantId),
-      ),
-    );
+    .where(and(eq(schema.mediaAssets.nodeId, nodeId), eq(schema.mediaAssets.tenantId, tenantId)));
 
   if (!row) return null;
   return mapAssetRowToDto(row);
@@ -402,10 +397,7 @@ export async function updateMediaAssetMetadata(
 /**
  * Delete a media asset (cascade deletes variants via DB constraint).
  */
-export async function deleteMediaAsset(
-  tenantId: string,
-  mediaAssetId: string,
-): Promise<boolean> {
+export async function deleteMediaAsset(tenantId: string, mediaAssetId: string): Promise<boolean> {
   const result = await dbWs
     .delete(schema.mediaAssets)
     .where(
@@ -466,9 +458,7 @@ export async function createMediaVariant(input: {
 /**
  * List all variants for a media asset.
  */
-export async function listMediaVariants(
-  assetId: string,
-): Promise<MediaVariant[]> {
+export async function listMediaVariants(assetId: string): Promise<MediaVariant[]> {
   const rows = await dbWs
     .select({
       variant_id: schema.mediaVariants.variantId,

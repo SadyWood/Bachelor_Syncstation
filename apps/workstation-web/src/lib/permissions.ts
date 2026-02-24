@@ -12,7 +12,7 @@ function patToRegExp(pat: string): RegExp {
 }
 
 function anyMatch(perms: string[], target: string) {
-  return perms.some(p => patToRegExp(p).test(target));
+  return perms.some((p) => patToRegExp(p).test(target));
 }
 
 export function hasPermission(
@@ -24,7 +24,7 @@ export function hasPermission(
   },
 ): boolean {
   // 1) Admin role short-circuit (MVP)
-  if (opts.memberships.some(m => m.role === 'Admin')) return true;
+  if (opts.memberships.some((m) => m.role === 'Admin')) return true;
 
   // 2) Future: check allow/deny from rolePermissions (if provided)
   if (!opts.rolePermissions) return false;

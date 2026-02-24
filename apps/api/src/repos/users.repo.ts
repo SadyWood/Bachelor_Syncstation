@@ -10,7 +10,10 @@ type UserUpdate = Partial<Omit<UserInsert, 'id' | 'email'>>;
 type InviteRow = typeof schema.invites.$inferSelect;
 
 export async function findUserByEmail(email: string): Promise<UserRow | null> {
-  const [u] = await dbUsers.select().from(schema.users).where(eq(schema.users.email, email.toLowerCase()));
+  const [u] = await dbUsers
+    .select()
+    .from(schema.users)
+    .where(eq(schema.users.email, email.toLowerCase()));
   return u || null;
 }
 
@@ -27,12 +30,17 @@ export async function insertUser(values: UserInsert): Promise<UserRow> {
 }
 
 export async function updateInvitedUser(id: string, values: UserUpdate): Promise<UserRow> {
-  const [row] = await dbUsers.update(schema.users).set(values).where(eq(schema.users.id, id)).returning();
+  const [row] = await dbUsers
+    .update(schema.users)
+    .set(values)
+    .where(eq(schema.users.id, id))
+    .returning();
   return row;
 }
 
 export async function upsertAccess(userId: string, platformId: number, hasAccess: boolean) {
-  await dbUsers.insert(schema.userAccessToPlatform)
+  await dbUsers
+    .insert(schema.userAccessToPlatform)
     .values({ userId, platformId, hasAccess, preferences: {} })
     .onConflictDoUpdate({
       target: [schema.userAccessToPlatform.userId, schema.userAccessToPlatform.platformId],
@@ -59,7 +67,10 @@ export async function findInviteByToken(token: string): Promise<InviteRow | null
 }
 
 export async function consumeInvite(token: string, when: Date): Promise<void> {
-  await dbUsers.update(schema.invites).set({ consumedAt: when }).where(eq(schema.invites.token, token));
+  await dbUsers
+    .update(schema.invites)
+    .set({ consumedAt: when })
+    .where(eq(schema.invites.token, token));
 }
 
 export async function getPlatformCode(platformId: number): Promise<string | undefined> {

@@ -18,7 +18,7 @@ export default function SubjectEditor({ title, onClose }: Omit<WidgetProps, 'id'
   // Get the source subject from context
   const sourceSubject = useMemo(() => {
     if (!selectedSubjectId || selectedSubjectId === 'MULTIPLE') return null;
-    return subjects.find(s => s.subjectId === selectedSubjectId) ?? null;
+    return subjects.find((s) => s.subjectId === selectedSubjectId) ?? null;
   }, [selectedSubjectId, subjects]);
 
   // Reset edit state when selection changes (state-based pattern)
@@ -57,7 +57,7 @@ export default function SubjectEditor({ title, onClose }: Omit<WidgetProps, 'id'
 
   const updateField = <K extends keyof Subject>(field: K, value: Subject[K]) => {
     if (!editedSubject) return;
-    setEditedSubject(prev => prev ? { ...prev, [field]: value } : null);
+    setEditedSubject((prev) => (prev ? { ...prev, [field]: value } : null));
     setHasChanges(true);
   };
 
@@ -111,9 +111,7 @@ export default function SubjectEditor({ title, onClose }: Omit<WidgetProps, 'id'
         <div className="p-3 space-y-3">
           {/* Label */}
           <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">
-              Label
-            </label>
+            <label className="block text-xs font-medium text-gray-700 mb-1">Label</label>
             <input
               type="text"
               value={editedSubject.label}
@@ -126,9 +124,7 @@ export default function SubjectEditor({ title, onClose }: Omit<WidgetProps, 'id'
           {/* Type and Color in row */}
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">
-                Type
-              </label>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Type</label>
               <select
                 value={editedSubject.subjectType}
                 onChange={(e) => updateField('subjectType', e.target.value as SubjectType)}
@@ -143,9 +139,7 @@ export default function SubjectEditor({ title, onClose }: Omit<WidgetProps, 'id'
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">
-                Color
-              </label>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Color</label>
               <div className="flex gap-1">
                 <input
                   type="color"
@@ -172,9 +166,7 @@ export default function SubjectEditor({ title, onClose }: Omit<WidgetProps, 'id'
 
           {/* Description */}
           <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">
-              Description
-            </label>
+            <label className="block text-xs font-medium text-gray-700 mb-1">Description</label>
             <textarea
               value={editedSubject.description || ''}
               onChange={(e) => updateField('description', e.target.value)}
@@ -187,9 +179,9 @@ export default function SubjectEditor({ title, onClose }: Omit<WidgetProps, 'id'
           {/* Info box */}
           <div className="bg-blue-50 border border-blue-200 rounded p-2">
             <p className="text-xs text-blue-800">
-              <strong>Note:</strong> This editor updates subject metadata (name, description, color, type).
-              Changes apply to all appearances of this subject on the timeline.
-              To edit timing, use the timeline directly.
+              <strong>Note:</strong> This editor updates subject metadata (name, description, color,
+              type). Changes apply to all appearances of this subject on the timeline. To edit
+              timing, use the timeline directly.
             </p>
           </div>
 
@@ -226,7 +218,9 @@ export default function SubjectEditor({ title, onClose }: Omit<WidgetProps, 'id'
             <div className="mt-2 space-y-1 text-xs">
               <div className="flex justify-between">
                 <span className="text-gray-500">Subject ID:</span>
-                <code className="text-gray-600 text-xs">{editedSubject.subjectId.slice(0, 8)}...</code>
+                <code className="text-gray-600 text-xs">
+                  {editedSubject.subjectId.slice(0, 8)}...
+                </code>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">Node ID:</span>
@@ -235,13 +229,17 @@ export default function SubjectEditor({ title, onClose }: Omit<WidgetProps, 'id'
               {editedSubject.createdAt && (
                 <div className="flex justify-between">
                   <span className="text-gray-500">Created:</span>
-                  <span className="text-gray-600">{new Date(editedSubject.createdAt).toLocaleDateString()}</span>
+                  <span className="text-gray-600">
+                    {new Date(editedSubject.createdAt).toLocaleDateString()}
+                  </span>
                 </div>
               )}
               {editedSubject.updatedAt && (
                 <div className="flex justify-between">
                   <span className="text-gray-500">Updated:</span>
-                  <span className="text-gray-600">{new Date(editedSubject.updatedAt).toLocaleDateString()}</span>
+                  <span className="text-gray-600">
+                    {new Date(editedSubject.updatedAt).toLocaleDateString()}
+                  </span>
                 </div>
               )}
             </div>

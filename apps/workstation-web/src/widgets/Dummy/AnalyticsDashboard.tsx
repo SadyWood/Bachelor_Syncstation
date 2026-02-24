@@ -10,13 +10,13 @@ export const AnalyticsDashboard: React.FC<WidgetProps> = ({ title, onClose, ...p
     { label: 'Busta M.', value: 78 },
     { label: 'Wonder S.', value: 95 },
   ];
-  const max = Math.max(...data.map(d => d.value));
+  const max = Math.max(...data.map((d) => d.value));
 
   return (
     <BaseWidget title={title} onClose={onClose} titleIcon={BarChart3} {...props}>
       <div className="p-4 space-y-3">
         <div className="grid grid-cols-2 gap-2">
-          {data.map(row => {
+          {data.map((row) => {
             const pct = Math.round((row.value / max) * 100);
             return (
               <div key={row.label} className="ws-block p-2">
@@ -24,7 +24,9 @@ export const AnalyticsDashboard: React.FC<WidgetProps> = ({ title, onClose, ...p
                   <span className="text-xs">{row.label}</span>
                   <span className="text-xs ws-muted">{row.value}%</span>
                 </div>
-                <div className="ws-progress"><div className="ws-progress-bar" style={{ width: `${pct}%` }} /></div>
+                <div className="ws-progress">
+                  <div className="ws-progress-bar" style={{ width: `${pct}%` }} />
+                </div>
               </div>
             );
           })}

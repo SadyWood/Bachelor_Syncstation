@@ -12,7 +12,7 @@ type TenantHeader = { 'x-ws-tenant'?: string };
 
 const requireTenant = (req: FastifyRequest) => {
   const t = (req.headers as TenantHeader)['x-ws-tenant'];
-  return (typeof t === 'string' && t.trim()) ? t : null;
+  return typeof t === 'string' && t.trim() ? t : null;
 };
 
 const AssignBody = z.object({
@@ -44,7 +44,7 @@ export const wsMembershipRoutes: FastifyPluginAsyncZod = async (app) => {
     },
     async (req, reply) => {
       const tenantId = requireTenant(req);
-      if (!tenantId) return reply.code(400).send(err('TENANT_HEADER_MISSING', 'X-WS-Tenant header required'));
+      if (!tenantId) { return reply.code(400).send(err('TENANT_HEADER_MISSING', 'X-WS-Tenant header required')); }
 
       const { userId } = req.params;
 
@@ -73,7 +73,7 @@ export const wsMembershipRoutes: FastifyPluginAsyncZod = async (app) => {
       logger.debug('Assigning role to user', { body: req.body });
 
       const tenantId = requireTenant(req);
-      if (!tenantId) return reply.code(400).send(err('TENANT_HEADER_MISSING', 'X-WS-Tenant header required'));
+      if (!tenantId) { return reply.code(400).send(err('TENANT_HEADER_MISSING', 'X-WS-Tenant header required')); }
 
       const body = AssignBody.safeParse(req.body);
       if (!body.success) {
@@ -114,7 +114,7 @@ export const wsMembershipRoutes: FastifyPluginAsyncZod = async (app) => {
     },
     async (req, reply) => {
       const tenantId = requireTenant(req);
-      if (!tenantId) return reply.code(400).send(err('TENANT_HEADER_MISSING', 'X-WS-Tenant header required'));
+      if (!tenantId) { return reply.code(400).send(err('TENANT_HEADER_MISSING', 'X-WS-Tenant header required')); }
 
       const body = AssignBody.safeParse(req.body);
       if (!body.success) return reply.code(400).send(err('INVALID_BODY', 'Invalid request body'));
@@ -141,7 +141,7 @@ export const wsMembershipRoutes: FastifyPluginAsyncZod = async (app) => {
     },
     async (req, reply) => {
       const tenantId = requireTenant(req);
-      if (!tenantId) return reply.code(400).send(err('TENANT_HEADER_MISSING', 'X-WS-Tenant header required'));
+      if (!tenantId) { return reply.code(400).send(err('TENANT_HEADER_MISSING', 'X-WS-Tenant header required')); }
 
       const Body = z.object({
         userId: z.string().uuid(),

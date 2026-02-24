@@ -56,7 +56,9 @@ export default function MemberWidget({ title, onClose, ...props }: WidgetProps) 
   );
 
   // Fetch member roles with useSWR
-  const { data: memberRoles = [], mutate: mutateMemberRoles } = useSWR<{ roleId: string; name: string }[]>(
+  const { data: memberRoles = [], mutate: mutateMemberRoles } = useSWR<
+    { roleId: string; name: string }[]
+  >(
     tenantId && selected ? `/api/tenants/${tenantId}/users/${selected.userId}/roles` : null,
     tenantId && selected ? () => listUserRoles(tenantId, selected.userId) : null,
     {
@@ -75,7 +77,7 @@ export default function MemberWidget({ title, onClose, ...props }: WidgetProps) 
   // Listen for membership changes to refresh current user's roles
   useEffect(() => {
     const onMembershipsChanged = (e: Event) => {
-      const { detail } = (e as CustomEvent);
+      const { detail } = e as CustomEvent;
       if (selected && detail?.userId === selected.userId) {
         mutateMemberRoles();
       }
@@ -87,7 +89,7 @@ export default function MemberWidget({ title, onClose, ...props }: WidgetProps) 
   // Listen for member selection
   useEffect(() => {
     function handle(e: Event) {
-      const { detail } = (e as CustomEvent<WsMember>);
+      const { detail } = e as CustomEvent<WsMember>;
       setSelected(detail);
       setMsg(null);
       // useSWR will automatically fetch member roles when selected changes
@@ -116,11 +118,15 @@ export default function MemberWidget({ title, onClose, ...props }: WidgetProps) 
 
   async function addRole(role: Role) {
     if (!selected || !tenantId) return;
-    const alreadyHas = memberRoles.some(r => r.roleId === role.roleId);
+    const alreadyHas = memberRoles.some((r) => r.roleId === role.roleId);
     if (alreadyHas) return;
 
     try {
-      logger.debug('Adding role to user', { tenantId, userId: selected.userId, roleId: role.roleId });
+      logger.debug('Adding role to user', {
+        tenantId,
+        userId: selected.userId,
+        roleId: role.roleId,
+      });
 
       // Optimistic update
       await mutateMemberRoles(
@@ -152,10 +158,10 @@ export default function MemberWidget({ title, onClose, ...props }: WidgetProps) 
       await mutateMemberRoles(
         async () => {
           await removeRoleFromUser(tenantId, selected.userId, role.roleId);
-          return memberRoles.filter(r => r.roleId !== role.roleId);
+          return memberRoles.filter((r) => r.roleId !== role.roleId);
         },
         {
-          optimisticData: memberRoles.filter(r => r.roleId !== role.roleId),
+          optimisticData: memberRoles.filter((r) => r.roleId !== role.roleId),
           rollbackOnError: true,
           revalidate: false,
         },
@@ -167,7 +173,9 @@ export default function MemberWidget({ title, onClose, ...props }: WidgetProps) 
     }
   }
 
-  const availableToAdd = availableRoles.filter(r => !memberRoles.some(mr => mr.roleId === r.roleId));
+  const availableToAdd = availableRoles.filter(
+    (r) => !memberRoles.some((mr) => mr.roleId === r.roleId),
+  );
 
   return (
     <BaseWidget title={title} onClose={onClose} titleIcon={UserCircle2} {...props}>
@@ -180,11 +188,7 @@ export default function MemberWidget({ title, onClose, ...props }: WidgetProps) 
           </div>
         ) : (
           <div className="space-y-4">
-            {msg && (
-              <div className={`ws-alert text-xs ${getAlertClass(msg.type)}`}>
-                {msg.text}
-              </div>
-            )}
+            {msg && <div className={`ws-alert text-xs ${getAlertClass(msg.type)}`}>{msg.text}</div>}
 
             {/* Member info card */}
             <div className="ws-block p-4">
@@ -231,7 +235,7 @@ export default function MemberWidget({ title, onClose, ...props }: WidgetProps) 
                   </button>
                   {showRoleDropdown && (
                     <div className="absolute right-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
-                      {availableToAdd.map(role => (
+                      {availableToAdd.map((role) => (
                         <button
                           key={role.roleId}
                           className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg"
@@ -248,7 +252,7 @@ export default function MemberWidget({ title, onClose, ...props }: WidgetProps) 
                 {memberRoles.length === 0 ? (
                   <span className="text-sm ws-muted">No roles assigned</span>
                 ) : (
-                  memberRoles.map(role => (
+                  memberRoles.map((role) => (
                     <div key={role.roleId} className="ws-tag">
                       <span>{role.name}</span>
                       <button onClick={() => removeRole(role)} title="Remove role">
