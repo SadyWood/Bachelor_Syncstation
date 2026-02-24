@@ -1,13 +1,34 @@
 import React, { useEffect, useState } from 'react';
-import {  Text, TouchableOpacity, View } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-import { Colors } from '../../styles';
 import { styles } from './SelectContextScreen.styles';
-import type { SelectContextScreenProps } from './SelectContextScreen.types';
+import type { Project, SelectContextScreenProps } from './SelectContextScreen.types';
+
+const MOCK_PROJECTS: Project[] = [
+  {
+    id: '1',
+    name: 'Bad Boys',
+    role: 'Makeup Artist',
+    currentDay: 12,
+    totalDays: 210,
+    shootingDate: null,
+    hasNotices: true,
+  },
+  {
+    id: '2',
+    name: 'Barbie',
+    role: 'Makeup Artist',
+    currentDay: 12,
+    totalDays: 210,
+    shootingDate: '6 March',
+    hasNotices: true,
+  },
+];
 
 export function SelectContextScreen({ onBack, onSelectProject }: SelectContextScreenProps) {
+  const [projects] = useState<Project[]>(MOCK_PROJECTS);
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -16,6 +37,20 @@ export function SelectContextScreen({ onBack, onSelectProject }: SelectContextSc
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Select Project</Text>
       </View>
+
+      <ScrollView style={styles.content}>
+        <Text style={styles.sectionTitle}>Your projects</Text>
+        {projects.map((project) => (
+          <TouchableOpacity
+            key={project.id}
+            style={styles.projectCard}
+            onPress={() => onSelectProject(project)}
+          >
+            <Text style={styles.projectName}>{project.name}</Text>
+            <Text style={styles.projectRole}>{project.role}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
     </SafeAreaView>
   );
 }
