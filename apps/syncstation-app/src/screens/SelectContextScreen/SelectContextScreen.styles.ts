@@ -1,12 +1,21 @@
-import { StyleSheet } from 'react-native';
+import { Colors, Spacing, BorderRadius } from '../../styles';
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    backgroundColor: Colors.background,
   },
-  title: {
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingTop: Spacing.xl,
+    paddingBottom: Spacing.md,
+    paddingHorizontal: Spacing.md,
+  },
+  headerTitle: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: '700',
+    color: Colors.text,
+    marginLeft: Spacing.md,
   },
 });
