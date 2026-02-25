@@ -37,14 +37,6 @@
     "docker:logs": "docker compose --env-file .env -f docker/docker-compose.yml logs -f",
     "docker:ps": "docker compose --env-file .env -f docker/docker-compose.yml ps"
   },
-
-  "pnpm": {
-    "overrides": {
-      "react": "19.2.4",
-      "react-dom": "19.2.4"
-    }
-  },
-
   "devDependencies": {
     "@stylistic/eslint-plugin": "^5.6.1",
     "@types/node": "^22",
@@ -64,7 +56,6 @@
     "tsx": "^4.19.1",
     "typescript": "~5.8.3"
   },
-
   "dependencies": {
     "drizzle-orm": "^0.44.5",
     "uuid": "^10.0.0"

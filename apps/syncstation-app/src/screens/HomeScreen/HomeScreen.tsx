@@ -33,7 +33,7 @@ export function HomeScreen() {
   const activeProject = useContentStore((state) => state.activeProject);
 
   function handleChangeContext() {
-    navigation.navigate('SelectContext' as never);
+    navigation.navigate('SelectContext');
   }
 
   function handleChangeScene() {

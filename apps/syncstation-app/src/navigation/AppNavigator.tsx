@@ -1,20 +1,19 @@
 import React, { Fragment, useState } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createNativeStackNavigator, type NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { NavigatorScreenParams } from '@react-navigation/native';
 
 import { FabMenu, TabBar } from '@/components/TabBar';
 import { tabNavigatorScreenOptions } from '@/navigation/AppNavigator.styles';
-import { HomeScreen } from '@/screens';
+import { HomeScreen, SelectContextScreen } from '@/screens';
 import { LoginScreen } from '@/screens/login-screen';
 import { WelcomeScreen } from '@/screens/welcome-screen';
+
 import { useAuthStore } from '@/stores/authStore';
+import { useContentStore } from '@/stores/ContentStore';
 
 import type { FabMenuOption, TabName } from '@/components/TabBar/TabBar.types';
-
-type RootStackParamList = {
-  Auth: undefined;
-  App: undefined;
-};
+import type { Project } from '@/screens';
 
 type AppTabsParamList = {
   Home: undefined;
@@ -28,9 +27,16 @@ type AuthStackParamList = {
   Login: undefined;
 };
 
+type RootStackParamList = {
+  Auth: undefined;
+  App: NavigatorScreenParams<AppTabsParamList>;
+  SelectContext: undefined;
+};
+
 const RootStack = createNativeStackNavigator<RootStackParamList>();
-const Tab = createBottomTabNavigator<AppTabsParamList>();
 const AuthStackNav = createNativeStackNavigator<AuthStackParamList>();
+const Tab = createBottomTabNavigator<AppTabsParamList>();
+
 
 function AppTabs() {
   const [isFabMenuVisible, setIsFabMenuVisible] = useState<boolean>(false);
@@ -73,7 +79,6 @@ function AppTabs() {
     </Fragment>
   );
 }
-
 function AuthStack() {
   return (
     <AuthStackNav.Navigator screenOptions={{ headerShown: false }}>
@@ -87,8 +92,37 @@ function AuthStack() {
   );
 }
 
+type SelectContextProps = NativeStackScreenProps<
+  RootStackParamList,
+  'SelectContext'
+>;
+
+function SelectContextRoute({ navigation }: SelectContextProps) {
+  const setActiveProject = useContentStore(
+    (state) => state.setActiveProject,
+  );
+
+  function handleSelectProject(project: Project) {
+    setActiveProject(project);
+    navigation.goBack();
+  }
+
+  function handleBack() {
+    navigation.goBack();
+  }
+
+  return (
+    <SelectContextScreen
+      onBack={handleBack}
+      onSelectProject={handleSelectProject}
+    />
+  );
+}
+
 export function AppNavigator() {
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const isAuthenticated = useAuthStore(
+    (state) => state.isAuthenticated,
+  );
 
   return (
     <RootStack.Navigator screenOptions={{ headerShown: false }}>
@@ -97,6 +131,12 @@ export function AppNavigator() {
       ) : (
         <RootStack.Screen name="Auth" component={AuthStack} />
       )}
+
+      <RootStack.Screen
+        name="SelectContext"
+        component={SelectContextRoute}
+        options={{ presentation: 'modal' }}
+      />
     </RootStack.Navigator>
   );
 }

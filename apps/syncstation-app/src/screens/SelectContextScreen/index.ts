@@ -1,2 +1,2 @@
 export { SelectContextScreen } from './SelectContextScreen';
-export type { SelectContextScreenProps } from './SelectContextScreen.types';
+export type { Project, SelectContextScreenProps } from './SelectContextScreen.types';
