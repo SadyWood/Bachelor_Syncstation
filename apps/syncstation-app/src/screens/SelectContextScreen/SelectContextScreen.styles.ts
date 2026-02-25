@@ -83,4 +83,35 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  projectHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: Spacing.xs,
+  },
+  projectMeta: {
+    alignItems: 'flex-end',
+  },
+  shootingBadge: {
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: Spacing.xs,
+    borderRadius: BorderRadius.sm,
+    marginBottom: Spacing.xs,
+  },
+  shootingToday: {
+    backgroundColor: Colors.success,
+  },
+  shootingLater: {
+    backgroundColor: Colors.primary,
+  },
+  shootingBadgeText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: Colors.textOnPrimary,
+  },
+  dayInfo: {
+    fontSize: 12,
+    color: Colors.primary,
+    fontWeight: '600',
+  },
 });
