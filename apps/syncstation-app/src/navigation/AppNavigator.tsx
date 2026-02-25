@@ -11,6 +11,11 @@ import { useAuthStore } from '@/stores/authStore';
 
 import type { FabMenuOption, TabName } from '@/components/TabBar/TabBar.types';
 
+type RootStackParamList = {
+  Auth: undefined;
+  App: undefined;
+};
+
 type AppTabsParamList = {
   Home: undefined;
   Production: undefined;
@@ -23,8 +28,9 @@ type AuthStackParamList = {
   Login: undefined;
 };
 
+const RootStack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<AppTabsParamList>();
-const Stack = createNativeStackNavigator<AuthStackParamList>();
+const AuthStackNav = createNativeStackNavigator<AuthStackParamList>();
 
 function AppTabs() {
   const [isFabMenuVisible, setIsFabMenuVisible] = useState<boolean>(false);
@@ -70,19 +76,27 @@ function AppTabs() {
 
 function AuthStack() {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Welcome">
+    <AuthStackNav.Navigator screenOptions={{ headerShown: false }}>
+      <AuthStackNav.Screen name="Welcome">
         {({ navigation }) => (
           <WelcomeScreen onLoginPress={() => navigation.navigate('Login')} />
         )}
-      </Stack.Screen>
-      <Stack.Screen name="Login" component={LoginScreen} />
-    </Stack.Navigator>
+      </AuthStackNav.Screen>
+      <AuthStackNav.Screen name="Login" component={LoginScreen} />
+    </AuthStackNav.Navigator>
   );
 }
 
 export function AppNavigator() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
-  return isAuthenticated ? <AppTabs /> : <AuthStack />;
+  return (
+    <RootStack.Navigator screenOptions={{ headerShown: false }}>
+      {isAuthenticated ? (
+        <RootStack.Screen name="App" component={AppTabs} />
+      ) : (
+        <RootStack.Screen name="Auth" component={AuthStack} />
+      )}
+    </RootStack.Navigator>
+  );
 }
