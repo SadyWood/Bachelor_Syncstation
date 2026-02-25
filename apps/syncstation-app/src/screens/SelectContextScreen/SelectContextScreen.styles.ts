@@ -78,6 +78,12 @@ export const styles = StyleSheet.create({
     backgroundColor: Colors.primary,
     marginBottom: Spacing.md,
   },
+  divider: {
+    height: 1,
+    backgroundColor: Colors.primary,
+    marginHorizontal: Spacing.md,
+    marginBottom: Spacing.lg,
+  },
   loadingContainer: {
     flex: 1,
     alignItems: 'center',
@@ -113,5 +119,29 @@ export const styles = StyleSheet.create({
     fontSize: 12,
     color: Colors.primary,
     fontWeight: '600',
+  },
+  projectDivider: {
+    height: 1,
+    backgroundColor: Colors.borderLight,
+    marginVertical: Spacing.sm,
+  },
+  noticeText: {
+    fontSize: 13,
+    color: Colors.primary,
+  },
+  sectionDivider: {
+    height: 1,
+    backgroundColor: Colors.borderLight,
+    marginVertical: Spacing.lg,
+  },
+  emptyState: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: Spacing.xxl,
+  },
+  emptyStateText: {
+    fontSize: 16,
+    color: Colors.textSecondary,
+    marginTop: Spacing.md,
   },
 });

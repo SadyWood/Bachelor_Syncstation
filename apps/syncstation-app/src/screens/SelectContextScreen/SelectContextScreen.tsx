@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
+import React, { useEffect, useState} from "react";
 import { View, Text, TouchableOpacity, ScrollView, TextInput, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '@/styles';
-import { styles } from '/SelectContextScreen.styles';
+import { styles } from './SelectContextScreen.styles';
 import type { Project, SelectContextScreenProps } from './SelectContextScreen.types';
 
 const MOCK_PROJECTS: Project[] = [
@@ -39,6 +39,12 @@ const MOCK_RECENTS: Project[] = [
   },
 ];
 
+async function fetchProjects(_token: string, _tenantId: string): Promise<Project[]> {
+  // TODO: Replace with actual API call when backend is ready
+  await new Promise((resolve) => setTimeout(resolve, 500));
+  return MOCK_PROJECTS;
+}
+
 export function SelectContextScreen({ onBack, onSelectProject }: SelectContextScreenProps) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [recents, setRecents] = useState<Project[]>([]);
@@ -52,12 +58,19 @@ export function SelectContextScreen({ onBack, onSelectProject }: SelectContextSc
   async function loadProjects() {
     setIsLoading(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      setProjects(MOCK_PROJECTS);
+      // TODO: Get token and tenantId from AuthStore
+      const token = '';
+      const tenantId = '';
+      const data = await fetchProjects(token, tenantId);
+      setProjects(data);
       setRecents(MOCK_RECENTS);
     } finally {
       setIsLoading(false);
     }
+  }
+
+  function handleProjectPress(project: Project) {
+    onSelectProject(project);
   }
 
   function filterProjects(projectList: Project[]): Project[] {
@@ -78,7 +91,7 @@ export function SelectContextScreen({ onBack, onSelectProject }: SelectContextSc
       <TouchableOpacity
         key={key}
         style={styles.projectCard}
-        onPress={() => onSelectProject(project)}
+        onPress={() => handleProjectPress(project)}
       >
         <View style={styles.projectHeader}>
           <View>
@@ -99,11 +112,19 @@ export function SelectContextScreen({ onBack, onSelectProject }: SelectContextSc
             </Text>
           </View>
         </View>
+
+        {project.hasNotices && (
+          <>
+            <View style={styles.projectDivider} />
+            <Text style={styles.noticeText}>PS: You have messages on notice board</Text>
+          </>
+        )}
       </TouchableOpacity>
     );
   }
 
   const filteredProjects = filterProjects(projects);
+  const filteredRecents = filterProjects(recents);
 
   return (
     <SafeAreaView style={styles.container} edges={['top'] as const}>
@@ -136,7 +157,28 @@ export function SelectContextScreen({ onBack, onSelectProject }: SelectContextSc
           <Text style={styles.sectionTitle}>Your projects</Text>
           <View style={styles.sectionUnderline} />
 
-          {filteredProjects.map((project) => renderProjectCard(project))}
+          {filteredProjects.length > 0 ? (
+            filteredProjects.map((project) => renderProjectCard(project))
+          ) : (
+            <View style={styles.emptyState}>
+              <Ionicons name="film-outline" size={48} color={Colors.textSecondary} />
+              <Text style={styles.emptyStateText}>No projects found</Text>
+            </View>
+          )}
+
+          <View style={styles.sectionDivider} />
+
+          <Text style={styles.sectionTitle}>Recents</Text>
+          <View style={styles.sectionUnderline} />
+
+          {filteredRecents.length > 0 ? (
+            filteredRecents.map((project) => renderProjectCard(project, 'recent'))
+          ) : (
+            <View style={styles.emptyState}>
+              <Ionicons name="time-outline" size={48} color={Colors.textSecondary} />
+              <Text style={styles.emptyStateText}>No recent projects</Text>
+            </View>
+          )}
         </ScrollView>
       )}
     </SafeAreaView>
