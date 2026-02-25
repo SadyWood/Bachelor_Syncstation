@@ -1,13 +1,15 @@
+import React, { Fragment, useState } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import React, { Fragment, useState } from 'react';
-import { FabMenu, type FabMenuOption, TabBar, type TabName } from '@/components/TabBar';
+
+import { FabMenu, TabBar } from '@/components/TabBar';
 import { tabNavigatorScreenOptions } from '@/navigation/AppNavigator.styles';
 import { HomeScreen } from '@/screens';
 import { LoginScreen } from '@/screens/login-screen';
 import { WelcomeScreen } from '@/screens/welcome-screen';
 import { useAuthStore } from '@/stores/authStore';
 
+import type { FabMenuOption, TabName } from '@/components/TabBar/TabBar.types';
 
 type AppTabsParamList = {
   Home: undefined;
@@ -16,10 +18,15 @@ type AppTabsParamList = {
   Settings: undefined;
 };
 
-const Tab = createBottomTabNavigator<AppTabsParamList>();
-const Stack = createNativeStackNavigator();
+type AuthStackParamList = {
+  Welcome: undefined;
+  Login: undefined;
+};
 
-export function AppTabs() {
+const Tab = createBottomTabNavigator<AppTabsParamList>();
+const Stack = createNativeStackNavigator<AuthStackParamList>();
+
+function AppTabs() {
   const [isFabMenuVisible, setIsFabMenuVisible] = useState<boolean>(false);
 
   function handleFabPress() {
@@ -31,7 +38,6 @@ export function AppTabs() {
   }
 
   function handleMenuOptionPress(_option: FabMenuOption) {
-    // TODO: koble til riktig flow senere
     setIsFabMenuVisible(false);
   }
 
@@ -39,21 +45,13 @@ export function AppTabs() {
     <Fragment>
       <Tab.Navigator
         screenOptions={tabNavigatorScreenOptions}
-        tabBar={({ state, navigation }) => {
-          const activeRouteName = state.routeNames[state.index] as TabName;
-
-          function handleTabPress(tab: TabName) {
-            navigation.navigate(tab);
-          }
-
-          return (
-            <TabBar
-              activeTab={activeRouteName}
-              onTabPress={handleTabPress}
-              onFabPress={handleFabPress}
-            />
-          );
-        }}
+        tabBar={({ state, navigation }) => (
+          <TabBar
+            activeTab={state.routeNames[state.index] as TabName}
+            onTabPress={(tab: TabName) => navigation.navigate(tab)}
+            onFabPress={handleFabPress}
+          />
+        )}
       >
         <Tab.Screen name="Home" component={HomeScreen} />
         <Tab.Screen name="Production" component={HomeScreen} />
@@ -86,13 +84,5 @@ function AuthStack() {
 export function AppNavigator() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
-  return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      {isAuthenticated ? (
-        <Stack.Screen name="App" component={AppTabs}/>
-      ) : (
-        <Stack.Screen name="Auth" component={AuthStack} />
-      )}
-    </Stack.Navigator>
-  );
+  return isAuthenticated ? <AppTabs /> : <AuthStack />;
 }
