@@ -135,7 +135,6 @@ export function AppNavigator() {
       <RootStack.Screen
         name="SelectContext"
         component={SelectContextRoute}
-        options={{ presentation: 'modal' }}
       />
     </RootStack.Navigator>
   );
