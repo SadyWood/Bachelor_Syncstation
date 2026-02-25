@@ -1,13 +1,14 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { styles } from './HomeScreen.styles';
 import type { AgendaItem, NoticeItem } from '@/components';
 import { ActiveSceneCard, AgendaCard, ContextCard } from '@/components';
+import { useContentStore } from '@/stores/ContentStore';
 import { Colors } from '@/styles';
 
-// Mock data will be replaced with real data after
 const MOCK_NOTICES: NoticeItem[] = [
   { id: '1', time: '13.45', message: 'Lunch extended due to weather, resume 15.00' },
   { id: '2', time: '13.45', message: 'Lunch extended due to weather, resume 15.00' },
@@ -25,14 +26,18 @@ const MOCK_AGENDA: AgendaItem[] = [
 ];
 
 export function HomeScreen() {
+  const navigation = useNavigation();
   const [agendaItems, setAgendaItems] = useState<AgendaItem[]>(MOCK_AGENDA);
 
+  // Read from global store
+  const activeProject = useContentStore((state) => state.activeProject);
+
   function handleChangeContext() {
-    // TODO: Navigate to context selection
+    navigation.navigate('SelectContext' as never);
   }
 
   function handleChangeScene() {
-    // TODO: Navigate to scene selection
+    navigation.navigate('SelectScene' as never);
   }
 
   function handleAgendaItemToggle(id: string) {
@@ -49,7 +54,7 @@ export function HomeScreen() {
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Home</Text>
         <Ionicons
-          name="wifi-outline"
+          name="wifi"
           size={24}
           color={Colors.error}
           style={styles.offlineIcon}
@@ -65,9 +70,9 @@ export function HomeScreen() {
         contentContainerStyle={styles.scrollContainer}
       >
         <ContextCard
-          projectName="Bad Boys"
-          role="Makeup Artist"
-          dayInfo="Day 15 of 120"
+          projectName={activeProject?.name ?? 'No project selected'}
+          role={activeProject?.role ?? 'Select a project'}
+          dayInfo={activeProject ? `Day ${activeProject.currentDay} of ${activeProject.totalDays}` : ''}
           notices={MOCK_NOTICES}
           onChangePress={handleChangeContext}
         />
