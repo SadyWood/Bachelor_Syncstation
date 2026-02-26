@@ -1,6 +1,6 @@
-import { StyleSheet} from "react-native";
-import { Colors } from '@/styles';
-import { Spacing } from '@/styles';
+import { StyleSheet } from 'react-native';
+import { Colors, Spacing } from '@/styles';
+
 
 export const styles = StyleSheet.create({
   flex: {
@@ -89,4 +89,4 @@ export const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.text,
   },
-})
+});

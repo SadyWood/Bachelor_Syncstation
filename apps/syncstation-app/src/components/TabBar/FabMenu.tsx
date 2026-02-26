@@ -1,9 +1,8 @@
+import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { View, TouchableOpacity, TouchableWithoutFeedback, Text, Modal } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-
-import { Colors } from '../../styles';
 import { fabMenuStyles as styles } from './TabBar.styles';
+import { Colors } from '../../styles';
 import type { FabMenuProps, FabMenuOption } from './TabBar.types';
 
 interface MenuOption {

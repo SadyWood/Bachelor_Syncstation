@@ -1,4 +1,4 @@
-import React, { useRef, useEffect} from "react";
+import React, { useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -16,7 +16,7 @@ const BUBBLES = [
   { top: 0.24, left: 0.78, size: 0.20, delay: 200 },
   { top: 0.62, left: 0.02, size: 0.38, delay: 150 },
   { top: 0.60, left: 0.44, size: 0.22, delay: 50 },
-  { top: 0.76, left: 0.68, size: 0.28, delay: 250 }
+  { top: 0.76, left: 0.68, size: 0.28, delay: 250 },
 ];
 
 type BubbleProps = {
@@ -35,7 +35,7 @@ function FloatingBubble({ top, left, size, delay }: BubbleProps) {
       toValue: 1,
       duration: 1000,
       delay,
-      useNativeDriver: true
+      useNativeDriver: true,
     }).start();
   }, []);
 
@@ -52,7 +52,7 @@ function FloatingBubble({ top, left, size, delay }: BubbleProps) {
           opacity: fadeAnimation,
         },
       ]}
-      >
+    >
       <View style={[styles.bubblePlaceholder, { borderRadius: diameter / 2 }]} />
     </Animated.View>
   );
@@ -62,7 +62,7 @@ type Props = {
   onLoginPress: () => void;
 };
 
-export function WelcomeScreen({ onLoginPress}: Props) {
+export function WelcomeScreen({ onLoginPress }: Props) {
   const fadeTitle = useRef(new Animated.Value(0)).current;
   const slideButton = useRef(new Animated.Value(30)).current;
   const fadeButton = useRef(new Animated.Value(0)).current;
@@ -84,12 +84,12 @@ export function WelcomeScreen({ onLoginPress}: Props) {
         <FloatingBubble key={i} {...b} />
       ))}
 
-      <Animated.View style={[styles.center, { opacity: fadeTitle}]}>
+      <Animated.View style={[styles.center, { opacity: fadeTitle }]}>
         <Text style={styles.title}>Set On Sync</Text>
         <Text style={styles.powered}>Powered by Hoolsy</Text>
       </Animated.View>
 
-      <Animated.View style={[styles.btnWrapper, { opacity: fadeButton, transform: [{ translateY: slideButton}] },
+      <Animated.View style={[styles.btnWrapper, { opacity: fadeButton, transform: [{ translateY: slideButton }] },
       ]}
       >
 
