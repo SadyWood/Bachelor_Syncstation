@@ -35,6 +35,8 @@
             node-version: 22
             cache: pnpm
         - run: pnpm install --frozen-lockfile
+        - name: Build internal packages
+          run: pnpm --filter @hoolsy/timeline --filter @hoolsy/logger --filter @hk26/schema --filter @hoolsy/databases build
         - run: pnpm typecheck
 
     test:
