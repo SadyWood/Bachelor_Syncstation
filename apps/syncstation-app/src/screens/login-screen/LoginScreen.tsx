@@ -10,9 +10,9 @@ import {
   ScrollView,
   Dimensions, ActivityIndicator,
 } from 'react-native';
-import { styles } from './LoginScreen.styles';
 import { useAuthStore } from '@/stores/authStore';
 import { Colors } from '@/styles';
+import { styles } from './LoginScreen.styles';
 
 
 const { width, height } = Dimensions.get('window');
@@ -31,11 +31,11 @@ type CircleProps = {
 };
 
 function AnimatedCircle({ top, left, size, delay }: CircleProps) {
-  const fadeAnimation = useRef(new Animated.Value(0)).current;
+  const fadeAnimation = useRef(new Animated.Value(0));
   const diameter = width * size;
 
   useEffect(() => {
-    Animated.timing(fadeAnimation, {
+    Animated.timing(fadeAnimation.current, {
       toValue: 1,
       duration: 800,
       delay,
@@ -51,7 +51,7 @@ function AnimatedCircle({ top, left, size, delay }: CircleProps) {
         width: diameter,
         height: diameter,
         borderRadius: diameter / 2,
-        opacity: fadeAnimation,
+        opacity: fadeAnimation.current,
       },
     ]}
     >
@@ -71,13 +71,13 @@ export function LoginScreen({ onBack }: Props) {
   const [error, setError] = useState('');
   const login = useAuthStore((s) => s.login);
 
-  const slideAnimated = useRef(new Animated.Value(40)).current;
-  const fadeAnimated = useRef(new Animated.Value(0)).current;
+  const slideAnimated = useRef(new Animated.Value(40));
+  const fadeAnimated = useRef(new Animated.Value(0));
 
   useEffect(() => {
     Animated.parallel([
-      Animated.timing(fadeAnimated, { toValue: 1, duration: 400, useNativeDriver: true }),
-      Animated.timing(slideAnimated, { toValue: 0, duration: 400, useNativeDriver: true }),
+      Animated.timing(fadeAnimated.current, { toValue: 1, duration: 400, useNativeDriver: true }),
+      Animated.timing(slideAnimated.current, { toValue: 0, duration: 400, useNativeDriver: true }),
     ]).start();
   }, []);
 
@@ -103,14 +103,14 @@ export function LoginScreen({ onBack }: Props) {
           <AnimatedCircle key={i} {...c} />
         ))}
         <Animated.View style={[styles.titleBlock, {
-          opacity: fadeAnimated, transform: [{ translateY: slideAnimated }] },
+          opacity: fadeAnimated.current, transform: [{ translateY: slideAnimated.current }] },
         ]}
         >
           <Text style={styles.title}>Set On Sync</Text>
           <Text style={styles.powered}>Powered by Hoolsy</Text>
         </Animated.View>
         <Animated.View
-          style={[styles.form, { opacity: fadeAnimated, transform: [{ translateY: slideAnimated }] },
+          style={[styles.form, { opacity: fadeAnimated.current, transform: [{ translateY: slideAnimated.current }] },
           ]}
         >
           <Text style={styles.label}>Brukernavn/Mail</Text>

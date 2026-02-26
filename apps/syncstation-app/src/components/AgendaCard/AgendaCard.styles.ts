@@ -58,6 +58,6 @@ export const styles = StyleSheet.create({
   },
   itemTitleCompleted: {
     textDecorationLine: 'line-through',
-    color: Colors.textMuted,
+    color: Colors.textSecondary,
   },
 });

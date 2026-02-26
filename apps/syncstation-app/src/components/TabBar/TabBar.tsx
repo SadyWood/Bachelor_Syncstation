@@ -3,7 +3,7 @@ import React from 'react';
 import { View, TouchableOpacity, Text } from 'react-native';
 import { styles } from './TabBar.styles';
 import { Colors } from '../../styles';
-import type { TabBarProps, TabName } from './TabBar.types';
+import type { TabBarProps, TabName } from './types/TabBar.types';
 
 const TAB_ICONS: Record<Exclude<TabName, 'Add'>, string> = {
   Home: 'home-outline',

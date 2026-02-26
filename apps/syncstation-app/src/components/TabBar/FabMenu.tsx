@@ -3,7 +3,7 @@ import React from 'react';
 import { View, TouchableOpacity, TouchableWithoutFeedback, Text, Modal } from 'react-native';
 import { fabMenuStyles as styles } from './TabBar.styles';
 import { Colors } from '../../styles';
-import type { FabMenuProps, FabMenuOption } from './TabBar.types';
+import type { FabMenuProps, FabMenuOption } from './types/TabBar.types';
 
 interface MenuOption {
   key: FabMenuOption;

@@ -32,7 +32,7 @@ export const styles = StyleSheet.create({
   },
   dayInfo: {
     fontSize: 12,
-    color: Colors.textMuted,
+    color: Colors.textSecondary,
     marginTop: 2,
   },
   changeButton: {

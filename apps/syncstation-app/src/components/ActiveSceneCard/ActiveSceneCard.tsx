@@ -3,7 +3,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { styles } from './ActiveSceneCard.styles';
 import { Colors } from '../../styles';
-import type { ActiveSceneCardProps } from './ActiveSceneCard.types';
+import type { ActiveSceneCardProps } from './types/ActiveSceneCard.types';
 
 export function ActiveSceneCard({
   sceneName,

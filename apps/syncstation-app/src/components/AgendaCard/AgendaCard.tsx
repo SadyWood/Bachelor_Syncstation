@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { styles } from './AgendaCard.styles';
 import { Colors } from '../../styles';
-import type { AgendaCardProps } from './AgendaCard.types';
+import type { AgendaCardProps } from './types/AgendaCard.types';
 
 export function AgendaCard({ items, onItemToggle }: AgendaCardProps) {
   const [isExpanded, setIsExpanded] = useState(true);

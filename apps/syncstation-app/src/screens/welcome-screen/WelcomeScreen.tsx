@@ -27,11 +27,11 @@ type BubbleProps = {
 };
 
 function FloatingBubble({ top, left, size, delay }: BubbleProps) {
-  const fadeAnimation = useRef(new Animated.Value(0)).current;
+  const fadeAnimation = useRef(new Animated.Value(0));
   const diameter = width * size;
 
   useEffect(() => {
-    Animated.timing(fadeAnimation, {
+    Animated.timing(fadeAnimation.current, {
       toValue: 1,
       duration: 1000,
       delay,
@@ -49,7 +49,7 @@ function FloatingBubble({ top, left, size, delay }: BubbleProps) {
           width: diameter,
           height: diameter,
           borderRadius: diameter / 2,
-          opacity: fadeAnimation,
+          opacity: fadeAnimation.current,
         },
       ]}
     >
@@ -63,17 +63,17 @@ type Props = {
 };
 
 export function WelcomeScreen({ onLoginPress }: Props) {
-  const fadeTitle = useRef(new Animated.Value(0)).current;
-  const slideButton = useRef(new Animated.Value(30)).current;
-  const fadeButton = useRef(new Animated.Value(0)).current;
+  const fadeTitle = useRef(new Animated.Value(0));
+  const slideButton = useRef(new Animated.Value(30));
+  const fadeButton = useRef(new Animated.Value(0));
 
   useEffect(() => {
     Animated.sequence([
       Animated.delay(400),
       Animated.parallel([
-        Animated.timing(fadeTitle, { toValue: 1, duration: 700, useNativeDriver: true }),
-        Animated.timing(fadeButton, { toValue: 1, duration: 700, useNativeDriver: true }),
-        Animated.timing(slideButton, { toValue: 0, duration: 700, useNativeDriver: true }),
+        Animated.timing(fadeTitle.current, { toValue: 1, duration: 700, useNativeDriver: true }),
+        Animated.timing(fadeButton.current, { toValue: 1, duration: 700, useNativeDriver: true }),
+        Animated.timing(slideButton.current, { toValue: 0, duration: 700, useNativeDriver: true }),
       ]),
     ]).start();
   }, []);
@@ -84,12 +84,12 @@ export function WelcomeScreen({ onLoginPress }: Props) {
         <FloatingBubble key={i} {...b} />
       ))}
 
-      <Animated.View style={[styles.center, { opacity: fadeTitle }]}>
+      <Animated.View style={[styles.center, { opacity: fadeTitle.current }]}>
         <Text style={styles.title}>Set On Sync</Text>
         <Text style={styles.powered}>Powered by Hoolsy</Text>
       </Animated.View>
 
-      <Animated.View style={[styles.btnWrapper, { opacity: fadeButton, transform: [{ translateY: slideButton }] },
+      <Animated.View style={[styles.btnWrapper, { opacity: fadeButton.current, transform: [{ translateY: slideButton.current }] },
       ]}
       >
 

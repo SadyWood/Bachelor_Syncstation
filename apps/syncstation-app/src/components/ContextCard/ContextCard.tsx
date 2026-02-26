@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { styles } from './ContextCard.styles';
 import { Colors } from '../../styles';
-import type { ContextCardProps } from './ContextCard.types';
+import type { ContextCardProps } from './types/ContextCard.types';
 
 export function ContextCard({
   projectName,
