@@ -1,2 +1,2 @@
 export { AgendaCard } from './AgendaCard';
-export type { AgendaCardProps, AgendaItem } from './AgendaCard.types';
+export type { AgendaCardProps, AgendaItem } from './types/AgendaCard.types';

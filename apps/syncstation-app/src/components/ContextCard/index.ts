@@ -1,2 +1,2 @@
 export { ContextCard } from './ContextCard';
-export type { ContextCardProps, NoticeItem } from './ContextCard.types';
+export type { ContextCardProps, NoticeItem } from './types/ContextCard.types';

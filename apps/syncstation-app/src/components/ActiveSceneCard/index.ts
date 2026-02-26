@@ -1,2 +1,2 @@
 export { ActiveSceneCard } from './ActiveSceneCard';
-export type { ActiveSceneCardProps } from './ActiveSceneCard.types';
+export type { ActiveSceneCardProps } from './types/ActiveSceneCard.types';

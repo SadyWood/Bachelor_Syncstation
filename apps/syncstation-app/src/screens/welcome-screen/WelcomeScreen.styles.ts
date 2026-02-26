@@ -1,4 +1,4 @@
-import { StyleSheet} from "react-native";
+import { StyleSheet } from 'react-native';
 import { Colors } from  '@/styles';
 
 export const styles = StyleSheet.create({
@@ -7,13 +7,13 @@ export const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
   bubble: {
-    position: "absolute",
+    position: 'absolute',
     borderWidth: 2.5,
     borderColor: Colors.primary,
     overflow: 'hidden',
   },
   bubblePlaceholder: {
-    flex:1,
+    flex: 1,
     backgroundColor: Colors.background,
   },
   center: {
@@ -22,13 +22,13 @@ export const styles = StyleSheet.create({
   },
   title: {
     fontSize: 40,
-    fontWeight: "900",
+    fontWeight: '900',
     color: Colors.text,
     letterSpacing: 0.5,
   },
   powered: {
     fontSize: 15,
-    fontWeight: "400",
+    fontWeight: '400',
     color: Colors.primary,
     letterSpacing: 0.3,
   },
@@ -45,7 +45,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 80,
     paddingVertical: 16,
     borderRadius: 50,
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 4,
@@ -57,4 +57,4 @@ export const styles = StyleSheet.create({
   },
 
 
-})
+});
