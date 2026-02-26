@@ -39,20 +39,23 @@
           run: pnpm --filter @hoolsy/timeline --filter @hoolsy/logger --filter @hk26/schema --filter @hoolsy/databases build
         - run: pnpm typecheck
 
-    test:
-      name: Tests (timeline)
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v4
-        - uses: pnpm/action-setup@v4
-          with:
-            version: 9.12.0
-        - uses: actions/setup-node@v4
-          with:
-            node-version: 22
-            cache: pnpm
-        - run: pnpm install --frozen-lockfile
-        - run: pnpm -C packages/timeline test:run
+#   This was created to test the already added test:run script in the timeline package,
+#   however, we have not created any actual tests yet, so we will comment this out for now to avoid having a failing CI pipeline.
+
+#    test:
+#      name: Tests (timeline)
+#      runs-on: ubuntu-latest
+#      steps:
+#        - uses: actions/checkout@v4
+#        - uses: pnpm/action-setup@v4
+#          with:
+#            version: 9.12.0
+#        - uses: actions/setup-node@v4
+#          with:
+#            node-version: 22
+#            cache: pnpm
+#        - run: pnpm install --frozen-lockfile
+#        - run: pnpm -C packages/timeline test:run
 
     build:
       name: Build
