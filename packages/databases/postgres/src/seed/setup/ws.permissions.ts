@@ -62,6 +62,16 @@ export const PERMISSION_CATALOG: PermissionCatalogEntry[] = [
   // ───────────────────────── Tasks ────────────────────────────────────
   { permissionCode: 'task.read',            description: 'Read tasks' },
   { permissionCode: 'task.manage',          description: 'Create, update, delete tasks and change status' },
+
+  // ───────────────────────── Sync Station ─────────────────────────────
+  { permissionCode: 'syncstation.log.view',         description: 'View sync log entries' },
+  { permissionCode: 'syncstation.log.create',       description: 'Create sync log entries' },
+  { permissionCode: 'syncstation.log.update',       description: 'Update sync log entries' },
+  { permissionCode: 'syncstation.log.delete',       description: 'Delete sync log entries' },
+  { permissionCode: 'syncstation.attachment.upload',   description: 'Upload attachments to log entries' },
+  { permissionCode: 'syncstation.attachment.download', description: 'Download log entry attachments' },
+  { permissionCode: 'syncstation.attachment.delete',   description: 'Delete log entry attachments' },
+  { permissionCode: 'syncstation.status.view',      description: 'View sync queue status' },
 ];
 
 /**
@@ -115,6 +125,16 @@ export const GLOBAL_ROLE_TEMPLATES: RoleTemplate[] = [
         // Tasks
         'task.read',
         'task.manage',
+
+        // Syncstation
+        'syncstation.log.view',
+        'syncstation.log.create',
+        'syncstation.log.update',
+        'syncstation.log.delete',
+        'syncstation.attachment.upload',
+        'syncstation.attachment.download',
+        'syncstation.attachment.delete',
+        'syncstation.status.view',
       ],
       deny: [],
     },
@@ -133,6 +153,9 @@ export const GLOBAL_ROLE_TEMPLATES: RoleTemplate[] = [
         'content.media.view',
         'content.media.stream',
         'task.read',
+        'syncstation.log.view',
+        'syncstation.attachment.download',
+        'syncstation.status.view',
       ],
       deny: [],
     },
