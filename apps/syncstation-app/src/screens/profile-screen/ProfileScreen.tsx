@@ -78,6 +78,10 @@ export function ProfileScreen() {
               <Text style={styles.menuButtonIcon}>📤</Text>
               <Text style={styles.menuButtonText}>Export Data</Text>
             </TouchableOpacity>
+
+            <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+              <Text style={styles.logoutButton}>🚪</Text>
+            </TouchableOpacity>
           </ScrollView>
     </View>
   );
