@@ -22,6 +22,9 @@ function requireTenant(req: FastifyRequest): string | null {
 }
 
 export const wsRolesRoutes: FastifyPluginAsyncZod = async (app) => {
+
+  app.addHook('preHandler', app.authenticate);
+
   // LIST roles (global + tenant)
   app.get(
     '/ws/roles',

@@ -1,5 +1,4 @@
 import { StyleSheet } from 'react-native';
-
 import { Colors, Spacing, BorderRadius } from '../../styles';
 
 export const styles = StyleSheet.create({
@@ -59,6 +58,6 @@ export const styles = StyleSheet.create({
   },
   itemTitleCompleted: {
     textDecorationLine: 'line-through',
-    color: Colors.textMuted,
+    color: Colors.textSecondary,
   },
 });

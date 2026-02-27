@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { Project } from '@/screens/SelectContextScreen/SelectContextScreen.types';
+import type { Project } from '@/screens/SelectContextScreen/types/SelectContextScreen.types';
 
 interface ContentState {
   activeProjectId: string | null;

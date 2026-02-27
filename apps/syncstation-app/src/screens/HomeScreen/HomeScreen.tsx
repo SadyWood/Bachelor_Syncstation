@@ -3,11 +3,11 @@ import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { styles } from './HomeScreen.styles';
-import type { AgendaItem, NoticeItem } from '@/components';
 import { ActiveSceneCard, AgendaCard, ContextCard } from '@/components';
 import { useContentStore } from '@/stores/ContentStore';
 import { Colors } from '@/styles';
+import { styles } from './HomeScreen.styles';
+import type { AgendaItem, NoticeItem } from '@/components';
 
 const MOCK_NOTICES: NoticeItem[] = [
   { id: '1', time: '13.45', message: 'Lunch extended due to weather, resume 15.00' },

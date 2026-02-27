@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '@/styles';
 import { styles } from './SelectContextScreen.styles';
-import type { Project, SelectContextScreenProps } from './SelectContextScreen.types';
+import type { Project, SelectContextScreenProps } from './types/SelectContextScreen.types';
 import { useAuthStore } from '@/stores/authStore';
 import { useContentStore } from '@/stores/ContentStore';
 

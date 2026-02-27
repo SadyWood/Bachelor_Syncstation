@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState} from "react";
+import React, { useRef, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -10,9 +10,9 @@ import {
   ScrollView,
   Dimensions, ActivityIndicator,
 } from 'react-native';
+import { useAuthStore } from '@/stores/authStore';
+import { Colors } from '@/styles';
 import { styles } from './LoginScreen.styles';
-import { useAuthStore } from "@/stores/authStore";
-import {Colors} from "@/styles";
 
 
 const { width, height } = Dimensions.get('window');
@@ -31,11 +31,11 @@ type CircleProps = {
 };
 
 function AnimatedCircle({ top, left, size, delay }: CircleProps) {
-  const fadeAnimation = useRef(new Animated.Value(0)).current;
+  const fadeAnimation = useRef(new Animated.Value(0));
   const diameter = width * size;
 
   useEffect(() => {
-    Animated.timing(fadeAnimation, {
+    Animated.timing(fadeAnimation.current, {
       toValue: 1,
       duration: 800,
       delay,
@@ -43,7 +43,7 @@ function AnimatedCircle({ top, left, size, delay }: CircleProps) {
     }).start();
   }, []);
 
-  return(
+  return (
     <Animated.View style={[
       styles.circle, {
         top: height * top,
@@ -51,11 +51,11 @@ function AnimatedCircle({ top, left, size, delay }: CircleProps) {
         width: diameter,
         height: diameter,
         borderRadius: diameter / 2,
-        opacity: fadeAnimation,
+        opacity: fadeAnimation.current,
       },
     ]}
     >
-      <View style={[styles.circlePlaceholder, { borderRadius: diameter/ 2}]} />
+      <View style={[styles.circlePlaceholder, { borderRadius: diameter / 2 }]} />
     </Animated.View>
   );
 }
@@ -71,13 +71,13 @@ export function LoginScreen({ onBack }: Props) {
   const [error, setError] = useState('');
   const login = useAuthStore((s) => s.login);
 
-  const slideAnimated = useRef(new Animated.Value(40)).current;
-  const fadeAnimated = useRef(new Animated.Value(0)).current;
+  const slideAnimated = useRef(new Animated.Value(40));
+  const fadeAnimated = useRef(new Animated.Value(0));
 
   useEffect(() => {
     Animated.parallel([
-      Animated.timing(fadeAnimated, { toValue: 1, duration: 400, useNativeDriver: true }),
-      Animated.timing(slideAnimated, { toValue: 0, duration: 400, useNativeDriver: true }),
+      Animated.timing(fadeAnimated.current, { toValue: 1, duration: 400, useNativeDriver: true }),
+      Animated.timing(slideAnimated.current, { toValue: 0, duration: 400, useNativeDriver: true }),
     ]).start();
   }, []);
 
@@ -93,63 +93,63 @@ export function LoginScreen({ onBack }: Props) {
   }
   return (
     <KeyboardAvoidingView
-    style={styles.flex}
-  behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-  >
-    <ScrollView contentContainerStyle={styles.container}
-  keyboardShouldPersistTaps="handled"
-  >
-    {CIRCLES.map((c, i) => (
-      <AnimatedCircle key={i} {...c} />
-      ))}
-  <Animated.View style={[ styles.titleBlock, {
-    opacity: fadeAnimated, transform: [{ translateY: slideAnimated }] },
-  ]}
+      style={styles.flex}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-    <Text style={styles.title}>Set On Sync</Text>
-    <Text style={styles.powered}>Powered by Hoolsy</Text>
-  </Animated.View>
-      <Animated.View
-      style={[ styles.form, { opacity: fadeAnimated, transform: [{ translateY: slideAnimated }] },
-    ]}
+      <ScrollView contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
       >
-        <Text style={styles.label}>Brukernavn/Mail</Text>
-        <TextInput
-          style={styles.input}
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-          keyboardType="email-address"
-          placeholderTextColor={Colors.primary}
+        {CIRCLES.map((c, i) => (
+          <AnimatedCircle key={i} {...c} />
+        ))}
+        <Animated.View style={[styles.titleBlock, {
+          opacity: fadeAnimated.current, transform: [{ translateY: slideAnimated.current }] },
+        ]}
+        >
+          <Text style={styles.title}>Set On Sync</Text>
+          <Text style={styles.powered}>Powered by Hoolsy</Text>
+        </Animated.View>
+        <Animated.View
+          style={[styles.form, { opacity: fadeAnimated.current, transform: [{ translateY: slideAnimated.current }] },
+          ]}
+        >
+          <Text style={styles.label}>Brukernavn/Mail</Text>
+          <TextInput
+            style={styles.input}
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+            keyboardType="email-address"
+            placeholderTextColor={Colors.primary}
           />
-        <Text style={styles.label}>Passord</Text>
-        <TextInput
-          style={styles.input}
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          placeholderTextColor={Colors.primary}
-        />
+          <Text style={styles.label}>Passord</Text>
+          <TextInput
+            style={styles.input}
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            placeholderTextColor={Colors.primary}
+          />
 
-        {error ? <Text style={styles.error}>{error}</Text> : null}
+          {error ? <Text style={styles.error}>{error}</Text> : null}
 
-        <TouchableOpacity
-          style={styles.loginBtn}
-          onPress={handleLogin}
-          disabled={loading}
-          activeOpacity={0.85}
+          <TouchableOpacity
+            style={styles.loginBtn}
+            onPress={handleLogin}
+            disabled={loading}
+            activeOpacity={0.85}
           >
-          {loading
-            ? <ActivityIndicator color={Colors.text} />
-            : <Text style={styles.loginBtnText}>Log in</Text>
-          }
-        </TouchableOpacity>
+            {loading
+              ? <ActivityIndicator color={Colors.text} />
+              : <Text style={styles.loginBtnText}>Log in</Text>
+            }
+          </TouchableOpacity>
 
-        <TouchableOpacity style={styles.forgotPassword} activeOpacity={0.7}>
-          <Text style={styles.forgotPasswordText}>Forgot password?</Text>
-        </TouchableOpacity>
-      </Animated.View>
-  </ScrollView>
-  </KeyboardAvoidingView>
-  )
+          <TouchableOpacity style={styles.forgotPassword} activeOpacity={0.7}>
+            <Text style={styles.forgotPasswordText}>Forgot password?</Text>
+          </TouchableOpacity>
+        </Animated.View>
+      </ScrollView>
+    </KeyboardAvoidingView>
+  );
 }

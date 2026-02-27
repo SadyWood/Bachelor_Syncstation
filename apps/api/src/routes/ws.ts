@@ -11,6 +11,9 @@ const getTenantId = (req: FastifyRequest): string | null => {
 };
 
 export const wsRoutes: FastifyPluginAsync = async (app) => {
+
+  app.addHook('preHandler', app.authenticate);
+
   // GET /members
   app.get('/members', async (req: FastifyRequest, reply: FastifyReply) => {
     const tenantId = getTenantId(req);

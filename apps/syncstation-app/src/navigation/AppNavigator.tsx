@@ -1,18 +1,15 @@
-import React, { Fragment, useState } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createNativeStackNavigator, type NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { NavigatorScreenParams } from '@react-navigation/native';
-
+import { createNativeStackNavigator, type NativeStackScreenProps } from '@react-navigation/native-stack';
+import React, { Fragment, useState } from 'react';
 import { FabMenu, TabBar } from '@/components/TabBar';
+import type { FabMenuOption, TabName } from '@/components/TabBar/types/TabBar.types';
 import { tabNavigatorScreenOptions } from '@/navigation/AppNavigator.styles';
 import { HomeScreen, SelectContextScreen } from '@/screens';
 import { LoginScreen } from '@/screens/login-screen';
 import { WelcomeScreen } from '@/screens/welcome-screen';
-
 import { useAuthStore } from '@/stores/authStore';
 import { useContentStore } from '@/stores/ContentStore';
-
-import type { FabMenuOption, TabName } from '@/components/TabBar/TabBar.types';
 import type { Project } from '@/screens';
 
 type AppTabsParamList = {
@@ -132,10 +129,7 @@ export function AppNavigator() {
         <RootStack.Screen name="Auth" component={AuthStack} />
       )}
 
-      <RootStack.Screen
-        name="SelectContext"
-        component={SelectContextRoute}
-      />
+      <RootStack.Screen name="SelectContext"  component={SelectContextRoute}/>
     </RootStack.Navigator>
   );
 }

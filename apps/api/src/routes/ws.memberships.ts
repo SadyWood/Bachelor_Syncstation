@@ -33,6 +33,9 @@ const BulkRoleBody = z.object({
 });
 
 export const wsMembershipRoutes: FastifyPluginAsyncZod = async (app) => {
+
+  app.addHook('preHandler', app.authenticate);
+
   // List roles for a specific user within tenant
   app.get(
     '/ws/members/:userId/roles',

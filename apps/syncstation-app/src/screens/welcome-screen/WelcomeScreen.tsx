@@ -1,4 +1,4 @@
-import React, { useRef, useEffect} from "react";
+import React, { useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -16,7 +16,7 @@ const BUBBLES = [
   { top: 0.24, left: 0.78, size: 0.20, delay: 200 },
   { top: 0.62, left: 0.02, size: 0.38, delay: 150 },
   { top: 0.60, left: 0.44, size: 0.22, delay: 50 },
-  { top: 0.76, left: 0.68, size: 0.28, delay: 250 }
+  { top: 0.76, left: 0.68, size: 0.28, delay: 250 },
 ];
 
 type BubbleProps = {
@@ -27,15 +27,15 @@ type BubbleProps = {
 };
 
 function FloatingBubble({ top, left, size, delay }: BubbleProps) {
-  const fadeAnimation = useRef(new Animated.Value(0)).current;
+  const fadeAnimation = useRef(new Animated.Value(0));
   const diameter = width * size;
 
   useEffect(() => {
-    Animated.timing(fadeAnimation, {
+    Animated.timing(fadeAnimation.current, {
       toValue: 1,
       duration: 1000,
       delay,
-      useNativeDriver: true
+      useNativeDriver: true,
     }).start();
   }, []);
 
@@ -49,10 +49,10 @@ function FloatingBubble({ top, left, size, delay }: BubbleProps) {
           width: diameter,
           height: diameter,
           borderRadius: diameter / 2,
-          opacity: fadeAnimation,
+          opacity: fadeAnimation.current,
         },
       ]}
-      >
+    >
       <View style={[styles.bubblePlaceholder, { borderRadius: diameter / 2 }]} />
     </Animated.View>
   );
@@ -62,18 +62,18 @@ type Props = {
   onLoginPress: () => void;
 };
 
-export function WelcomeScreen({ onLoginPress}: Props) {
-  const fadeTitle = useRef(new Animated.Value(0)).current;
-  const slideButton = useRef(new Animated.Value(30)).current;
-  const fadeButton = useRef(new Animated.Value(0)).current;
+export function WelcomeScreen({ onLoginPress }: Props) {
+  const fadeTitle = useRef(new Animated.Value(0));
+  const slideButton = useRef(new Animated.Value(30));
+  const fadeButton = useRef(new Animated.Value(0));
 
   useEffect(() => {
     Animated.sequence([
       Animated.delay(400),
       Animated.parallel([
-        Animated.timing(fadeTitle, { toValue: 1, duration: 700, useNativeDriver: true }),
-        Animated.timing(fadeButton, { toValue: 1, duration: 700, useNativeDriver: true }),
-        Animated.timing(slideButton, { toValue: 0, duration: 700, useNativeDriver: true }),
+        Animated.timing(fadeTitle.current, { toValue: 1, duration: 700, useNativeDriver: true }),
+        Animated.timing(fadeButton.current, { toValue: 1, duration: 700, useNativeDriver: true }),
+        Animated.timing(slideButton.current, { toValue: 0, duration: 700, useNativeDriver: true }),
       ]),
     ]).start();
   }, []);
@@ -84,12 +84,12 @@ export function WelcomeScreen({ onLoginPress}: Props) {
         <FloatingBubble key={i} {...b} />
       ))}
 
-      <Animated.View style={[styles.center, { opacity: fadeTitle}]}>
+      <Animated.View style={[styles.center, { opacity: fadeTitle.current }]}>
         <Text style={styles.title}>Set On Sync</Text>
         <Text style={styles.powered}>Powered by Hoolsy</Text>
       </Animated.View>
 
-      <Animated.View style={[styles.btnWrapper, { opacity: fadeButton, transform: [{ translateY: slideButton}] },
+      <Animated.View style={[styles.btnWrapper, { opacity: fadeButton.current, transform: [{ translateY: slideButton.current }] },
       ]}
       >
 

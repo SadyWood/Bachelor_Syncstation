@@ -31,39 +31,33 @@ const LogEntriesQuerySchema = z.object({
 });
 
 export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
-  /* ========================================
-     LOG ENTRIES
-     ======================================== */
+
+  // All routes require authentication
+  app.addHook('preHandler', app.authenticate);
 
   // GET /syncstation/log-entries?nodeId=xxx&status=pending - List log entries
   app.get(
     '/syncstation/log-entries',
     {
+      preHandler: app.needsPerm('syncstation.log.view'),
       schema: {
         querystring: LogEntriesQuerySchema,
       },
     },
-    async (
-      req: FastifyRequest<{ Querystring: z.infer<typeof LogEntriesQuerySchema> }>,
-      reply: FastifyReply,
-    ) => {
+    async (req: FastifyRequest, reply: FastifyReply) => {
       const tenantId = requireTenant(req);
       if (!tenantId) {
-        return reply
-          .code(400)
-          .send(ErrorResponse.parse({ ok: false, error: 'TENANT_HEADER_MISSING' }));
+        return reply.code(400).send(ErrorResponse.parse({ ok: false, error: 'TENANT_HEADER_MISSING' }));
       }
 
-      const { nodeId, status } = req.query;
+      const { nodeId, status } = req.query as z.infer<typeof LogEntriesQuerySchema>;
 
       try {
         const items = await syncLogRepo.listLogEntries(tenantId, nodeId, status);
         return reply.send(LogEntriesListResponse.parse({ ok: true, items, total: items.length }));
       } catch (error) {
         app.log.error(error, 'Failed to list log entries');
-        return reply
-          .code(500)
-          .send(ErrorResponse.parse({ ok: false, error: 'Failed to list log entries' }));
+        return reply.code(500).send(ErrorResponse.parse({ ok: false, error: 'Failed to list log entries' }));
       }
     },
   );
@@ -72,40 +66,32 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
   app.get(
     '/syncstation/log-entries/:logEntryId',
     {
+      preHandler: app.needsPerm('syncstation.log.view'),
       schema: {
         params: LogEntryIdParamsSchema,
       },
     },
-    async (
-      req: FastifyRequest<{ Params: z.infer<typeof LogEntryIdParamsSchema> }>,
-      reply: FastifyReply,
-    ) => {
+    async (req: FastifyRequest, reply: FastifyReply) => {
       const tenantId = requireTenant(req);
       if (!tenantId) {
-        return reply
-          .code(400)
-          .send(ErrorResponse.parse({ ok: false, error: 'TENANT_HEADER_MISSING' }));
+        return reply.code(400).send(ErrorResponse.parse({ ok: false, error: 'TENANT_HEADER_MISSING' }));
       }
 
-      const { logEntryId } = req.params;
+      const { logEntryId } = req.params as z.infer<typeof LogEntryIdParamsSchema>;
 
       try {
         const entry = await syncLogRepo.getLogEntry(logEntryId, tenantId);
         if (!entry) {
-          return reply.code(404).send(
-            ErrorResponse.parse({
-              ok: false,
-              error: `Log entry '${logEntryId}' not found. Check that the ID is correct and belongs to your tenant.`,
-            }),
-          );
+          return reply.code(404).send(ErrorResponse.parse({
+            ok: false,
+            error: `Log entry '${logEntryId}' not found. Check that the ID is correct and belongs to your tenant.`,
+          }));
         }
 
         return reply.send(LogEntryResponse.parse({ ok: true, entry }));
       } catch (error) {
         app.log.error(error, 'Failed to get log entry');
-        return reply
-          .code(500)
-          .send(ErrorResponse.parse({ ok: false, error: 'Failed to get log entry' }));
+        return reply.code(500).send(ErrorResponse.parse({ ok: false, error: 'Failed to get log entry' }));
       }
     },
   );
@@ -114,6 +100,7 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
   app.post(
     '/syncstation/log-entries',
     {
+      preHandler: app.needsPerm('syncstation.log.create'),
       schema: {
         body: CreateLogEntryRequest.shape.body,
       },
@@ -121,21 +108,20 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
     async (req, reply) => {
       const tenantId = requireTenant(req);
       if (!tenantId) {
-        return reply
-          .code(400)
-          .send(ErrorResponse.parse({ ok: false, error: 'TENANT_HEADER_MISSING' }));
+        return reply.code(400).send(ErrorResponse.parse({ ok: false, error: 'TENANT_HEADER_MISSING' }));
       }
 
       // Get user ID from JWT (authenticated user)
-      try {
-        const decoded = await req.jwtVerify<{ sub: string }>();
-        const userId = decoded.sub;
+      const userId = (req.user as { sub: string }).sub;
 
+      try {
         const body = CreateLogEntryRequest.shape.body.parse(req.body);
         if (body.id) {
           const existing = await syncLogRepo.getLogEntry(body.id, tenantId);
           if (existing) {
-            return reply.code(200).send(LogEntryResponse.parse({ ok: true, entry: existing }));
+            return reply.code(200).send(
+              LogEntryResponse.parse({ ok: true, entry: existing }),
+            );
           }
         }
 
@@ -155,17 +141,13 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
         // Check for foreign key constraint error (invalid nodeId)
         if (error instanceof Error && error.message.includes('foreign key constraint')) {
           const body = CreateLogEntryRequest.shape.body.parse(req.body);
-          return reply.code(400).send(
-            ErrorResponse.parse({
-              ok: false,
-              error: `Content node '${body.nodeId}' not found. Make sure the node exists and belongs to your tenant.`,
-            }),
-          );
+          return reply.code(400).send(ErrorResponse.parse({
+            ok: false,
+            error: `Content node '${body.nodeId}' not found. Make sure the node exists and belongs to your tenant.`,
+          }));
         }
 
-        return reply
-          .code(500)
-          .send(ErrorResponse.parse({ ok: false, error: 'Failed to create log entry' }));
+        return reply.code(500).send(ErrorResponse.parse({ ok: false, error: 'Failed to create log entry' }));
       }
     },
   );
@@ -174,45 +156,37 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
   app.patch(
     '/syncstation/log-entries/:logEntryId',
     {
+      preHandler: app.needsPerm('syncstation.log.update'),
       schema: {
         params: LogEntryIdParamsSchema,
         body: UpdateLogEntryRequest.shape.body,
       },
     },
     async (
-      req: FastifyRequest<{
-        Params: z.infer<typeof LogEntryIdParamsSchema>;
-        Body: z.infer<typeof UpdateLogEntryRequest>['body'];
-      }>,
+      req: FastifyRequest,
       reply: FastifyReply,
     ) => {
       const tenantId = requireTenant(req);
       if (!tenantId) {
-        return reply
-          .code(400)
-          .send(ErrorResponse.parse({ ok: false, error: 'TENANT_HEADER_MISSING' }));
+        return reply.code(400).send(ErrorResponse.parse({ ok: false, error: 'TENANT_HEADER_MISSING' }));
       }
 
-      const { logEntryId } = req.params;
+      const { logEntryId } = req.params as z.infer<typeof LogEntryIdParamsSchema>;
       const body = UpdateLogEntryRequest.shape.body.parse(req.body);
 
       try {
         const entry = await syncLogRepo.updateLogEntry(logEntryId, tenantId, body);
         if (!entry) {
-          return reply.code(404).send(
-            ErrorResponse.parse({
-              ok: false,
-              error: `Log entry '${logEntryId}' not found. Check that the ID is correct and belongs to your tenant.`,
-            }),
-          );
+          return reply.code(404).send(ErrorResponse.parse({
+            ok: false,
+            error: `Log entry '${logEntryId}' not found. Check that the ID is correct and belongs to your tenant.`,
+          }));
         }
 
         return reply.send(LogEntryResponse.parse({ ok: true, entry }));
       } catch (error) {
         app.log.error(error, 'Failed to update log entry');
-        return reply
-          .code(500)
-          .send(ErrorResponse.parse({ ok: false, error: 'Failed to update log entry' }));
+        return reply.code(500).send(ErrorResponse.parse({ ok: false, error: 'Failed to update log entry' }));
       }
     },
   );
@@ -221,40 +195,32 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
   app.delete(
     '/syncstation/log-entries/:logEntryId',
     {
+      preHandler: app.needsPerm('syncstation.log.delete'),
       schema: {
         params: LogEntryIdParamsSchema,
       },
     },
-    async (
-      req: FastifyRequest<{ Params: z.infer<typeof LogEntryIdParamsSchema> }>,
-      reply: FastifyReply,
-    ) => {
+    async (req: FastifyRequest, reply: FastifyReply) => {
       const tenantId = requireTenant(req);
       if (!tenantId) {
-        return reply
-          .code(400)
-          .send(ErrorResponse.parse({ ok: false, error: 'TENANT_HEADER_MISSING' }));
+        return reply.code(400).send(ErrorResponse.parse({ ok: false, error: 'TENANT_HEADER_MISSING' }));
       }
 
-      const { logEntryId } = req.params;
+      const { logEntryId } = req.params as z.infer<typeof LogEntryIdParamsSchema>;
 
       try {
         const deleted = await syncLogRepo.deleteLogEntry(logEntryId, tenantId);
         if (!deleted) {
-          return reply.code(404).send(
-            ErrorResponse.parse({
-              ok: false,
-              error: `Log entry '${logEntryId}' not found. It may have already been deleted or doesn't belong to your tenant.`,
-            }),
-          );
+          return reply.code(404).send(ErrorResponse.parse({
+            ok: false,
+            error: `Log entry '${logEntryId}' not found. It may have already been deleted or doesn't belong to your tenant.`,
+          }));
         }
 
         return reply.send(SuccessResponse.parse({ ok: true }));
       } catch (error) {
         app.log.error(error, 'Failed to delete log entry');
-        return reply
-          .code(500)
-          .send(ErrorResponse.parse({ ok: false, error: 'Failed to delete log entry' }));
+        return reply.code(500).send(ErrorResponse.parse({ ok: false, error: 'Failed to delete log entry' }));
       }
     },
   );
@@ -267,23 +233,24 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
   app.post(
     '/syncstation/log-entries/:logEntryId/attachments',
     {
+      preHandler: app.needsPerm('syncstation.attachment.upload'),
       schema: {
         params: LogEntryIdParamsSchema,
       },
     },
     async (
-      req: FastifyRequest<{ Params: z.infer<typeof LogEntryIdParamsSchema> }>,
+      req: FastifyRequest,
       reply: FastifyReply,
     ) => {
-      // 1. Verify tenant header
+    // 1. Verify tenant header
       const tenantId = requireTenant(req);
       if (!tenantId) {
-        return reply
-          .code(400)
-          .send(ErrorResponse.parse({ ok: false, error: 'TENANT_HEADER_MISSING' }));
+        return reply.code(400).send(
+          ErrorResponse.parse({ ok: false, error: 'TENANT_HEADER_MISSING' }),
+        );
       }
 
-      const { logEntryId } = req.params;
+      const { logEntryId } = req.params as z.infer<typeof LogEntryIdParamsSchema>;
 
       // 2. Verify long entry exists and belongs to this tenant - checked before file processing
       const logEntry = await syncLogRepo.getLogEntry(logEntryId, tenantId);
@@ -300,7 +267,8 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
       // req.file() is provided by @fastify/multipart (registered in server.ts)
       const file = await req.file();
       if (!file) {
-        return reply.code(400).send(ErrorResponse.parse({ ok: false, error: 'No file uploaded' }));
+        return reply.code(400).send(ErrorResponse.parse({ ok: false, error: 'No file uploaded' }),
+        );
       }
 
       try {
@@ -327,12 +295,13 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
         });
 
         // 7. Return the created attachment
-        return reply.code(201).send(AttachmentUploadResponse.parse({ ok: true, attachment }));
+        return reply.code(201).send(
+          AttachmentUploadResponse.parse({ ok: true, attachment }),
+        );
       } catch (error) {
         app.log.error(error, 'Failed to upload attachment');
-        return reply
-          .code(500)
-          .send(ErrorResponse.parse({ ok: false, error: 'Failed to upload attachment' }));
+        return reply.code(500).send(ErrorResponse.parse({ ok: false, error: 'Failed to upload attachment' }),
+        );
       }
     },
   );
@@ -341,42 +310,48 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
   app.get(
     '/syncstation/attachments/:attachmentId/download',
     {
+      preHandler: app.needsPerm('syncstation.attachment.download'),
       schema: {
         params: z.object({ attachmentId: z.string().uuid() }),
       },
     },
-    async (req: FastifyRequest<{ Params: { attachmentId: string } }>, reply: FastifyReply) => {
+    async (req: FastifyRequest,
+      reply: FastifyReply,
+    ) => {
       // 1. Verify tenant header
       const tenantId = requireTenant(req);
       if (!tenantId) {
-        return reply
-          .code(400)
-          .send(ErrorResponse.parse({ ok: false, error: 'TENANT_HEADER_MISSING' }));
+        return reply.code(400).send(
+          ErrorResponse.parse({ ok: false, error: 'TENANT_HEADER_MISSING' }),
+        );
       }
 
-      const { attachmentId } = req.params;
+      const { attachmentId } = req.params as { attachmentId: string };
 
       // 2. Get attachment record with tenant verification - repo method joins through log-entries to check tenant ownership
       const attachment = await syncLogRepo.getAttachment(attachmentId, tenantId);
       if (!attachment) {
-        return reply
-          .code(404)
-          .send(ErrorResponse.parse({ ok: false, error: 'Attachment not found.' }));
+        return reply.code(404).send(
+          ErrorResponse.parse({ ok: false, error: 'Attachment not found.' }),
+        );
       }
 
       // 3. Check the file actually exists on disk before stream
       const exists = await fileStorage.fileExists(attachment.storagePath);
       if (!exists) {
-        return reply
-          .code(404)
-          .send(ErrorResponse.parse({ ok: false, error: 'File not found on filesystem.' }));
+        return reply.code(404).send(
+          ErrorResponse.parse({ ok: false, error: 'File not found on filesystem.' }),
+        );
       }
 
       // 4. Stream file back with correct headers
       const stream = fileStorage.getFileStream(attachment.storagePath);
       return reply
         .header('Content-Type', attachment.mimeType)
-        .header('Content-Disposition', `attachment; filename="${attachment.filename}"`)
+        .header(
+          'Content-Disposition',
+          `attachment; filename="${attachment.filename}"`,
+        )
         .send(stream);
     },
   );
@@ -385,27 +360,31 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
   app.delete(
     '/syncstation/attachments/:attachmentId',
     {
+      preHandler: app.needsPerm('syncstation.attachment.delete'),
       schema: {
         params: z.object({ attachmentId: z.string().uuid() }),
       },
     },
-    async (req: FastifyRequest<{ Params: { attachmentId: string } }>, reply: FastifyReply) => {
+    async (
+      req: FastifyRequest,
+      reply: FastifyReply,
+    ) => {
       // 1. Verify tenant header
       const tenantId = requireTenant(req);
       if (!tenantId) {
-        return reply
-          .code(400)
-          .send(ErrorResponse.parse({ ok: false, error: 'TENANT_HEADER_MISSING' }));
+        return reply.code(400).send(
+          ErrorResponse.parse({ ok: false, error: 'TENANT_HEADER_MISSING' }),
+        );
       }
 
-      const { attachmentId } = req.params;
+      const { attachmentId } = req.params as { attachmentId: string };
 
       // 2. Get attachment record with tenant verification
       const attachment = await syncLogRepo.getAttachment(attachmentId, tenantId);
       if (!attachment) {
-        return reply
-          .code(404)
-          .send(ErrorResponse.parse({ ok: false, error: 'Attachment not found.' }));
+        return reply.code(404).send(
+          ErrorResponse.parse({ ok: false, error: 'Attachment not found.' }),
+        );
       }
 
       try {
@@ -418,9 +397,9 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
         return reply.send(SuccessResponse.parse({ ok: true }));
       } catch (error) {
         app.log.error(error, 'Failed to delete attachment');
-        return reply
-          .code(500)
-          .send(ErrorResponse.parse({ ok: false, error: 'Failed to delete attachment.' }));
+        return reply.code(500).send(
+          ErrorResponse.parse({ ok: false, error: 'Failed to delete attachment.' }),
+        );
       }
     },
   );
@@ -430,17 +409,19 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
      ======================================== */
 
   // GET /syncstation/sync-status - Get sync queue status
-  app.get('/syncstation/sync-status', async (req: FastifyRequest, reply: FastifyReply) => {
+  app.get(
+    '/syncstation/sync-status',
+    {
+      preHandler: app.needsPerm('syncstation.status.view'),
+    },
+    async (req: FastifyRequest, reply: FastifyReply) => {
     const tenantId = requireTenant(req);
     if (!tenantId) {
-      return reply
-        .code(400)
-        .send(ErrorResponse.parse({ ok: false, error: 'TENANT_HEADER_MISSING' }));
+      return reply.code(400).send(ErrorResponse.parse({ ok: false, error: 'TENANT_HEADER_MISSING' }));
     }
 
+    const userId = (req.user as { sub: string }).sub;
     try {
-      const decoded = await req.jwtVerify<{ sub: string }>();
-      const userId = decoded.sub;
 
       const status = await syncLogRepo.getSyncStatus(tenantId, userId);
 
@@ -454,9 +435,7 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
       );
     } catch (error) {
       app.log.error(error, 'Failed to get sync status');
-      return reply
-        .code(500)
-        .send(ErrorResponse.parse({ ok: false, error: 'Failed to get sync status' }));
+      return reply.code(500).send(ErrorResponse.parse({ ok: false, error: 'Failed to get sync status' }));
     }
   });
 };
