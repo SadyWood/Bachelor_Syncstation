@@ -1,10 +1,9 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-
-import { Colors } from '../../styles';
 import { styles } from './AgendaCard.styles';
-import type { AgendaCardProps } from './AgendaCard.types';
+import { Colors } from '../../styles';
+import type { AgendaCardProps } from './types/AgendaCard.types';
 
 export function AgendaCard({ items, onItemToggle }: AgendaCardProps) {
   const [isExpanded, setIsExpanded] = useState(true);

@@ -1,10 +1,9 @@
+import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { View, TouchableOpacity, Text } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-
-import { Colors } from '../../styles';
 import { styles } from './TabBar.styles';
-import type { TabBarProps, TabName } from './TabBar.types';
+import { Colors } from '../../styles';
+import type { TabBarProps, TabName } from './types/TabBar.types';
 
 const TAB_ICONS: Record<Exclude<TabName, 'Add'>, string> = {
   Home: 'home-outline',

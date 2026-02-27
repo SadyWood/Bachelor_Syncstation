@@ -392,6 +392,14 @@ export default [
       ],
     },
   },
+  // React Native (syncstation-app): Animated API requires passing ref values to style props during render
+  // react-hooks/refs is a false positive for this pattern - Animated.Value is designed for this use case
+  {
+    files: ['apps/syncstation-app/**/*.{ts,tsx}'],
+    rules: {
+      'react-hooks/refs': 'off',
+    },
+  },
   // Type Safety for Packages: No ESLint restrictions
   // Packages SHOULD freely export types - the API surface is controlled by:
   //  1. What's re-exported from src/index.ts (public API)

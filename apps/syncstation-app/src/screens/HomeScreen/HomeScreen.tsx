@@ -2,10 +2,10 @@ import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { styles } from './HomeScreen.styles';
-import type { AgendaItem, NoticeItem } from '@/components';
 import { ActiveSceneCard, AgendaCard, ContextCard } from '@/components';
 import { Colors } from '@/styles';
+import { styles } from './HomeScreen.styles';
+import type { AgendaItem, NoticeItem } from '@/components';
 
 // Mock data will be replaced with real data after
 const MOCK_NOTICES: NoticeItem[] = [
