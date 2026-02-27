@@ -70,4 +70,48 @@ export const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.textSecondary,
   },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.text,
+    marginTop: Spacing.lg,
+    marginBottom: Spacing.md,
+  },
+  menuButton: {
+    backgroundColor: Colors.cardBackground,
+    borderRadius: 50,
+    padding: Spacing.md,
+    marginBottom: Spacing.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    shadowColor: Colors.text,
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  menuButtonIcon: {
+    marginRight: Spacing.md,
+    color: Colors.primary,
+  },
+  menuButtonIcon: {
+    fontSize: 15,
+    color: Colors.text,
+    fontWeight: '500',
+  },
+  logoutButton: {
+    backgroundColor: Colors.primary,
+    borderRadius: 50,
+    padding: Spacing.md,
+    marginTop: Spacing.xl,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logoutButtonText: {
+    fontSize: 14,
+    color: Colors.textOnPrimary,
+    fontWeight: '700',
+    marginLeft: Spacing.sm,
+  },
 });
+
