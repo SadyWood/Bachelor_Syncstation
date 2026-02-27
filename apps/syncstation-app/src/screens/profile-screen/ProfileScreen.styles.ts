@@ -39,7 +39,7 @@ export const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-   profileImagePlacerHolder: {
+   profileImagePlaceholder: {
      width: '100%',
      height: '100%',
      backgroundColor: Colors.cardBackground,
