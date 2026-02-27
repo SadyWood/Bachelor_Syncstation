@@ -1,6 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { Colors } from '@/styles';
-import { Spacing } from '@/styles';
+import { Colors, Spacing } from '@/styles';
 
 
 export const styles = StyleSheet.create({
@@ -39,13 +38,13 @@ export const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-   profileImagePlaceholder: {
-     width: '100%',
-     height: '100%',
-     backgroundColor: Colors.cardBackground,
-     justifyContent: 'center',
-     alignItems: 'center',
-     },
+  profileImagePlaceholder: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: Colors.cardBackground,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   infoCard: {
     backgroundColor: Colors.backgroundSecondary,
     padding: Spacing.md,
@@ -112,7 +111,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     color: Colors.textOnPrimary,
     fontWeight: '700',
-    marginLeft: Spacing.sm,
+    marginLeft: Spacing.sm
   },
 });
 
