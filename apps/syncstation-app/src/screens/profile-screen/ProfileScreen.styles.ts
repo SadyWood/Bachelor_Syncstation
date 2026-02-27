@@ -108,7 +108,8 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   logoutButtonText: {
-    fontSize: 14,
+    fontSize: 20,
+    alignItems: 'center',
     color: Colors.textOnPrimary,
     fontWeight: '700',
     marginLeft: Spacing.sm,

@@ -80,7 +80,7 @@ export function ProfileScreen() {
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-              <Text style={styles.logoutButton}>🚪</Text>
+              <Text style={styles.logoutButtonText}>Log out</Text>
             </TouchableOpacity>
           </ScrollView>
     </View>
