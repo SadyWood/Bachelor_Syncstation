@@ -111,7 +111,6 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     color: Colors.textOnPrimary,
     fontWeight: '700',
-    marginLeft: Spacing.sm
   },
 });
 
