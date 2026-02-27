@@ -93,7 +93,7 @@ export const styles = StyleSheet.create({
     marginRight: Spacing.md,
     color: Colors.primary,
   },
-  menuButtonIcon: {
+  menuButtonText: {
     fontSize: 15,
     color: Colors.text,
     fontWeight: '500',
