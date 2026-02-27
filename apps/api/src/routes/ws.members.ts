@@ -22,6 +22,9 @@ const UserParamsSchema = z.object({
 });
 
 export const wsMembersRoutes: FastifyPluginAsyncZod = async (app) => {
+
+  app.addHook('preHandler', app.authenticate);
+
   // GET /ws/members
   app.get(
     '/ws/members',

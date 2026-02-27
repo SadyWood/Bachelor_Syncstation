@@ -1,10 +1,9 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-
-import { Colors } from '../../styles';
 import { styles } from './ContextCard.styles';
-import type { ContextCardProps } from './ContextCard.types';
+import { Colors } from '../../styles';
+import type { ContextCardProps } from './types/ContextCard.types';
 
 export function ContextCard({
   projectName,

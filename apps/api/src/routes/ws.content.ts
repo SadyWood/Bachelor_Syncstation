@@ -35,6 +35,8 @@ export const wsContentRoutes: FastifyPluginAsyncZod = async (app) => {
      PROJECTS
      ======================================== */
 
+  app.addHook('preHandler', app.authenticate);
+
   // GET /ws/projects - List all projects
   app.get(
     '/ws/projects',

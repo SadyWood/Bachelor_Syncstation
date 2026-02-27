@@ -9,6 +9,13 @@ import { tabNavigatorScreenOptions } from './AppNavigator.styles';
 import type { FabMenuOption, TabName } from '@/components/TabBar';
 import { FabMenu, TabBar } from '@/components/TabBar';
 import { HomeScreen } from '@/screens';
+import React, { Fragment, useState } from 'react';
+import { FabMenu, type FabMenuOption, TabBar, type TabName } from '@/components/TabBar';
+import { tabNavigatorScreenOptions } from '@/navigation/AppNavigator.styles';
+import { HomeScreen } from '@/screens';
+import { LoginScreen } from '@/screens/login-screen';
+import { WelcomeScreen } from '@/screens/welcome-screen';
+import { useAuthStore } from '@/stores/authStore';
 
 
 type AppTabsParamList = {
