@@ -1,13 +1,10 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import React, { Fragment, useState }from 'react';
-import { LogEntryScreen } from '@/screens/ExploreScreen';
-import { ProjectsScreen } from '@/screens/HomeScreen';
-import { SettingsScreen } from '@/screens/ProfileScreen';
+import React, { Fragment, useState } from 'react';
 import { ProfileScreen } from '@/screens/profile-screen';
 import { WelcomeScreen } from '@/screens/welcome-screen';
 import { LoginScreen } from '@/screens/login-screen';
-import { useAuthStore} from '@/stores/authStore';
+import { useAuthStore } from '@/stores/authStore';
 import { tabNavigatorScreenOptions } from './AppNavigator.styles';
 import type { FabMenuOption, TabName } from '@/components/TabBar';
 import { FabMenu, TabBar } from '@/components/TabBar';
