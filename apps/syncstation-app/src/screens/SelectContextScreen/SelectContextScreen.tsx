@@ -58,7 +58,6 @@ export function SelectContextScreen({ onBack, onSelectProject }: SelectContextSc
 
   useEffect(() => {
     void loadProjects();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function loadProjects() {

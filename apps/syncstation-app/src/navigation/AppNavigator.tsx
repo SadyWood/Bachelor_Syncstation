@@ -10,7 +10,7 @@ import { LoginScreen } from '@/screens/login-screen';
 import { WelcomeScreen } from '@/screens/welcome-screen';
 import { useAuthStore } from '@/stores/authStore';
 import { useContentStore } from '@/stores/ContentStore';
-import type { Project } from '@/screens';
+import type { Project } from '@/screens/SelectContextScreen/types/SelectContextScreen.types';
 
 type AppTabsParamList = {
   Home: undefined;

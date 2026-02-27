@@ -1,13 +1,15 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import React, { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ActiveSceneCard, AgendaCard, ContextCard } from '@/components';
+import { useAuthStore } from '@/stores/authStore';
 import { useContentStore } from '@/stores/ContentStore';
 import { Colors } from '@/styles';
 import { styles } from './HomeScreen.styles';
 import type { AgendaItem, NoticeItem } from '@/components';
+
 
 const MOCK_NOTICES: NoticeItem[] = [
   { id: '1', time: '13.45', message: 'Lunch extended due to weather, resume 15.00' },
@@ -25,15 +27,39 @@ const MOCK_AGENDA: AgendaItem[] = [
   { id: '6', time: '09:45', title: 'Team meetup', isCompleted: false },
 ];
 
+// TODO: Replace with API call when backend is ready
+async function fetchNotices(_token: string, _tenantId: string): Promise<NoticeItem[]> {
+  await new Promise((resolve) => setTimeout(resolve, 500));
+  return MOCK_NOTICES;
+}
+
+// TODO: Replace with API call when backend is ready
+async function fetchAgenda(_token: string, _tenantId: string): Promise<AgendaItem[]> {
+  await new Promise((resolve) => setTimeout(resolve, 500));
+  return MOCK_AGENDA;
+}
+
+
 export function HomeScreen() {
   const navigation = useNavigation();
-  const [agendaItems, setAgendaItems] = useState<AgendaItem[]>(MOCK_AGENDA);
+  const [agendaItems, setAgendaItems] = useState<AgendaItem[]>([]);
+  const [notices, setNotices] = useState<NoticeItem[]>([]);
 
-  // Read from global store
   const activeProject = useContentStore((state) => state.activeProject);
+  const token = useAuthStore((s) => s.token);
 
+  useEffect(() => {
+    void loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeProject]);async function loadData() {
+    const tenantId = '';
+    const noticesData = await fetchNotices(token ?? '', tenantId);
+    const agendaData = await fetchAgenda(token ?? '', tenantId);
+    setNotices(noticesData);
+    setAgendaItems(agendaData);
+  }
   function handleChangeContext() {
-    navigation.navigate('SelectContext');
+    navigation.navigate('SelectContext' as never);
   }
 
   function handleChangeScene() {
@@ -50,7 +76,6 @@ export function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top'] as const}>
-      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Home</Text>
         <Ionicons
@@ -61,10 +86,8 @@ export function HomeScreen() {
         />
       </View>
 
-      {/* Divider */}
       <View style={styles.divider} />
 
-      {/* Content */}
       <ScrollView
         style={styles.scrollContent}
         contentContainerStyle={styles.scrollContainer}
@@ -73,7 +96,7 @@ export function HomeScreen() {
           projectName={activeProject?.name ?? 'No project selected'}
           role={activeProject?.role ?? 'Select a project'}
           dayInfo={activeProject ? `Day ${activeProject.currentDay} of ${activeProject.totalDays}` : ''}
-          notices={MOCK_NOTICES}
+          notices={notices}
           onChangePress={handleChangeContext}
         />
 
