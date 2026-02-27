@@ -56,6 +56,28 @@ export function ProfileScreen() {
                   </View>
                 </View>
               </View>
+
+            <Text style={styles.sectionTitle}>Account</Text>
+            <TouchableOpacity style={styles.menuButton}>
+              <Text style={styles.menuButtonIcon}>🔒</Text>
+              <Text style={styles.menuButtonText}>Change Password</Text>
+            </TouchableOpacity>
+
+            <Text style={styles.sectionTitle}>My Data</Text>
+            <TouchableOpacity style={styles.menuButton}>
+              <Text style={styles.menuButtonIcon}>📋</Text>
+              <Text style={styles.menuButtonText}>My Logposts</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.menuButton}>
+              <Text style={styles.menuButtonIcon}>📷</Text>
+              <Text style={styles.menuButtonText}>My Media</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.menuButton}>
+              <Text style={styles.menuButtonIcon}>📤</Text>
+              <Text style={styles.menuButtonText}>Export Data</Text>
+            </TouchableOpacity>
           </ScrollView>
     </View>
   );
