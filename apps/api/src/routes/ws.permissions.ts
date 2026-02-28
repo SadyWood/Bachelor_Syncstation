@@ -4,7 +4,6 @@ import * as permissionsRepo from '../repos/ws.permissions.repo.js';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 
 export const wsPermissionsRoutes: FastifyPluginAsyncZod = async (app) => {
-
   app.addHook('preHandler', app.authenticate);
 
   // List available permissions from catalog
