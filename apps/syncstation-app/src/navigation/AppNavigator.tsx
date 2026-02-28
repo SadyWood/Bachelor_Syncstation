@@ -76,7 +76,7 @@ function AppTabs() {
       >
         <Tab.Screen name="Home" component={HomeScreen} />
         <Tab.Screen name="Production" component={HomeScreen} /> {/* TODO: ProductionScreen */}
-        <Tab.Screen name="Profile" component={HomeScreen} />
+        <Tab.Screen name="Profile" component={ProfileScreen} />
         <Tab.Screen name="Settings" component={HomeScreen} /> {/* TODO: SettingsScreen */}
       </Tab.Navigator>
 
