@@ -155,7 +155,9 @@ const CompleteInvitedUserInput = z.object({
 });
 type CompleteInvitedUserInput = z.infer<typeof CompleteInvitedUserInput>;
 
-export async function completeInvitedUser(input: CompleteInvitedUserInput): Promise<{ id: string } | null> {
+export async function completeInvitedUser(
+  input: CompleteInvitedUserInput,
+): Promise<{ id: string } | null> {
   const data = CompleteInvitedUserInput.parse(input);
 
   const existing = await repoFindUserByEmail(data.email.toLowerCase());
@@ -203,8 +205,8 @@ export async function grantAccess(userId: string, platformId: number, hasAccess:
 
 export async function getAccessSummary(userId: string) {
   const rows = await selectAccessSummary(userId);
-  return rows.map(r => ({
-    platform: r.code,               // e.g. 'workstation'
+  return rows.map((r) => ({
+    platform: r.code, // e.g. 'workstation'
     hasAccess: !!r.hasAccess,
     preferences: r.preferences ?? {},
     updatedAt: r.updatedAt?.toISOString(),
@@ -213,9 +215,9 @@ export async function getAccessSummary(userId: string) {
 
 export async function getWsMemberships(userId: string) {
   const rows = await listWsMemberships(userId);
-  return rows.map(r => ({
-    tenantId: r.tenantId,                         // can be null in DB → caller may filter
-    nodeId: r.nodeId ?? null,                     // keep null in payload, don't filter out
+  return rows.map((r) => ({
+    tenantId: r.tenantId, // can be null in DB → caller may filter
+    nodeId: r.nodeId ?? null, // keep null in payload, don't filter out
     role: r.roleName,
     createdAt: r.createdAt?.toISOString() ?? null, // ensure null instead of undefined
   }));
@@ -233,26 +235,30 @@ export function resolveCurrentTenant(opts: {
   memberships: Array<{ tenantId: string; createdAt?: string }>;
 }): string | undefined {
   const header = (opts.headerValue ?? '').trim();
-  const hasHeader = header && opts.memberships.some(m => m.tenantId === header);
+  const hasHeader = header && opts.memberships.some((m) => m.tenantId === header);
   if (hasHeader) return header;
 
   // Proper Zod validation for preferences instead of 'any' casting
-  const PrefsSchema = z.object({
-    ws: z.object({
-      tenantId: z.string().uuid().optional(),
-    }).optional(),
-  }).optional();
+  const PrefsSchema = z
+    .object({
+      ws: z
+        .object({
+          tenantId: z.string().uuid().optional(),
+        })
+        .optional(),
+    })
+    .optional();
 
-  const ws = (opts.accessPrefs ?? []).find(p => p.platform === 'workstation');
+  const ws = (opts.accessPrefs ?? []).find((p) => p.platform === 'workstation');
   const parsed = PrefsSchema.safeParse(ws?.preferences);
   const pref = parsed.success ? parsed.data?.ws?.tenantId : undefined;
 
-  if (typeof pref === 'string' && opts.memberships.some(m => m.tenantId === pref)) {
+  if (typeof pref === 'string' && opts.memberships.some((m) => m.tenantId === pref)) {
     return pref;
   }
 
-  const first = [...opts.memberships].sort(
-    (a, b) => (a.createdAt || '').localeCompare(b.createdAt || ''),
+  const first = [...opts.memberships].sort((a, b) =>
+    (a.createdAt || '').localeCompare(b.createdAt || ''),
   )[0];
   return first?.tenantId ?? undefined;
 }

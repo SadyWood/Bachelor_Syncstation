@@ -10,7 +10,11 @@ import type { z } from 'zod';
 
 type ContentNode = z.infer<typeof ContentNodeSchema>;
 
-export default function ProjectMeta({ title, onClose, titleIcon }: WidgetProps & { titleIcon?: React.ComponentType<{ size?: number; className?: string }> }) {
+export default function ProjectMeta({
+  title,
+  onClose,
+  titleIcon,
+}: WidgetProps & { titleIcon?: React.ComponentType<{ size?: number; className?: string }> }) {
   const { currentProject, updateProject, deleteProject, loadProjects } = useContentStore();
   const [project, setProject] = useState<ContentNode | null>(null);
   const [name, setName] = useState('');
@@ -58,7 +62,11 @@ export default function ProjectMeta({ title, onClose, titleIcon }: WidgetProps &
   };
 
   return (
-    <BaseWidget title={title || 'Project Info'} onClose={onClose} titleIcon={titleIcon || FolderTree}>
+    <BaseWidget
+      title={title || 'Project Info'}
+      onClose={onClose}
+      titleIcon={titleIcon || FolderTree}
+    >
       <div className="p-4 space-y-3">
         {!project ? (
           <div className="ws-empty">
@@ -76,7 +84,8 @@ export default function ProjectMeta({ title, onClose, titleIcon }: WidgetProps &
                 placeholder="My Awesome Project"
               />
               <p className="text-[11px] text-gray-500 mt-1">
-                Slug: <span className="font-mono bg-gray-100 px-1.5 py-0.5 rounded">
+                Slug:{' '}
+                <span className="font-mono bg-gray-100 px-1.5 py-0.5 rounded">
                   {slugify(name || '') || 'project-slug'}
                 </span>
               </p>

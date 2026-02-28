@@ -54,7 +54,9 @@ export const wsContentRoutes: FastifyPluginAsyncZod = async (app) => {
         return reply.send(ProjectsListResponse.parse({ ok: true, items }));
       } catch (error) {
         app.log.error(error, 'Failed to list projects');
-        return reply.code(500).send({ ok: false, code: 'INTERNAL_ERROR', message: 'Failed to list projects' });
+        return reply
+          .code(500)
+          .send({ ok: false, code: 'INTERNAL_ERROR', message: 'Failed to list projects' });
       }
     },
   );
@@ -95,7 +97,9 @@ export const wsContentRoutes: FastifyPluginAsyncZod = async (app) => {
         return reply.code(201).send(ProjectResponse.parse({ ok: true, project }));
       } catch (error) {
         app.log.error(error, 'Failed to create project');
-        return reply.code(500).send({ ok: false, code: 'INTERNAL_ERROR', message: 'Failed to create project' });
+        return reply
+          .code(500)
+          .send({ ok: false, code: 'INTERNAL_ERROR', message: 'Failed to create project' });
       }
     },
   );
@@ -125,7 +129,9 @@ export const wsContentRoutes: FastifyPluginAsyncZod = async (app) => {
         return reply.send(ProjectResponse.parse({ ok: true, project }));
       } catch (error) {
         app.log.error(error, 'Failed to get project');
-        return reply.code(500).send({ ok: false, code: 'INTERNAL_ERROR', message: 'Failed to get project' });
+        return reply
+          .code(500)
+          .send({ ok: false, code: 'INTERNAL_ERROR', message: 'Failed to get project' });
       }
     },
   );
@@ -157,7 +163,9 @@ export const wsContentRoutes: FastifyPluginAsyncZod = async (app) => {
         return reply.send(ProjectResponse.parse({ ok: true, project }));
       } catch (error) {
         app.log.error(error, 'Failed to update project');
-        return reply.code(500).send({ ok: false, code: 'INTERNAL_ERROR', message: 'Failed to update project' });
+        return reply
+          .code(500)
+          .send({ ok: false, code: 'INTERNAL_ERROR', message: 'Failed to update project' });
       }
     },
   );
@@ -187,7 +195,9 @@ export const wsContentRoutes: FastifyPluginAsyncZod = async (app) => {
         return reply.send({ ok: true });
       } catch (error) {
         app.log.error(error, 'Failed to delete project');
-        return reply.code(500).send({ ok: false, code: 'INTERNAL_ERROR', message: 'Failed to delete project' });
+        return reply
+          .code(500)
+          .send({ ok: false, code: 'INTERNAL_ERROR', message: 'Failed to delete project' });
       }
     },
   );
@@ -214,7 +224,9 @@ export const wsContentRoutes: FastifyPluginAsyncZod = async (app) => {
         return reply.send(ProjectTreeFlatResponse.parse({ ok: true, items }));
       } catch (error) {
         app.log.error(error, 'Failed to get project tree');
-        return reply.code(500).send({ ok: false, code: 'INTERNAL_ERROR', message: 'Failed to get project tree' });
+        return reply
+          .code(500)
+          .send({ ok: false, code: 'INTERNAL_ERROR', message: 'Failed to get project tree' });
       }
     },
   );
@@ -244,7 +256,9 @@ export const wsContentRoutes: FastifyPluginAsyncZod = async (app) => {
         // Validate: Only groups can have children (content/bonus_content cannot)
         const parent = await contentRepo.getNodeById(tenantId, body.parentId);
         if (!parent) {
-          return reply.code(404).send({ ok: false, code: 'PARENT_NOT_FOUND', message: 'Parent node not found' });
+          return reply
+            .code(404)
+            .send({ ok: false, code: 'PARENT_NOT_FOUND', message: 'Parent node not found' });
         }
 
         if (parent.nodeType !== 'group') {
@@ -262,7 +276,9 @@ export const wsContentRoutes: FastifyPluginAsyncZod = async (app) => {
         return reply.code(201).send(NodeResponse.parse({ ok: true, node }));
       } catch (error) {
         app.log.error(error, 'Failed to create node');
-        return reply.code(500).send({ ok: false, code: 'INTERNAL_ERROR', message: 'Failed to create node' });
+        return reply
+          .code(500)
+          .send({ ok: false, code: 'INTERNAL_ERROR', message: 'Failed to create node' });
       }
     },
   );
@@ -294,7 +310,9 @@ export const wsContentRoutes: FastifyPluginAsyncZod = async (app) => {
         return reply.send(NodeResponse.parse({ ok: true, node }));
       } catch (error) {
         app.log.error(error, 'Failed to update node');
-        return reply.code(500).send({ ok: false, code: 'INTERNAL_ERROR', message: 'Failed to update node' });
+        return reply
+          .code(500)
+          .send({ ok: false, code: 'INTERNAL_ERROR', message: 'Failed to update node' });
       }
     },
   );
@@ -324,7 +342,9 @@ export const wsContentRoutes: FastifyPluginAsyncZod = async (app) => {
         return reply.send({ ok: true });
       } catch (error) {
         app.log.error(error, 'Failed to delete node');
-        return reply.code(500).send({ ok: false, code: 'INTERNAL_ERROR', message: 'Failed to delete node' });
+        return reply
+          .code(500)
+          .send({ ok: false, code: 'INTERNAL_ERROR', message: 'Failed to delete node' });
       }
     },
   );
@@ -356,23 +376,43 @@ export const wsContentRoutes: FastifyPluginAsyncZod = async (app) => {
         const message = error instanceof Error ? error.message : 'Unknown error';
 
         if (message === 'NODE_NOT_FOUND') {
-          return reply.code(404).send({ ok: false, code: 'NODE_NOT_FOUND', message: 'Node not found' });
+          return reply
+            .code(404)
+            .send({ ok: false, code: 'NODE_NOT_FOUND', message: 'Node not found' });
         }
         if (message === 'TARGET_NOT_FOUND') {
-          return reply.code(404).send({ ok: false, code: 'TARGET_NOT_FOUND', message: 'Target parent not found' });
+          return reply
+            .code(404)
+            .send({ ok: false, code: 'TARGET_NOT_FOUND', message: 'Target parent not found' });
         }
         if (message === 'INVALID_PARENT') {
-          return reply.code(400).send({ ok: false, code: 'INVALID_PARENT', message: 'Target must be a group' });
+          return reply
+            .code(400)
+            .send({ ok: false, code: 'INVALID_PARENT', message: 'Target must be a group' });
         }
         if (message === 'CYCLE_FORBIDDEN') {
-          return reply.code(400).send({ ok: false, code: 'CYCLE_FORBIDDEN', message: 'Cannot move node into its own subtree' });
+          return reply
+            .code(400)
+            .send({
+              ok: false,
+              code: 'CYCLE_FORBIDDEN',
+              message: 'Cannot move node into its own subtree',
+            });
         }
         if (message === 'CROSS_TENANT_FORBIDDEN' || message === 'TENANT_MISMATCH') {
-          return reply.code(403).send({ ok: false, code: 'CROSS_TENANT_FORBIDDEN', message: 'Cross-tenant moves not allowed' });
+          return reply
+            .code(403)
+            .send({
+              ok: false,
+              code: 'CROSS_TENANT_FORBIDDEN',
+              message: 'Cross-tenant moves not allowed',
+            });
         }
 
         app.log.error(error, 'Failed to move node');
-        return reply.code(500).send({ ok: false, code: 'INTERNAL_ERROR', message: 'Failed to move node' });
+        return reply
+          .code(500)
+          .send({ ok: false, code: 'INTERNAL_ERROR', message: 'Failed to move node' });
       }
     },
   );
@@ -399,7 +439,9 @@ export const wsContentRoutes: FastifyPluginAsyncZod = async (app) => {
         return reply.send({ ok: true });
       } catch (error) {
         app.log.error(error, 'Failed to reorder nodes');
-        return reply.code(500).send({ ok: false, code: 'INTERNAL_ERROR', message: 'Failed to reorder nodes' });
+        return reply
+          .code(500)
+          .send({ ok: false, code: 'INTERNAL_ERROR', message: 'Failed to reorder nodes' });
       }
     },
   );

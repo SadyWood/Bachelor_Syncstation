@@ -37,17 +37,25 @@ export async function evaluateEffectivePerms(userUuid: string, tenantId: string,
       customPerms: schema.wsUserMemberships.customPerms,
     })
     .from(schema.wsUserMemberships)
-    .where(and(eq(schema.wsUserMemberships.userUuid, userUuid), eq(schema.wsUserMemberships.tenantId, tenantId)));
+    .where(
+      and(
+        eq(schema.wsUserMemberships.userUuid, userUuid),
+        eq(schema.wsUserMemberships.tenantId, tenantId),
+      ),
+    );
 
   log.debug('Found memberships:', memberships.length);
 
   if (memberships.length === 0) {
     log.debug('No memberships found - denying all permissions');
     const empty: PermSet = { allow: [], deny: [] };
-    return { can: (_: string) => false, snapshot: { ...empty, source: { roles: [], memberships: [] } } };
+    return {
+      can: (_: string) => false,
+      snapshot: { ...empty, source: { roles: [], memberships: [] } },
+    };
   }
 
-  const roleIds = memberships.map(m => m.roleId);
+  const roleIds = memberships.map((m) => m.roleId);
   const roles = await dbWs
     .select({
       roleId: schema.wsRoles.roleId,
@@ -57,10 +65,13 @@ export async function evaluateEffectivePerms(userUuid: string, tenantId: string,
     .from(schema.wsRoles)
     .where(inArray(schema.wsRoles.roleId, roleIds));
 
-  log.debug('Found roles:', roles.map(r => r.name));
+  log.debug(
+    'Found roles:',
+    roles.map((r) => r.name),
+  );
 
   // Short-circuit: Admin role name grants everything (keeps MVP behavior)
-  const isAdmin = roles.some(r => (r.name || '').toLowerCase() === 'admin');
+  const isAdmin = roles.some((r) => (r.name || '').toLowerCase() === 'admin');
   if (isAdmin) {
     log.debug('User is Admin - granting all permissions');
     const effective: PermSet = { allow: ['**'], deny: [] };
@@ -71,7 +82,13 @@ export async function evaluateEffectivePerms(userUuid: string, tenantId: string,
   for (const r of roles) effective = mergePerms(effective, normalize(r.defaultPerms));
   for (const m of memberships) effective = mergePerms(effective, normalize(m.customPerms));
 
-  log.debug('Effective permissions:', effective.allow.length, 'allow rules,', effective.deny.length, 'deny rules');
+  log.debug(
+    'Effective permissions:',
+    effective.allow.length,
+    'allow rules,',
+    effective.deny.length,
+    'deny rules',
+  );
 
   const can = (perm: string) => {
     const denyMatch = matchesAny(effective.deny, perm);

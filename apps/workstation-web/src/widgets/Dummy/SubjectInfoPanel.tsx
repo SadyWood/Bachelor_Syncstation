@@ -17,7 +17,8 @@ export default function SubjectInfoPanel({ title, onClose, ...props }: WidgetPro
         </div>
 
         <div className="ws-block p-3 text-sm" style={{ height: 140, overflow: 'auto' }}>
-          Favorite among her followers… (lorem ipsum dummy bio)… <span className="ws-muted">Read more</span>
+          Favorite among her followers… (lorem ipsum dummy bio)…{' '}
+          <span className="ws-muted">Read more</span>
         </div>
 
         <div className="flex gap-2">

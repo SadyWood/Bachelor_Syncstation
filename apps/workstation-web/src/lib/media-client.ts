@@ -30,10 +30,7 @@ type CompleteUploadRequest = z.infer<typeof CompleteUploadRequestSchema>;
  * @param file File to upload.
  * @returns Upload session with uploadId (and uploadUrl for Azure).
  */
-export async function initUpload(
-  nodeId: string,
-  file: File,
-): Promise<InitUploadResponse> {
+export async function initUpload(nodeId: string, file: File): Promise<InitUploadResponse> {
   const body: InitUploadRequest = {
     filename: file.name,
     mimeType: file.type,
@@ -190,12 +187,14 @@ export async function getMediaForNode(
       assetId: response.asset?.mediaAssetId,
       filename: response.asset?.filename,
       mimeType: response.asset?.mimeType,
-      metadata: response.asset ? {
-        durationMs: response.asset.durationMs,
-        width: response.asset.width,
-        height: response.asset.height,
-        frameRate: response.asset.frameRate,
-      } : null,
+      metadata: response.asset
+        ? {
+          durationMs: response.asset.durationMs,
+          width: response.asset.width,
+          height: response.asset.height,
+          frameRate: response.asset.frameRate,
+        }
+        : null,
       variantsCount: response.variants.length,
     });
 

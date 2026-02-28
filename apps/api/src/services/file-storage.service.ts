@@ -11,7 +11,6 @@ Responsible for saving, retrieving and deleting files from filesystem
 The service abstracts file storage so routes don't care about where a file lives just that they can be saved and retrieved
 */
 
-
 // Save an uploaded file to the organized folder structure - Uses streams so large files never load entirely into memory
 export async function saveFile(
   fileStream: Readable,

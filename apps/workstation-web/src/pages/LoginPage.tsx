@@ -13,7 +13,8 @@ const LoginPage: React.FC = () => {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setBusy(true); setErr(null);
+    setBusy(true);
+    setErr(null);
     try {
       await login({ email, password });
       nav('/start', { replace: true });
@@ -29,11 +30,7 @@ const LoginPage: React.FC = () => {
       <div className="w-full max-w-md">
         {/* Brand */}
         <div className="flex flex-col items-center mb-4">
-          <img
-            src="/hoolsy_logo.png"
-            alt="Hoolsy"
-            className="h-12 w-auto mb-2 object-contain"
-          />
+          <img src="/hoolsy_logo.png" alt="Hoolsy" className="h-12 w-auto mb-2 object-contain" />
           <h1 className="text-lg font-semibold" style={{ color: 'var(--ws-text)' }}>
             Hoolsy Workstation
           </h1>
@@ -46,12 +43,26 @@ const LoginPage: React.FC = () => {
 
             <div className="space-y-1">
               <label className="text-xs ws-muted">Email</label>
-              <input className="ws-input" type="email" placeholder="you@company.com" value={email} onChange={e => setEmail(e.target.value)} required />
+              <input
+                className="ws-input"
+                type="email"
+                placeholder="you@company.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
             </div>
 
             <div className="space-y-1">
               <label className="text-xs ws-muted">Password</label>
-              <input className="ws-input" type="password" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} required />
+              <input
+                className="ws-input"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
             </div>
 
             <div className="flex items-center justify-between pt-1">

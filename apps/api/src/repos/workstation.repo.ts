@@ -3,7 +3,7 @@ import { and, eq, isNull, or } from 'drizzle-orm';
 import { dbWs, schema } from '../db.js';
 
 // Reuse Drizzle-inferred literal unions for status, etc.
-type MemberStatus = typeof schema.wsTenantMembers.$inferInsert['status'];
+type MemberStatus = (typeof schema.wsTenantMembers.$inferInsert)['status'];
 
 export async function listWsMemberships(userUuid: string) {
   return dbWs
@@ -28,14 +28,16 @@ export async function activateMembershipsForUserByInvite(userUuid: string, invit
       activatedAt: now,
       deactivatedAt: null,
     })
-    .where(and(
-      eq(schema.wsTenantMembers.userUuid, userUuid),
-      eq(schema.wsTenantMembers.inviteToken, inviteToken),
-      or(
-        eq(schema.wsTenantMembers.status, 'pending'),
-        eq(schema.wsTenantMembers.status, 'disabled'),
+    .where(
+      and(
+        eq(schema.wsTenantMembers.userUuid, userUuid),
+        eq(schema.wsTenantMembers.inviteToken, inviteToken),
+        or(
+          eq(schema.wsTenantMembers.status, 'pending'),
+          eq(schema.wsTenantMembers.status, 'disabled'),
+        ),
       ),
-    ))
+    )
     .returning({ memberId: schema.wsTenantMembers.memberId });
   return rows.length;
 }
@@ -50,13 +52,15 @@ export async function activateAllPendingMembershipsForUser(userUuid: string) {
       activatedAt: now,
       deactivatedAt: null,
     })
-    .where(and(
-      eq(schema.wsTenantMembers.userUuid, userUuid),
-      or(
-        eq(schema.wsTenantMembers.status, 'pending'),
-        eq(schema.wsTenantMembers.status, 'disabled'),
+    .where(
+      and(
+        eq(schema.wsTenantMembers.userUuid, userUuid),
+        or(
+          eq(schema.wsTenantMembers.status, 'pending'),
+          eq(schema.wsTenantMembers.status, 'disabled'),
+        ),
       ),
-    ))
+    )
     .returning({ memberId: schema.wsTenantMembers.memberId });
   return rows.length;
 }

@@ -38,14 +38,17 @@ interface UploadSession {
 const uploadSessions = new Map<string, UploadSession>();
 
 // Clean up old sessions (> 1 hour)
-setInterval(() => {
-  const oneHourAgo = Date.now() - (60 * 60 * 1000);
-  for (const [uploadId, session] of uploadSessions.entries()) {
-    if (session.createdAt.getTime() < oneHourAgo) {
-      uploadSessions.delete(uploadId);
+setInterval(
+  () => {
+    const oneHourAgo = Date.now() - 60 * 60 * 1000;
+    for (const [uploadId, session] of uploadSessions.entries()) {
+      if (session.createdAt.getTime() < oneHourAgo) {
+        uploadSessions.delete(uploadId);
+      }
     }
-  }
-}, 5 * 60 * 1000); // Run every 5 minutes
+  },
+  5 * 60 * 1000,
+); // Run every 5 minutes
 
 /* ========================================
    UPLOAD DIRECTORY
@@ -183,7 +186,10 @@ export const wsMediaRoutes: FastifyPluginAsyncZod = async (app) => {
     },
     async (req, reply) => {
       const tenantId = requireTenant(req);
-      app.log.info({ tenantId, headers: req.headers }, '[GET /ws/nodes/:nodeId/media] Request received');
+      app.log.info(
+        { tenantId, headers: req.headers },
+        '[GET /ws/nodes/:nodeId/media] Request received',
+      );
 
       if (!tenantId) {
         app.log.warn('[GET /ws/nodes/:nodeId/media] Tenant header missing');
@@ -199,7 +205,10 @@ export const wsMediaRoutes: FastifyPluginAsyncZod = async (app) => {
 
         // If no media, return null asset with empty variants
         if (!asset) {
-          app.log.info({ tenantId, nodeId }, '[GET /ws/nodes/:nodeId/media] No media found for node');
+          app.log.info(
+            { tenantId, nodeId },
+            '[GET /ws/nodes/:nodeId/media] No media found for node',
+          );
           return reply.send(
             MediaListResponseSchema.parse({
               ok: true,
@@ -209,22 +218,28 @@ export const wsMediaRoutes: FastifyPluginAsyncZod = async (app) => {
           );
         }
 
-        app.log.info({
-          tenantId,
-          nodeId,
-          assetId: asset.mediaAssetId,
-          filename: asset.filename,
-          metadata: {
-            durationMs: asset.durationMs,
-            width: asset.width,
-            height: asset.height,
-            frameRate: asset.frameRate,
+        app.log.info(
+          {
+            tenantId,
+            nodeId,
+            assetId: asset.mediaAssetId,
+            filename: asset.filename,
+            metadata: {
+              durationMs: asset.durationMs,
+              width: asset.width,
+              height: asset.height,
+              frameRate: asset.frameRate,
+            },
           },
-        }, '[GET /ws/nodes/:nodeId/media] Media asset found');
+          '[GET /ws/nodes/:nodeId/media] Media asset found',
+        );
 
         // Get variants for this asset
         const variants = await mediaRepo.listMediaVariants(asset.mediaAssetId);
-        app.log.info({ assetId: asset.mediaAssetId, variantsCount: variants.length }, '[GET /ws/nodes/:nodeId/media] Variants fetched');
+        app.log.info(
+          { assetId: asset.mediaAssetId, variantsCount: variants.length },
+          '[GET /ws/nodes/:nodeId/media] Variants fetched',
+        );
 
         return reply.send(
           MediaListResponseSchema.parse({
@@ -234,7 +249,10 @@ export const wsMediaRoutes: FastifyPluginAsyncZod = async (app) => {
           }),
         );
       } catch (error) {
-        app.log.error({ error, tenantId, nodeId }, '[GET /ws/nodes/:nodeId/media] Failed to get media for node');
+        app.log.error(
+          { error, tenantId, nodeId },
+          '[GET /ws/nodes/:nodeId/media] Failed to get media for node',
+        );
         return reply.code(500).send({
           ok: false,
           code: 'INTERNAL_ERROR',
@@ -344,7 +362,10 @@ export const wsMediaRoutes: FastifyPluginAsyncZod = async (app) => {
           });
         }
 
-        app.log.info({ uploadId, filename: data.filename, mimetype: data.mimetype }, 'File received');
+        app.log.info(
+          { uploadId, filename: data.filename, mimetype: data.mimetype },
+          'File received',
+        );
 
         // 4. Ensure upload directory exists
         const uploadDir = await ensureUploadDir(session.tenantId, session.nodeId);
@@ -512,7 +533,10 @@ export const wsMediaRoutes: FastifyPluginAsyncZod = async (app) => {
     async (req, reply) => {
       try {
         const { assetId } = req.params as { assetId: string };
-        const { download, filename } = req.query as { download?: 'true' | 'false'; filename?: string };
+        const { download, filename } = req.query as {
+          download?: 'true' | 'false';
+          filename?: string;
+        };
         const tenantId = requireTenant(req);
 
         if (!tenantId) {
@@ -585,7 +609,7 @@ export const wsMediaRoutes: FastifyPluginAsyncZod = async (app) => {
           const parts = range.replace(/bytes=/, '').split('-');
           const start = parseInt(parts[0], 10);
           const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
-          const chunkSize = (end - start) + 1;
+          const chunkSize = end - start + 1;
 
           reply.code(206); // Partial Content
           reply.header('Content-Range', `bytes ${start}-${end}/${fileSize}`);

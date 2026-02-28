@@ -8,12 +8,17 @@ const ResponsiveGrid = WidthProvider(Responsive);
 
 interface WidgetGridProps {
   className?: string;
-  items: GridItemMeta[];       // layout + meta per item
-  registry: WidgetRegistry;    // tilgjengelige widgets
-  persistKey?: string;         // valgfritt: lagre layout i localStorage
+  items: GridItemMeta[]; // layout + meta per item
+  registry: WidgetRegistry; // tilgjengelige widgets
+  persistKey?: string; // valgfritt: lagre layout i localStorage
 }
 
-export const WidgetGrid: React.FC<WidgetGridProps> = ({ className = '', items, registry, persistKey }) => {
+export const WidgetGrid: React.FC<WidgetGridProps> = ({
+  className = '',
+  items,
+  registry,
+  persistKey,
+}) => {
   const [mounted, setMounted] = useState(false);
   const [layout, setLayout] = useState<GridItemMeta[]>(items);
 
@@ -44,29 +49,38 @@ export const WidgetGrid: React.FC<WidgetGridProps> = ({ className = '', items, r
   const compactLayout = useCallback((current: GridItemMeta[]) => {
     const sorted = [...current].sort((a, b) => (a.y !== b.y ? a.y - b.y : a.x - b.x));
     return sorted.map((item) => {
-      let bestX = 0, bestY = 0, found = false;
+      let bestX = 0,
+        bestY = 0,
+        found = false;
       for (let y = 0; y <= 20 && !found; y++) {
         for (let x = 0; x <= 12 - item.w && !found; x++) {
           const collides = sorted
             .filter((o) => o.i !== item.i)
             .some((o) => x < o.x + o.w && x + item.w > o.x && y < o.y + o.h && y + item.h > o.y);
-          if (!collides) { bestX = x; bestY = y; found = true; }
+          if (!collides) {
+            bestX = x;
+            bestY = y;
+            found = true;
+          }
         }
       }
       return { ...item, x: bestX, y: bestY };
     });
   }, []);
 
-  const onLayoutChange = useCallback((l: Layout[]) => {
-    // flett posisjoner inn i vår meta
-    setLayout((prev) => {
-      const next = prev.map((it) => {
-        const fromRgl = l.find((x) => x.i === it.i);
-        return fromRgl ? { ...it, ...fromRgl } : it;
+  const onLayoutChange = useCallback(
+    (l: Layout[]) => {
+      // flett posisjoner inn i vår meta
+      setLayout((prev) => {
+        const next = prev.map((it) => {
+          const fromRgl = l.find((x) => x.i === it.i);
+          return fromRgl ? { ...it, ...fromRgl } : it;
+        });
+        return compactLayout(next);
       });
-      return compactLayout(next);
-    });
-  }, [compactLayout]);
+    },
+    [compactLayout],
+  );
 
   const visible = useMemo(() => layout, [layout]);
 

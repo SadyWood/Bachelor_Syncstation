@@ -18,6 +18,6 @@ export function msToTime(ms: number): string {
  * Get human-readable track label from subject type code
  */
 export function getTrackLabel(type: SubjectType | string): string {
-  const track = DEFAULT_TIMELINE_TRACKS.find(t => t.id === type);
+  const track = DEFAULT_TIMELINE_TRACKS.find((t) => t.id === type);
   return track?.label || type;
 }

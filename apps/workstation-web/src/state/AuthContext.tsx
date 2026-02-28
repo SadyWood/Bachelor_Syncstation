@@ -56,9 +56,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setHttpTenantId(tenantId);
 
     // Server can include an "effectivePermissions" snapshot when x-ws-tenant is set
-    const eff = me.effectivePermissions as
-      | { allow?: string[]; deny?: string[] }
-      | undefined;
+    const eff = me.effectivePermissions as { allow?: string[]; deny?: string[] } | undefined;
     if (eff && (Array.isArray(eff.allow) || Array.isArray(eff.deny))) {
       setEffectivePerms({ allow: eff.allow || [], deny: eff.deny || [] });
     } else {
@@ -81,7 +79,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         await loadMe();
       } catch (err) {
         // Only log out if we actually got an error (not just unauthenticated)
-        logger.debug('Auth initialization failed:', err instanceof Error ? err.message : 'Unknown error');
+        logger.debug(
+          'Auth initialization failed:',
+          err instanceof Error ? err.message : 'Unknown error',
+        );
         setUser(null);
         setHttpTenantId(null);
         setCurrentTenantId(null);
@@ -92,11 +93,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   // can(): deny > allow via EffectivePerms if available; fallback: Admin role grants all
-  const can = useMemo(() => (perm: string) => {
-    if (effectivePerms) return canFromEffective(effectivePerms, perm);
-    if (memberships?.some((m) => m.role === 'Admin')) return true;
-    return false;
-  }, [effectivePerms, memberships]);
+  const can = useMemo(
+    () => (perm: string) => {
+      if (effectivePerms) return canFromEffective(effectivePerms, perm);
+      if (memberships?.some((m) => m.role === 'Admin')) return true;
+      return false;
+    },
+    [effectivePerms, memberships],
+  );
 
   const value = useMemo<AuthState>(
     () => ({
@@ -129,15 +133,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         await loadMe();
       },
     }),
-    [
-      user,
-      currentTenantInfo,
-      currentTenantId,
-      memberships,
-      effectivePerms,
-      accessLoaded,
-      can,
-    ],
+    [user, currentTenantInfo, currentTenantId, memberships, effectivePerms, accessLoaded, can],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

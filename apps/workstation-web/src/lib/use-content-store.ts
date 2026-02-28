@@ -42,9 +42,17 @@ interface ContentStoreState {
   // Project Actions
   // ──────────────────────────────────────────────────────────────────────────
   loadProjects: () => Promise<void>;
-  createProject: (title: string, synopsis?: string, slug?: string, templateId?: TemplateTypeT) => Promise<void>;
+  createProject: (
+    title: string,
+    synopsis?: string,
+    slug?: string,
+    templateId?: TemplateTypeT,
+  ) => Promise<void>;
   loadProject: (projectId: string) => Promise<void>;
-  updateProject: (projectId: string, updates: { title?: string; synopsis?: string; slug?: string }) => Promise<void>;
+  updateProject: (
+    projectId: string,
+    updates: { title?: string; synopsis?: string; slug?: string },
+  ) => Promise<void>;
   deleteProject: (projectId: string) => Promise<void>;
   applyTemplate: (projectId: string, templateId: TemplateTypeT) => Promise<void>;
 
@@ -103,7 +111,12 @@ export const useContentStore = create<ContentStoreState>((set, get) => ({
     }
   },
 
-  createProject: async (title: string, synopsis?: string, slug?: string, templateId?: TemplateTypeT) => {
+  createProject: async (
+    title: string,
+    synopsis?: string,
+    slug?: string,
+    templateId?: TemplateTypeT,
+  ) => {
     set({ isLoading: true, error: null });
     try {
       const newProject = await createProjectApi({
@@ -134,7 +147,10 @@ export const useContentStore = create<ContentStoreState>((set, get) => ({
     }
   },
 
-  updateProject: async (projectId: string, updates: { title?: string; synopsis?: string; slug?: string }) => {
+  updateProject: async (
+    projectId: string,
+    updates: { title?: string; synopsis?: string; slug?: string },
+  ) => {
     set({ isLoading: true, error: null });
     try {
       const updated = await updateProjectApi(projectId, { body: updates });

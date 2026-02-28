@@ -57,13 +57,10 @@ export async function logout(): Promise<void> {
 }
 
 export function invitePreview(token: string) {
-  return httpTyped(
-    `/auth/invite/${encodeURIComponent(token)}`,
-    {
-      method: 'GET',
-      schema: { res: InvitePreviewResponse },
-    },
-  );
+  return httpTyped(`/auth/invite/${encodeURIComponent(token)}`, {
+    method: 'GET',
+    schema: { res: InvitePreviewResponse },
+  });
 }
 
 export function register(req: RegisterBody) {

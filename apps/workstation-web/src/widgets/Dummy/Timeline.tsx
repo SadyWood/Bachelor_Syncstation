@@ -5,9 +5,27 @@ import type { WidgetProps } from '../../components/WidgetBase/WidgetTypes';
 
 export const Timeline: React.FC<WidgetProps> = ({ title, onClose, ...props }) => {
   const items = [
-    { id: 1, time: '09:00', title: 'Team Meeting', description: 'Weekly sync with development team', status: 'completed' },
-    { id: 2, time: '11:30', title: 'Content Review', description: 'Review new course materials', status: 'current' },
-    { id: 3, time: '14:00', title: 'Student Presentation', description: 'Final project presentations', status: 'upcoming' },
+    {
+      id: 1,
+      time: '09:00',
+      title: 'Team Meeting',
+      description: 'Weekly sync with development team',
+      status: 'completed',
+    },
+    {
+      id: 2,
+      time: '11:30',
+      title: 'Content Review',
+      description: 'Review new course materials',
+      status: 'current',
+    },
+    {
+      id: 3,
+      time: '14:00',
+      title: 'Student Presentation',
+      description: 'Final project presentations',
+      status: 'upcoming',
+    },
   ];
 
   function getStatusText(s: string): string {
@@ -24,11 +42,15 @@ export const Timeline: React.FC<WidgetProps> = ({ title, onClose, ...props }) =>
             <div key={it.id} className="flex gap-3">
               <div className="flex flex-col items-center">
                 <div className="w-3 h-3 rounded-full flex items-center justify-center bg-[color:var(--ws-text)]/15">
-                  {it.status === 'completed'
-                    ? <CheckCircle size={10} style={{ color: 'var(--ws-text)' }} />
-                    : <Clock size={10} style={{ color: 'var(--ws-text)' }} />}
+                  {it.status === 'completed' ? (
+                    <CheckCircle size={10} style={{ color: 'var(--ws-text)' }} />
+                  ) : (
+                    <Clock size={10} style={{ color: 'var(--ws-text)' }} />
+                  )}
                 </div>
-                {i < items.length - 1 && <div className="w-px h-8 bg-[color:var(--ws-text)]/15 mt-1" />}
+                {i < items.length - 1 && (
+                  <div className="w-px h-8 bg-[color:var(--ws-text)]/15 mt-1" />
+                )}
               </div>
 
               <div className="flex-1 pb-3">

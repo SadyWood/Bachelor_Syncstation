@@ -34,7 +34,9 @@ export const wsPermissionsRoutes: FastifyPluginAsyncZod = async (app) => {
         const items = await permissionsRepo.listPermissionsCatalog();
         return reply.send({ ok: true, items });
       } catch (error) {
-        return reply.code(500).send({ error: 'INTERNAL_ERROR', message: 'Failed to fetch permissions catalog' });
+        return reply
+          .code(500)
+          .send({ error: 'INTERNAL_ERROR', message: 'Failed to fetch permissions catalog' });
       }
     },
   );
