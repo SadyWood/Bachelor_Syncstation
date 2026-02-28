@@ -1,17 +1,16 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import type { NavigatorScreenParams } from '@react-navigation/native';
 import { createNativeStackNavigator, type NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { Fragment, useState } from 'react';
-
-import { FabMenu, TabBar } from '@/components/TabBar';
 import type { FabMenuOption, TabName } from '@/components/TabBar/types/TabBar.types';
+import type { Project } from '@/screens/SelectContextScreen/types/SelectContextScreen.types';
+import type { NavigatorScreenParams } from '@react-navigation/native';
+import { FabMenu, TabBar } from '@/components/TabBar';
 import { tabNavigatorScreenOptions } from '@/navigation/AppNavigator.styles';
 import { HomeScreen, SelectContextScreen, ProfileScreen } from '@/screens';
 import { LoginScreen } from '@/screens/login-screen';
 import { WelcomeScreen } from '@/screens/welcome-screen';
 import { useAuthStore } from '@/stores/authStore';
 import { useContentStore } from '@/stores/ContentStore';
-import type { Project } from '@/screens/SelectContextScreen/types/SelectContextScreen.types';
 
 type AppTabsParamList = {
   Home: undefined;
@@ -139,9 +138,17 @@ export function AppNavigator() {
 
   return (
     <RootStack.Navigator screenOptions={{ headerShown: false }}>
-      {isAuthenticated ? <RootStack.Screen name="App" component={AppTabs} /> : <RootStack.Screen name="Auth" component={AuthStack} />}
+      {isAuthenticated ? (
+        <RootStack.Screen name="App" component={AppTabs} />
+      ) : (
+        <RootStack.Screen name="Auth" component={AuthStack} />
+      )}
 
       <RootStack.Screen name="SelectContext" component={SelectContextRoute} />
+      <RootStack.Screen name="SelectScene" component={SelectSceneRoute} />
+      <RootStack.Screen name="SelectTake" component={SelectTakeRoute} />
+      <RootStack.Screen name="CreateLog" component={CreateLogRoute} />
+      <RootStack.Screen name="Subject" component={SubjectRoute} />
     </RootStack.Navigator>
   );
 }
