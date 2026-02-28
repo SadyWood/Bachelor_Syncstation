@@ -31,7 +31,6 @@ const LogEntriesQuerySchema = z.object({
 });
 
 export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
-
   // All routes require authentication
   app.addHook('preHandler', app.authenticate);
 
@@ -415,27 +414,26 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
       preHandler: app.needsPerm('syncstation.status.view'),
     },
     async (req: FastifyRequest, reply: FastifyReply) => {
-    const tenantId = requireTenant(req);
-    if (!tenantId) {
-      return reply.code(400).send(ErrorResponse.parse({ ok: false, error: 'TENANT_HEADER_MISSING' }));
-    }
+      const tenantId = requireTenant(req);
+      if (!tenantId) {
+        return reply.code(400).send(ErrorResponse.parse({ ok: false, error: 'TENANT_HEADER_MISSING' }));
+      }
 
-    const userId = (req.user as { sub: string }).sub;
-    try {
+      const userId = (req.user as { sub: string }).sub;
+      try {
+        const status = await syncLogRepo.getSyncStatus(tenantId, userId);
 
-      const status = await syncLogRepo.getSyncStatus(tenantId, userId);
-
-      return reply.send(
-        SyncStatusResponse.parse({
-          ok: true,
-          pendingCount: status.pendingCount,
-          failedCount: status.failedCount,
-          lastSyncAt: status.lastSyncAt,
-        }),
-      );
-    } catch (error) {
-      app.log.error(error, 'Failed to get sync status');
-      return reply.code(500).send(ErrorResponse.parse({ ok: false, error: 'Failed to get sync status' }));
-    }
-  });
+        return reply.send(
+          SyncStatusResponse.parse({
+            ok: true,
+            pendingCount: status.pendingCount,
+            failedCount: status.failedCount,
+            lastSyncAt: status.lastSyncAt,
+          }),
+        );
+      } catch (error) {
+        app.log.error(error, 'Failed to get sync status');
+        return reply.code(500).send(ErrorResponse.parse({ ok: false, error: 'Failed to get sync status' }));
+      }
+    });
 };

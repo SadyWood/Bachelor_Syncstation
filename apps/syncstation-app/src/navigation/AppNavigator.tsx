@@ -6,6 +6,7 @@ import { FabMenu, TabBar } from '@/components/TabBar';
 import type { FabMenuOption, TabName } from '@/components/TabBar/types/TabBar.types';
 import { tabNavigatorScreenOptions } from '@/navigation/AppNavigator.styles';
 import { HomeScreen, SelectContextScreen } from '@/screens';
+import { ProfileScreen } from '@/screens/ProfileScreen';
 import { LoginScreen } from '@/screens/login-screen';
 import { WelcomeScreen } from '@/screens/welcome-screen';
 import { useAuthStore } from '@/stores/authStore';
@@ -64,7 +65,7 @@ function AppTabs() {
       >
         <Tab.Screen name="Home" component={HomeScreen} />
         <Tab.Screen name="Production" component={HomeScreen} />
-        <Tab.Screen name="Profile" component={HomeScreen} />
+        <Tab.Screen name="Profile" component={ProfileScreen} />
         <Tab.Screen name="Settings" component={HomeScreen} />
       </Tab.Navigator>
 
