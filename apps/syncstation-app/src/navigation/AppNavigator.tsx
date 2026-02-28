@@ -6,9 +6,17 @@ import type { Project } from '@/screens/SelectContextScreen/types/SelectContextS
 import type { NavigatorScreenParams } from '@react-navigation/native';
 import { FabMenu, TabBar } from '@/components/TabBar';
 import { tabNavigatorScreenOptions } from '@/navigation/AppNavigator.styles';
-import { HomeScreen, SelectContextScreen, ProfileScreen } from '@/screens';
+import { HomeScreen, SelectContextScreen } from '@/screens';
 import { LoginScreen } from '@/screens/login-screen';
 import { WelcomeScreen } from '@/screens/welcome-screen';
+import { ProfileScreen } from '@/screens/profile-screen';
+// TODO: import when is ready
+// import { SettingsScreen } from '@/screens/settings-screen';
+// import { ProductionScreen } from '@/screens/production-screen';
+// import { SelectSceneScreen } from '@/screens/select-scene-screen';
+// import { SelectTakeScreen } from '@/screens/select-take-screen';
+// import { CreateLogScreen } from '@/screens/create-log-screen';
+// import { SubjectScreen } from '@/screens/subject-screen';
 import { useAuthStore } from '@/stores/authStore';
 import { useContentStore } from '@/stores/ContentStore';
 
