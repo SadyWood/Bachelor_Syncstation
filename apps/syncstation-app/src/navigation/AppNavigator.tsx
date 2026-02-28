@@ -75,9 +75,9 @@ function AppTabs() {
         )}
       >
         <Tab.Screen name="Home" component={HomeScreen} />
-        <Tab.Screen name="Production" component={HomeScreen} />
-        <Tab.Screen name="Profile" component={ProfileScreen} />
-        <Tab.Screen name="Settings" component={HomeScreen} />
+        <Tab.Screen name="Production" component={HomeScreen} /> {/* TODO: ProductionScreen */}
+        <Tab.Screen name="Profile" component={HomeScreen} />
+        <Tab.Screen name="Settings" component={HomeScreen} /> {/* TODO: SettingsScreen */}
       </Tab.Navigator>
 
       <FabMenu isVisible={isFabMenuVisible} onClose={handleCloseFabMenu} onOptionPress={handleMenuOptionPress} />
@@ -113,28 +113,28 @@ function SelectContextRoute({ navigation }: SelectContextProps) {
   return <SelectContextScreen onBack={handleBack} onSelectProject={handleSelectProject} />;
 }
 
-// TODO: Replace HomeScreen with SelectSceneScreen when ready
+// TODO: Replace homescreen with selectscenescreen when ready
 type SelectSceneProps = NativeStackScreenProps<RootStackParamList, 'SelectScene'>;
 
 function SelectSceneRoute(_props: SelectSceneProps) {
   return <HomeScreen />;
 }
 
-// TODO: Replace HomeScreen with SelectTakeScreen when ready
+// TODO: replace Homescreen with selecttakescreen when ready
 type SelectTakeProps = NativeStackScreenProps<RootStackParamList, 'SelectTake'>;
 
 function SelectTakeRoute(_props: SelectTakeProps) {
   return <HomeScreen />;
 }
 
-// TODO: Replace HomeScreen with CreateLogScreen when ready
+// TODO: replace homescreen with createlogscreen when ready
 type CreateLogProps = NativeStackScreenProps<RootStackParamList, 'CreateLog'>;
 
 function CreateLogRoute(_props: CreateLogProps) {
   return <HomeScreen />;
 }
 
-// TODO: Replace HomeScreen with SubjectScreen when ready
+// TODO: replace homescreen with subjectscreen when ready
 type SubjectProps = NativeStackScreenProps<RootStackParamList, 'Subject'>;
 
 function SubjectRoute(_props: SubjectProps) {
