@@ -1,12 +1,13 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React, { Fragment, useState } from 'react';
-import { FabMenu, type FabMenuOption, TabBar, type TabName } from '@/components/TabBar';
-import { tabNavigatorScreenOptions } from '@/navigation/AppNavigator.styles';
+import { FabMenu, TabBar, type FabMenuOption, type TabName } from '@/components/TabBar';
 import { HomeScreen } from '@/screens';
 import { LoginScreen } from '@/screens/login-screen';
+import { ProfileScreen } from '@/screens/profile-screen';
 import { WelcomeScreen } from '@/screens/welcome-screen';
 import { useAuthStore } from '@/stores/authStore';
+import { tabNavigatorScreenOptions } from './AppNavigator.styles';
 
 
 type AppTabsParamList = {
@@ -18,6 +19,7 @@ type AppTabsParamList = {
 
 const Tab = createBottomTabNavigator<AppTabsParamList>();
 const Stack = createNativeStackNavigator();
+
 
 export function AppTabs() {
   const [isFabMenuVisible, setIsFabMenuVisible] = useState<boolean>(false);
@@ -57,7 +59,7 @@ export function AppTabs() {
       >
         <Tab.Screen name="Home" component={HomeScreen} />
         <Tab.Screen name="Production" component={HomeScreen} />
-        <Tab.Screen name="Profile" component={HomeScreen} />
+        <Tab.Screen name="Profile" component={ProfileScreen} />
         <Tab.Screen name="Settings" component={HomeScreen} />
       </Tab.Navigator>
 
