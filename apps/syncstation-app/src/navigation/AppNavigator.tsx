@@ -2,12 +2,15 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import type { NavigatorScreenParams } from '@react-navigation/native';
 import { createNativeStackNavigator, type NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { Fragment, useState } from 'react';
+
 import { FabMenu, TabBar } from '@/components/TabBar';
 import type { FabMenuOption, TabName } from '@/components/TabBar/types/TabBar.types';
 import { tabNavigatorScreenOptions } from '@/navigation/AppNavigator.styles';
+
 import { HomeScreen, SelectContextScreen, ProfileScreen } from '@/screens';
 import { LoginScreen } from '@/screens/login-screen';
 import { WelcomeScreen } from '@/screens/welcome-screen';
+
 import { useAuthStore } from '@/stores/authStore';
 import { useContentStore } from '@/stores/ContentStore';
 import type { Project } from '@/screens/SelectContextScreen/types/SelectContextScreen.types';
@@ -28,6 +31,10 @@ type RootStackParamList = {
   Auth: undefined;
   App: NavigatorScreenParams<AppTabsParamList>;
   SelectContext: undefined;
+  SelectScene: undefined;
+  SelectTake: undefined;
+  CreateLog: undefined;
+  Subject: undefined;
 };
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
