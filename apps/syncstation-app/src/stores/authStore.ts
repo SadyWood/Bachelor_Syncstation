@@ -3,7 +3,9 @@ import { create } from 'zustand';
 type User = {
   id: string;
   email: string;
-  name: string;
+  firstName: string;
+  lastName: string;
+  displayName: string;
 };
 
 type AuthState = {
@@ -19,11 +21,22 @@ export const useAuthStore = create<AuthState>((set) => ({
   token: null,
   isAuthenticated: false,
 
-  login: async (email, _password) => {
-    await new Promise((r) => setTimeout(r, 600));
+  login: async (email, password) => {
+    const response = await fetch('http://192.168.50.208:3333/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || !data.ok) {
+      throw new Error(data.message ?? 'Login failed');
+    }
+
     set({
-      user: { id: '1', email, name: 'Mock User' },
-      token: 'mock-token-123',
+      user: data.user,
+      token: data.accessToken,
       isAuthenticated: true,
     });
   },
