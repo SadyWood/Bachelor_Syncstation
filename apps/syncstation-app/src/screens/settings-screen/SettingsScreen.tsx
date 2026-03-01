@@ -19,6 +19,17 @@ export function SettingsScreen() {
           <Text style={styles.menuButtonIcon}>🗑️</Text>
           <Text style={styles.menuButtonText}>Clear Cache/Reset</Text>
         </TouchableOpacity>
+
+        <Text style={styles.sectionTitle}>App</Text>
+        <TouchableOpacity style={styles.menuButton}>
+          <Text style={styles.menuButtonIcon}>🎨</Text>
+          <Text style={styles.menuButtonText}>Appearance</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.menuButton}>
+          <Text style={styles.menuButtonIcon}>🔔</Text>
+          <Text style={styles.menuButtonText}>Notification</Text>
+        </TouchableOpacity>
       </ScrollView>
     </View>
   );
