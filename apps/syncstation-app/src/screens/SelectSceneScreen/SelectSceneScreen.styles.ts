@@ -61,4 +61,11 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     color: Colors.text,
   },
+  projectTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: Colors.text,
+    marginBottom: Spacing.xs,
+    textDecorationLine: 'underline',
+  },
 });
