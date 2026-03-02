@@ -15,6 +15,7 @@ export function SelectSceneScreen({ onBack }: SelectSceneScreenProps) {
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Select Scene</Text>
       </View>
+      <View style={styles.divider} />
     </SafeAreaView>
   );
 }

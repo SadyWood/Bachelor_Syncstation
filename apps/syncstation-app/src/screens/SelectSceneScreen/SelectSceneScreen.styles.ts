@@ -13,4 +13,24 @@ export const styles = StyleSheet.create({
     paddingBottom: Spacing.md,
     paddingHorizontal: Spacing.md,
   },
+  backButton: {
+    width: 48,
+    height: 48,
+    backgroundColor: Colors.primary,
+    borderRadius: BorderRadius.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: Colors.text,
+    marginLeft: Spacing.md,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: Colors.primary,
+    marginHorizontal: Spacing.md,
+    marginBottom: Spacing.lg,
+  },
 });
