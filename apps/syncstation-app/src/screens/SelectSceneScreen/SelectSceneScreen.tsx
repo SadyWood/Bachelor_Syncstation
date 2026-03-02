@@ -12,6 +12,10 @@ const MOCK_SCENES: Scene[] = [
   { id: '2', number: 2, name: 'Scene 2', description: 'Marcus home', location: 'LA - Suburb house' },
   { id: '3', number: 3, name: 'Scene 3', description: 'Police station', location: 'Miami - Police HQ' },
   { id: '4', number: 4, name: 'Scene 4', description: 'M&M explosion', location: 'Miami - Warehouse district' },
+  { id: '5', number: 5, name: 'Scene 5', description: 'Reggie first meeting', location: 'Miami - Restaurant' },
+  { id: '6', number: 6, name: 'Scene 6', description: 'Car chase', location: 'CA - Hollywood street 2' },
+  { id: '7', number: 7, name: 'Scene 7', description: 'Rooftop showdown', location: 'Miami - Downtown tower' },
+  { id: '8', number: 8, name: 'Scene 8', description: 'Hospital visit', location: 'LA - General Hospital' },
 ];
 
 async function fetchScenes(
