@@ -42,4 +42,23 @@ export const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: Spacing.md,
   },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.cardBackground,
+    borderRadius: BorderRadius.round,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    marginBottom: Spacing.lg,
+  },
+  searchIcon: {
+    marginRight: Spacing.sm,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    color: Colors.text,
+  },
 });
