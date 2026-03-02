@@ -61,7 +61,7 @@ export default function PermissionsCatalogWidget({ title, onClose, ...props }: W
 
   function toggleSort(key: SortKey) {
     if (key === sortKey) {
-      setSortDir(prev => (prev === 'asc' ? 'desc' : 'asc'));
+      setSortDir((prev) => (prev === 'asc' ? 'desc' : 'asc'));
     } else {
       setSortKey(key);
       setSortDir('asc');
@@ -74,15 +74,15 @@ export default function PermissionsCatalogWidget({ title, onClose, ...props }: W
 
     if (s) {
       filtered = items.filter(
-        i =>
+        (i) =>
           i.permissionCode.toLowerCase().includes(s) ||
           (i.description ?? '').toLowerCase().includes(s),
       );
     }
 
     const sorted = [...filtered].sort((a, b) => {
-      const aVal = sortKey === 'permissionCode' ? a.permissionCode : a.description ?? '';
-      const bVal = sortKey === 'permissionCode' ? b.permissionCode : b.description ?? '';
+      const aVal = sortKey === 'permissionCode' ? a.permissionCode : (a.description ?? '');
+      const bVal = sortKey === 'permissionCode' ? b.permissionCode : (b.description ?? '');
       return sortDir === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
     });
 
@@ -107,7 +107,7 @@ export default function PermissionsCatalogWidget({ title, onClose, ...props }: W
               className="ws-input pl-9"
               placeholder="Search permissions…"
               value={q}
-              onChange={e => setQ(e.target.value)}
+              onChange={(e) => setQ(e.target.value)}
             />
             {q && (
               <button
@@ -160,28 +160,32 @@ export default function PermissionsCatalogWidget({ title, onClose, ...props }: W
                   </td>
                 </tr>
               )}
-              {!loading && filteredSorted.length > 0 && filteredSorted.map(r => (
-                <tr
-                  key={r.permissionCode}
-                  className="cursor-pointer"
-                  onClick={() => copyPermission(r.permissionCode)}
-                  title="Click to copy permission code"
-                >
-                  <td>
-                    <code className="text-sm font-medium" style={{ color: 'var(--ws-brand)' }}>
-                      {r.permissionCode}
-                    </code>
-                  </td>
-                  <td className="ws-muted">{r.description || '—'}</td>
-                </tr>
-              ))}
+              {!loading &&
+                filteredSorted.length > 0 &&
+                filteredSorted.map((r) => (
+                  <tr
+                    key={r.permissionCode}
+                    className="cursor-pointer"
+                    onClick={() => copyPermission(r.permissionCode)}
+                    title="Click to copy permission code"
+                  >
+                    <td>
+                      <code className="text-sm font-medium" style={{ color: 'var(--ws-brand)' }}>
+                        {r.permissionCode}
+                      </code>
+                    </td>
+                    <td className="ws-muted">{r.description || '—'}</td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>
 
         {/* Info about total permissions */}
         <div className="flex items-center justify-between text-xs ws-muted">
-          <span>Showing {filteredSorted.length} of {items.length} permissions</span>
+          <span>
+            Showing {filteredSorted.length} of {items.length} permissions
+          </span>
           {!alertDismissed && (
             <button onClick={() => setAlertDismissed(true)} className="text-xs hover:underline">
               Dismiss tip

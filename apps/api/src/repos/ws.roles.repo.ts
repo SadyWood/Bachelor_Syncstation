@@ -56,12 +56,12 @@ export async function listRolesForTenant(tenantId: string): Promise<Role[]> {
     .where(eq(schema.wsUserMemberships.tenantId, tenantId))
     .groupBy(schema.wsUserMemberships.roleId);
 
-  const countByRole = new Map(memberCounts.map(m => [m.roleId, Number(m.cnt)]));
+  const countByRole = new Map(memberCounts.map((m) => [m.roleId, Number(m.cnt)]));
 
-  const result = rows.map(r => ({
+  const result = rows.map((r) => ({
     roleId: r.roleId,
     name: r.name,
-    scope: r.tenantId ? 'tenant' as const : 'global' as const,
+    scope: r.tenantId ? ('tenant' as const) : ('global' as const),
     memberCount: countByRole.get(r.roleId) ?? 0,
     defaultPerms: normalizePerms(r.defaultPerms),
   }));
@@ -94,7 +94,7 @@ export async function createRole(
   const result = {
     roleId: row.roleId,
     name: row.name,
-    scope: row.tenantId ? 'tenant' as const : 'global' as const,
+    scope: row.tenantId ? ('tenant' as const) : ('global' as const),
     defaultPerms: normalizePerms(row.defaultPerms),
   };
 
@@ -152,7 +152,7 @@ export async function updateRole(
   const result = {
     roleId: row.roleId,
     name: row.name,
-    scope: row.tenantId ? 'tenant' as const : 'global' as const,
+    scope: row.tenantId ? ('tenant' as const) : ('global' as const),
     defaultPerms: normalizePerms(row.defaultPerms),
   };
 
@@ -164,10 +164,12 @@ export async function deleteRole(roleId: string, tenantId: string): Promise<void
   const [memberCount] = await dbWs
     .select({ cnt: sql<number>`count(*)`.as('cnt') })
     .from(schema.wsUserMemberships)
-    .where(and(
-      eq(schema.wsUserMemberships.roleId, roleId),
-      eq(schema.wsUserMemberships.tenantId, tenantId),
-    ));
+    .where(
+      and(
+        eq(schema.wsUserMemberships.roleId, roleId),
+        eq(schema.wsUserMemberships.tenantId, tenantId),
+      ),
+    );
 
   if (Number(memberCount.cnt) > 0) {
     throw new Error('Cannot delete role: still has members');
@@ -190,9 +192,7 @@ export async function deleteRole(roleId: string, tenantId: string): Promise<void
     throw new Error('Role not in tenant');
   }
 
-  await dbWs
-    .delete(schema.wsRoles)
-    .where(eq(schema.wsRoles.roleId, roleId));
+  await dbWs.delete(schema.wsRoles).where(eq(schema.wsRoles.roleId, roleId));
 }
 
 export async function getRoleById(roleId: string, tenantId: string): Promise<DetailedRole> {
@@ -216,7 +216,7 @@ export async function getRoleById(roleId: string, tenantId: string): Promise<Det
   const result = {
     roleId: row.roleId,
     name: row.name,
-    scope: row.tenantId ? 'tenant' as const : 'global' as const,
+    scope: row.tenantId ? ('tenant' as const) : ('global' as const),
     defaultPerms: normalizePerms(row.defaultPerms),
   };
 

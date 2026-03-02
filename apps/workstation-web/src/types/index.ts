@@ -6,12 +6,7 @@
  */
 
 // Common types (icons, sorting)
-export type {
-  IconProps,
-  IconComp,
-  SortKey,
-  SortDir,
-} from './common';
+export type { IconProps, IconComp, SortKey, SortDir } from './common';
 
 // UI component types (buttons, modals)
 export type {
@@ -25,10 +20,7 @@ export type {
 } from './components';
 
 // Layout types (navigation, sidenav)
-export type {
-  SideNavProps,
-  MenuItem,
-} from './layout';
+export type { SideNavProps, MenuItem } from './layout';
 
 // Widget system types
 export type {
@@ -41,23 +33,13 @@ export type {
 } from './widgets';
 
 // Admin-specific types
-export type {
-  CatalogItem,
-} from './admin';
+export type { CatalogItem } from './admin';
 
 // Content/project types
-export type {
-  TemplateType,
-  DropPosition,
-} from './content';
+export type { TemplateType, DropPosition } from './content';
 
 // Permissions types
-export type {
-  Membership,
-  RolePerms,
-  EffectivePerms,
-  RoleDetail,
-} from './permissions';
+export type { Membership, RolePerms, EffectivePerms, RoleDetail } from './permissions';
 
 // Event types
 export type {

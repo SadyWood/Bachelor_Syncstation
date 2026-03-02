@@ -39,9 +39,20 @@ export default function RolePermissionsWidget({ title, onClose, ...props }: Widg
     getPermissionsCatalog,
     {
       fallbackData: [
-        'member.list.view', 'member.invite.send', 'member.access.revoke', 'member.roles.assign',
-        'role.list.view', 'role.create', 'role.delete', 'role.perms.view', 'role.perms.update',
-        'content.read', 'content.manage', 'task.read', 'task.manage', '**',
+        'member.list.view',
+        'member.invite.send',
+        'member.access.revoke',
+        'member.roles.assign',
+        'role.list.view',
+        'role.create',
+        'role.delete',
+        'role.perms.view',
+        'role.perms.update',
+        'content.read',
+        'content.manage',
+        'task.read',
+        'task.manage',
+        '**',
       ],
       revalidateOnFocus: false,
       dedupingInterval: 300000, // 5 minutes - permissions don't change often
@@ -87,7 +98,7 @@ export default function RolePermissionsWidget({ title, onClose, ...props }: Widg
   function addAllowPerm(perm: string) {
     if (!allow.includes(perm)) {
       setAllow([...allow, perm]);
-      setDeny(deny.filter(p => p !== perm));
+      setDeny(deny.filter((p) => p !== perm));
     }
     setShowAllowDropdown(false);
   }
@@ -95,17 +106,17 @@ export default function RolePermissionsWidget({ title, onClose, ...props }: Widg
   function addDenyPerm(perm: string) {
     if (!deny.includes(perm)) {
       setDeny([...deny, perm]);
-      setAllow(allow.filter(p => p !== perm));
+      setAllow(allow.filter((p) => p !== perm));
     }
     setShowDenyDropdown(false);
   }
 
   function removeAllowPerm(perm: string) {
-    setAllow(allow.filter(p => p !== perm));
+    setAllow(allow.filter((p) => p !== perm));
   }
 
   function removeDenyPerm(perm: string) {
-    setDeny(deny.filter(p => p !== perm));
+    setDeny(deny.filter((p) => p !== perm));
   }
 
   async function saveChanges() {
@@ -117,9 +128,11 @@ export default function RolePermissionsWidget({ title, onClose, ...props }: Widg
       await updateRole(tenantId, active.roleId, { name, allow, deny });
       setSuccessMsg('Permissions updated successfully!');
       // Trigger role updated event for other widgets to refresh
-      window.dispatchEvent(new CustomEvent('ws:roles:changed', {
-        detail: { action: 'updated', role: { ...active, name, defaultPerms: { allow, deny } } },
-      }));
+      window.dispatchEvent(
+        new CustomEvent('ws:roles:changed', {
+          detail: { action: 'updated', role: { ...active, name, defaultPerms: { allow, deny } } },
+        }),
+      );
     } catch (e) {
       setSaveError(e instanceof Error ? e.message : 'Save failed');
     } finally {
@@ -127,8 +140,12 @@ export default function RolePermissionsWidget({ title, onClose, ...props }: Widg
     }
   }
 
-  const availableForAllow = availablePermissions.filter(p => !allow.includes(p) && !deny.includes(p));
-  const availableForDeny = availablePermissions.filter(p => !deny.includes(p) && !allow.includes(p));
+  const availableForAllow = availablePermissions.filter(
+    (p) => !allow.includes(p) && !deny.includes(p),
+  );
+  const availableForDeny = availablePermissions.filter(
+    (p) => !deny.includes(p) && !allow.includes(p),
+  );
   const isGlobalRole = active?.scope === 'global';
 
   return (
@@ -153,14 +170,22 @@ export default function RolePermissionsWidget({ title, onClose, ...props }: Widg
                   <div className="flex items-center gap-2">
                     <Shield size={18} className="text-gray-500" />
                     <span className="text-base font-semibold">{name}</span>
-                    <span className={`ws-chip ${active.scope === 'global' ? 'ws-chip-primary' : ''}`}>
+                    <span
+                      className={`ws-chip ${active.scope === 'global' ? 'ws-chip-primary' : ''}`}
+                    >
                       {active.scope}
                     </span>
                   </div>
-                  {isGlobalRole && <div className="text-xs ws-muted mt-1">Global roles cannot be edited</div>}
+                  {isGlobalRole && (
+                    <div className="text-xs ws-muted mt-1">Global roles cannot be edited</div>
+                  )}
                 </div>
                 {!isGlobalRole && (
-                  <button className="ws-btn ws-btn-sm ws-btn-solid" onClick={saveChanges} disabled={saving}>
+                  <button
+                    className="ws-btn ws-btn-sm ws-btn-solid"
+                    onClick={saveChanges}
+                    disabled={saving}
+                  >
                     <Save size={14} />
                     {saving ? 'Saving...' : 'Save'}
                   </button>
@@ -187,7 +212,7 @@ export default function RolePermissionsWidget({ title, onClose, ...props }: Widg
                     </button>
                     {showAllowDropdown && (
                       <div className="absolute right-0 mt-1 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-10 max-h-64 overflow-y-auto">
-                        {availableForAllow.map(perm => (
+                        {availableForAllow.map((perm) => (
                           <button
                             key={perm}
                             className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg font-mono"
@@ -205,7 +230,7 @@ export default function RolePermissionsWidget({ title, onClose, ...props }: Widg
                 {allow.length === 0 ? (
                   <span className="text-sm ws-muted">No allow permissions</span>
                 ) : (
-                  allow.map(perm => (
+                  allow.map((perm) => (
                     <div
                       key={perm}
                       className="ws-tag"
@@ -242,7 +267,7 @@ export default function RolePermissionsWidget({ title, onClose, ...props }: Widg
                     </button>
                     {showDenyDropdown && (
                       <div className="absolute right-0 mt-1 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-10 max-h-64 overflow-y-auto">
-                        {availableForDeny.map(perm => (
+                        {availableForDeny.map((perm) => (
                           <button
                             key={perm}
                             className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg font-mono"
@@ -260,7 +285,7 @@ export default function RolePermissionsWidget({ title, onClose, ...props }: Widg
                 {deny.length === 0 ? (
                   <span className="text-sm ws-muted">No deny permissions</span>
                 ) : (
-                  deny.map(perm => (
+                  deny.map((perm) => (
                     <div
                       key={perm}
                       className="ws-tag"
@@ -282,12 +307,9 @@ export default function RolePermissionsWidget({ title, onClose, ...props }: Widg
             <div className="ws-alert ws-alert-info text-xs">
               <div>
                 <strong>Permission patterns:</strong>
-                <br />
-                • Use <code>**</code> to match all permissions
-                <br />
-                • Use <code>*</code> to match one segment
-                <br />
-                • Deny permissions override allow permissions
+                <br />• Use <code>**</code> to match all permissions
+                <br />• Use <code>*</code> to match one segment
+                <br />• Deny permissions override allow permissions
               </div>
             </div>
           </div>

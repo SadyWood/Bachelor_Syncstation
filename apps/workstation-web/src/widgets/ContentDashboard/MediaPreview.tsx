@@ -142,15 +142,16 @@ export default function MediaPreview({ title, onClose, nodeId }: MediaPreviewWid
   }, [asset]);
 
   // Listen for timeline seek events
-  useEffect(() => addTypedEventListener<TimelineSeekEvent>(
-    EVENT_NAMES.TIMELINE_SEEK,
-    (e) => {
-      const video = videoRef.current;
-      if (video && e.detail.time !== undefined) {
-        video.currentTime = e.detail.time;
-      }
-    },
-  ), []);
+  useEffect(
+    () =>
+      addTypedEventListener<TimelineSeekEvent>(EVENT_NAMES.TIMELINE_SEEK, (e) => {
+        const video = videoRef.current;
+        if (video && e.detail.time !== undefined) {
+          video.currentTime = e.detail.time;
+        }
+      }),
+    [],
+  );
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -183,7 +184,7 @@ export default function MediaPreview({ title, onClose, nodeId }: MediaPreviewWid
           if (e.shiftKey) {
             video.currentTime = 0;
           } else {
-            video.currentTime = Math.max(0, video.currentTime - (frameDurationMs / 1000));
+            video.currentTime = Math.max(0, video.currentTime - frameDurationMs / 1000);
           }
           break;
 
@@ -192,7 +193,10 @@ export default function MediaPreview({ title, onClose, nodeId }: MediaPreviewWid
           if (e.shiftKey) {
             video.currentTime = video.duration;
           } else {
-            video.currentTime = Math.min(video.duration, video.currentTime + (frameDurationMs / 1000));
+            video.currentTime = Math.min(
+              video.duration,
+              video.currentTime + frameDurationMs / 1000,
+            );
           }
           break;
 
@@ -271,19 +275,30 @@ export default function MediaPreview({ title, onClose, nodeId }: MediaPreviewWid
               <div className="p-2 border-t border-gray-200 bg-gray-50 text-xs text-gray-600">
                 <div className="flex gap-4 flex-wrap">
                   {asset.width && asset.height && (
-                    <span><strong>Resolution:</strong> {asset.width}×{asset.height}</span>
+                    <span>
+                      <strong>Resolution:</strong> {asset.width}×{asset.height}
+                    </span>
                   )}
                   {asset.durationMs && (
-                    <span><strong>Duration:</strong> {(asset.durationMs / 1000).toFixed(2)}s</span>
+                    <span>
+                      <strong>Duration:</strong> {(asset.durationMs / 1000).toFixed(2)}s
+                    </span>
                   )}
                   {asset.frameRate && (
-                    <span><strong>FPS:</strong> {asset.frameRate.toFixed(2)}</span>
+                    <span>
+                      <strong>FPS:</strong> {asset.frameRate.toFixed(2)}
+                    </span>
                   )}
                   {asset.videoCodec && (
-                    <span><strong>Video:</strong> {asset.videoCodec}</span>
+                    <span>
+                      <strong>Video:</strong> {asset.videoCodec}
+                    </span>
                   )}
                   {asset.audioCodec && (
-                    <span><strong>Audio:</strong> {asset.audioCodec} {asset.audioChannels ? `(${asset.audioChannels}ch)` : ''}</span>
+                    <span>
+                      <strong>Audio:</strong> {asset.audioCodec}{' '}
+                      {asset.audioChannels ? `(${asset.audioChannels}ch)` : ''}
+                    </span>
                   )}
                 </div>
               </div>
@@ -295,9 +310,7 @@ export default function MediaPreview({ title, onClose, nodeId }: MediaPreviewWid
           <div className="flex-1 flex items-center justify-center p-3">
             <div className="text-center">
               <ImageIcon size={32} className="mx-auto mb-2 opacity-40" />
-              <div className="text-sm ws-muted">
-                Only video files are supported in this preview
-              </div>
+              <div className="text-sm ws-muted">Only video files are supported in this preview</div>
             </div>
           </div>
         )}

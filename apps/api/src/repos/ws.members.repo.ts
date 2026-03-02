@@ -23,9 +23,11 @@ export async function listTenantMembers(tenantId: string): Promise<Member[]> {
     .where(eq(schema.wsTenantMembers.tenantId, tenantId));
 
   // Get unique user IDs
-  const userIds = [...new Set(
-    roster.map(r => r.userUuid).filter((id): id is string => typeof id === 'string' && !!id),
-  )];
+  const userIds = [
+    ...new Set(
+      roster.map((r) => r.userUuid).filter((id): id is string => typeof id === 'string' && !!id),
+    ),
+  ];
 
   // Get user details
   const users = userIds.length
@@ -40,7 +42,7 @@ export async function listTenantMembers(tenantId: string): Promise<Member[]> {
       .where(inArray(schema.users.id, userIds))
     : [];
 
-  const userById = new Map(users.map(u => [u.id, u]));
+  const userById = new Map(users.map((u) => [u.id, u]));
 
   // Get memberships
   const memberships = await dbWs
@@ -52,21 +54,21 @@ export async function listTenantMembers(tenantId: string): Promise<Member[]> {
     .where(eq(schema.wsUserMemberships.tenantId, tenantId));
 
   // Get role names
-  const roleIds = [...new Set(memberships.map(m => m.roleId))];
+  const roleIds = [...new Set(memberships.map((m) => m.roleId))];
   const roles = roleIds.length
     ? await dbWs
       .select({ roleId: schema.wsRoles.roleId, name: schema.wsRoles.name })
       .from(schema.wsRoles)
       .where(inArray(schema.wsRoles.roleId, roleIds))
     : [];
-  const roleName = new Map(roles.map(r => [r.roleId, r.name]));
+  const roleName = new Map(roles.map((r) => [r.roleId, r.name]));
 
   // Build result
-  const items = roster.map(r => {
+  const items = roster.map((r) => {
     const user = r.userUuid ? userById.get(r.userUuid) : undefined;
     const roleNames = memberships
-      .filter(m => m.userUuid === r.userUuid)
-      .map(m => roleName.get(m.roleId))
+      .filter((m) => m.userUuid === r.userUuid)
+      .map((m) => roleName.get(m.roleId))
       .filter((n): n is string => typeof n === 'string');
 
     return {
@@ -91,11 +93,14 @@ export async function inviteMember(tenantId: string, email: string): Promise<voi
     .from(schema.users)
     .where(eq(schema.users.email, email));
 
-  const userId = existing?.id ??
-    (await dbUsers
-      .insert(schema.users)
-      .values({ email, isActive: false })
-      .returning({ id: schema.users.id }))[0].id;
+  const userId =
+    existing?.id ??
+    (
+      await dbUsers
+        .insert(schema.users)
+        .values({ email, isActive: false })
+        .returning({ id: schema.users.id })
+    )[0].id;
 
   await dbWs
     .insert(schema.wsTenantMembers)
@@ -113,10 +118,12 @@ export async function deactivateMember(tenantId: string, userId: string): Promis
   const [row] = await dbWs
     .update(schema.wsTenantMembers)
     .set({ status: 'disabled', deactivatedAt: new Date() })
-    .where(and(
-      eq(schema.wsTenantMembers.tenantId, tenantId),
-      eq(schema.wsTenantMembers.userUuid, userId),
-    ))
+    .where(
+      and(
+        eq(schema.wsTenantMembers.tenantId, tenantId),
+        eq(schema.wsTenantMembers.userUuid, userId),
+      ),
+    )
     .returning({ memberId: schema.wsTenantMembers.memberId });
 
   if (!row) {
@@ -132,10 +139,12 @@ export async function listUserRoles(tenantId: string, userId: string): Promise<U
     })
     .from(schema.wsUserMemberships)
     .innerJoin(schema.wsRoles, eq(schema.wsRoles.roleId, schema.wsUserMemberships.roleId))
-    .where(and(
-      eq(schema.wsUserMemberships.tenantId, tenantId),
-      eq(schema.wsUserMemberships.userUuid, userId),
-    ));
+    .where(
+      and(
+        eq(schema.wsUserMemberships.tenantId, tenantId),
+        eq(schema.wsUserMemberships.userUuid, userId),
+      ),
+    );
 
   return z.array(UserRoleSchema).parse(rows);
 }

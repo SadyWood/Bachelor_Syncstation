@@ -1,8 +1,17 @@
 // apps/workstation-web/src/widgets/ProjectStructure/ContentTree.tsx
 import { createLogger } from '@hoolsy/logger';
 import {
-  GitBranch, Folder as FolderIcon, Film, Music, FileText,
-  ChevronRight, ChevronDown, Pencil, Trash2, FolderTree, GripVertical,
+  GitBranch,
+  Folder as FolderIcon,
+  Film,
+  Music,
+  FileText,
+  ChevronRight,
+  ChevronDown,
+  Pencil,
+  Trash2,
+  FolderTree,
+  GripVertical,
 } from 'lucide-react';
 import React, { useState, useEffect, useRef } from 'react';
 import { useDrag, useDrop, DndProvider } from 'react-dnd';
@@ -19,46 +28,47 @@ type ContentNode = z.infer<typeof ContentNodeNested>;
 
 const DRAG_TYPE = 'CONTENT_NODE';
 
-const KIND_OPTIONS: Array<{ category: string; options: Array<{ value: string; label: string }> }> = [
-  {
-    category: 'Video',
-    options: [
-      { value: 'episode_video', label: 'Episode' },
-      { value: 'movie', label: 'Movie' },
-      { value: 'trailer', label: 'Trailer' },
-      { value: 'teaser', label: 'Teaser' },
-      { value: 'clip', label: 'Clip' },
-      { value: 'featurette', label: 'Featurette' },
-      { value: 'behind_the_scenes', label: 'Behind the Scenes' },
-      { value: 'interview', label: 'Interview' },
-      { value: 'livestream', label: 'Livestream' },
-      { value: 'video_other', label: 'Other' },
-    ],
-  },
-  {
-    category: 'Audio',
-    options: [
-      { value: 'podcast_episode', label: 'Podcast' },
-      { value: 'song', label: 'Song' },
-      { value: 'audiobook_chapter', label: 'Audiobook' },
-      { value: 'soundtrack', label: 'Soundtrack' },
-      { value: 'audio_trailer', label: 'Audio Trailer' },
-      { value: 'audio_other', label: 'Other' },
-    ],
-  },
-  {
-    category: 'Image',
-    options: [
-      { value: 'poster', label: 'Poster' },
-      { value: 'thumbnail', label: 'Thumbnail' },
-      { value: 'cover', label: 'Cover' },
-      { value: 'banner', label: 'Banner' },
-      { value: 'still', label: 'Still' },
-      { value: 'storyboard', label: 'Storyboard' },
-      { value: 'image_other', label: 'Other' },
-    ],
-  },
-];
+const KIND_OPTIONS: Array<{ category: string; options: Array<{ value: string; label: string }> }> =
+  [
+    {
+      category: 'Video',
+      options: [
+        { value: 'episode_video', label: 'Episode' },
+        { value: 'movie', label: 'Movie' },
+        { value: 'trailer', label: 'Trailer' },
+        { value: 'teaser', label: 'Teaser' },
+        { value: 'clip', label: 'Clip' },
+        { value: 'featurette', label: 'Featurette' },
+        { value: 'behind_the_scenes', label: 'Behind the Scenes' },
+        { value: 'interview', label: 'Interview' },
+        { value: 'livestream', label: 'Livestream' },
+        { value: 'video_other', label: 'Other' },
+      ],
+    },
+    {
+      category: 'Audio',
+      options: [
+        { value: 'podcast_episode', label: 'Podcast' },
+        { value: 'song', label: 'Song' },
+        { value: 'audiobook_chapter', label: 'Audiobook' },
+        { value: 'soundtrack', label: 'Soundtrack' },
+        { value: 'audio_trailer', label: 'Audio Trailer' },
+        { value: 'audio_other', label: 'Other' },
+      ],
+    },
+    {
+      category: 'Image',
+      options: [
+        { value: 'poster', label: 'Poster' },
+        { value: 'thumbnail', label: 'Thumbnail' },
+        { value: 'cover', label: 'Cover' },
+        { value: 'banner', label: 'Banner' },
+        { value: 'still', label: 'Still' },
+        { value: 'storyboard', label: 'Storyboard' },
+        { value: 'image_other', label: 'Other' },
+      ],
+    },
+  ];
 
 const getNodeIcon = (node: ContentNode) => {
   if (node.nodeType === 'group') return <FolderIcon size={16} className="text-yellow-500" />;
@@ -72,7 +82,7 @@ const getTypeLabel = (node: ContentNode): string => {
   if (node.nodeType === 'group') return 'Group';
   if (node.nodeType === 'bonus_content') return 'Bonus Content';
   for (const cat of KIND_OPTIONS) {
-    const opt = cat.options.find(o => o.value === node.mediaKindCode);
+    const opt = cat.options.find((o) => o.value === node.mediaKindCode);
     if (opt) return opt.label;
   }
   return 'Content';
@@ -89,20 +99,23 @@ function FirstChildDropZone({ firstChildId, onMoveBefore }: FirstChildDropZonePr
   // Track previous isOverCurrent for derived state pattern
   const [wasOverCurrent, setWasOverCurrent] = useState(false);
 
-  const [{ isOverCurrent }, drop] = useDrop(() => ({
-    accept: DRAG_TYPE,
-    hover: () => {
-      setIsOver(true);
-    },
-    drop: async (item: { nodeIds: string[] }) => {
-      if (firstChildId) {
-        await onMoveBefore(item.nodeIds, firstChildId);
-      }
-    },
-    collect: (monitor) => ({
-      isOverCurrent: monitor.isOver({ shallow: true }),
+  const [{ isOverCurrent }, drop] = useDrop(
+    () => ({
+      accept: DRAG_TYPE,
+      hover: () => {
+        setIsOver(true);
+      },
+      drop: async (item: { nodeIds: string[] }) => {
+        if (firstChildId) {
+          await onMoveBefore(item.nodeIds, firstChildId);
+        }
+      },
+      collect: (monitor) => ({
+        isOverCurrent: monitor.isOver({ shallow: true }),
+      }),
     }),
-  }), [firstChildId, onMoveBefore]);
+    [firstChildId, onMoveBefore],
+  );
 
   // Reset isOver when not hovering (derived state pattern)
   if (wasOverCurrent !== isOverCurrent) {
@@ -120,11 +133,7 @@ function FirstChildDropZone({ firstChildId, onMoveBefore }: FirstChildDropZonePr
   if (!firstChildId) return null;
 
   return (
-    <div
-      ref={ref}
-      className="relative"
-      style={{ height: '12px', marginBottom: '-8px' }}
-    >
+    <div ref={ref} className="relative" style={{ height: '12px', marginBottom: '-8px' }}>
       {isOver && (
         <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-[var(--ws-brand)] z-10 shadow-lg" />
       )}
@@ -181,71 +190,78 @@ function NodeRow({
   const isSelected = selectedIds.has(node.nodeId);
 
   // Drag source
-  const [{ isDragging }, drag, preview] = useDrag(() => ({
-    type: DRAG_TYPE,
-    item: () => {
-      const dragIds = selectedIds.has(node.nodeId) && selectedIds.size > 1
-        ? Array.from(selectedIds)
-        : [node.nodeId];
-      return { nodeIds: dragIds };
-    },
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
+  const [{ isDragging }, drag, preview] = useDrag(
+    () => ({
+      type: DRAG_TYPE,
+      item: () => {
+        const dragIds =
+          selectedIds.has(node.nodeId) && selectedIds.size > 1
+            ? Array.from(selectedIds)
+            : [node.nodeId];
+        return { nodeIds: dragIds };
+      },
+      collect: (monitor) => ({
+        isDragging: monitor.isDragging(),
+      }),
+      canDrag: !editing,
     }),
-    canDrag: !editing,
-  }), [node.nodeId, selectedIds, editing]);
+    [node.nodeId, selectedIds, editing],
+  );
 
   // Drop target with hover detection
-  const [{ isOver }, drop] = useDrop(() => ({
-    accept: DRAG_TYPE,
-    hover: (item: { nodeIds: string[] }, monitor) => {
-      if (!ref.current) return;
+  const [{ isOver }, drop] = useDrop(
+    () => ({
+      accept: DRAG_TYPE,
+      hover: (item: { nodeIds: string[] }, monitor) => {
+        if (!ref.current) return;
 
-      // Can't drop on self
-      if (item.nodeIds.includes(node.nodeId)) {
-        setDropPosition(null);
-        return;
-      }
-
-      const hoverBoundingRect = ref.current.getBoundingClientRect();
-      const clientOffset = monitor.getClientOffset();
-
-      if (!clientOffset) return;
-
-      const hoverClientY = clientOffset.y - hoverBoundingRect.top;
-      const hoverHeight = hoverBoundingRect.bottom - hoverBoundingRect.top;
-
-      // Determine drop position based on cursor position
-      if (node.nodeType === 'group') {
-        // For groups: before (top 25%), inside (middle 50%), after (bottom 25%)
-        if (hoverClientY < hoverHeight * 0.25) {
-          setDropPosition('before');
-        } else if (hoverClientY > hoverHeight * 0.75) {
-          setDropPosition('after');
-        } else {
-          setDropPosition('inside');
+        // Can't drop on self
+        if (item.nodeIds.includes(node.nodeId)) {
+          setDropPosition(null);
+          return;
         }
-      } else if (hoverClientY < hoverHeight * 0.5) {
-        // For content: before (top 50%), after (bottom 50%)
-        setDropPosition('before');
-      } else {
-        setDropPosition('after');
-      }
-    },
-    drop: async (item: { nodeIds: string[] }) => {
-      if (dropPosition === 'before') {
-        await onMoveBefore(item.nodeIds, node.nodeId);
-      } else if (dropPosition === 'after') {
-        await onMoveAfter(item.nodeIds, node.nodeId);
-      } else if (dropPosition === 'inside' && node.nodeType === 'group') {
-        await onMoveInto(item.nodeIds, node.nodeId);
-      }
-      setDropPosition(null);
-    },
-    collect: (monitor) => ({
-      isOver: monitor.isOver({ shallow: true }),
+
+        const hoverBoundingRect = ref.current.getBoundingClientRect();
+        const clientOffset = monitor.getClientOffset();
+
+        if (!clientOffset) return;
+
+        const hoverClientY = clientOffset.y - hoverBoundingRect.top;
+        const hoverHeight = hoverBoundingRect.bottom - hoverBoundingRect.top;
+
+        // Determine drop position based on cursor position
+        if (node.nodeType === 'group') {
+          // For groups: before (top 25%), inside (middle 50%), after (bottom 25%)
+          if (hoverClientY < hoverHeight * 0.25) {
+            setDropPosition('before');
+          } else if (hoverClientY > hoverHeight * 0.75) {
+            setDropPosition('after');
+          } else {
+            setDropPosition('inside');
+          }
+        } else if (hoverClientY < hoverHeight * 0.5) {
+          // For content: before (top 50%), after (bottom 50%)
+          setDropPosition('before');
+        } else {
+          setDropPosition('after');
+        }
+      },
+      drop: async (item: { nodeIds: string[] }) => {
+        if (dropPosition === 'before') {
+          await onMoveBefore(item.nodeIds, node.nodeId);
+        } else if (dropPosition === 'after') {
+          await onMoveAfter(item.nodeIds, node.nodeId);
+        } else if (dropPosition === 'inside' && node.nodeType === 'group') {
+          await onMoveInto(item.nodeIds, node.nodeId);
+        }
+        setDropPosition(null);
+      },
+      collect: (monitor) => ({
+        isOver: monitor.isOver({ shallow: true }),
+      }),
     }),
-  }), [node.nodeId, node.nodeType, dropPosition, onMoveInto, onMoveBefore, onMoveAfter]);
+    [node.nodeId, node.nodeType, dropPosition, onMoveInto, onMoveBefore, onMoveAfter],
+  );
 
   // Connect drag and drop refs in effect to satisfy ESLint
   useEffect(() => {
@@ -282,8 +298,10 @@ function NodeRow({
     <div className="flex flex-col relative">
       {/* Drop indicator - BEFORE */}
       {dropPosition === 'before' && (
-        <div className="absolute -top-1 left-0 right-0 h-0.5 bg-[var(--ws-brand)] z-10 shadow-lg"
-          style={{ marginLeft: depth * 20 }} />
+        <div
+          className="absolute -top-1 left-0 right-0 h-0.5 bg-[var(--ws-brand)] z-10 shadow-lg"
+          style={{ marginLeft: depth * 20 }}
+        />
       )}
 
       <div
@@ -400,34 +418,51 @@ function NodeRow({
 
       {/* Drop indicator - AFTER */}
       {dropPosition === 'after' && (
-        <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-[var(--ws-brand)] z-10 shadow-lg"
-          style={{ marginLeft: depth * 20 }} />
+        <div
+          className="absolute -bottom-1 left-0 right-0 h-0.5 bg-[var(--ws-brand)] z-10 shadow-lg"
+          style={{ marginLeft: depth * 20 }}
+        />
       )}
 
-      {isExpanded && node.children && node.children.map((child: ContentNode) => (
-        <NodeRow
-          key={child.nodeId}
-          node={child}
-          depth={depth + 1}
-          expandedIds={expandedIds}
-          toggleExpanded={toggleExpanded}
-          selectedId={selectedId}
-          selectedIds={selectedIds}
-          onNodeClick={onNodeClick}
-          updateNode={updateNode}
-          deleteNode={deleteNode}
-          onDeleteComplete={onDeleteComplete}
-          onMoveInto={onMoveInto}
-          onMoveBefore={onMoveBefore}
-          onMoveAfter={onMoveAfter}
-        />
-      ))}
+      {isExpanded &&
+        node.children &&
+        node.children.map((child: ContentNode) => (
+          <NodeRow
+            key={child.nodeId}
+            node={child}
+            depth={depth + 1}
+            expandedIds={expandedIds}
+            toggleExpanded={toggleExpanded}
+            selectedId={selectedId}
+            selectedIds={selectedIds}
+            onNodeClick={onNodeClick}
+            updateNode={updateNode}
+            deleteNode={deleteNode}
+            onDeleteComplete={onDeleteComplete}
+            onMoveInto={onMoveInto}
+            onMoveBefore={onMoveBefore}
+            onMoveAfter={onMoveAfter}
+          />
+        ))}
     </div>
   );
 }
 
-export default function ContentTree({ title, onClose, titleIcon }: WidgetProps & { titleIcon?: React.ComponentType<{ size?: number; className?: string }> }) {
-  const { currentTree, loadProjectTree, createNode, updateNode, deleteNode, moveNode, reorderSiblings, error } = useContentStore();
+export default function ContentTree({
+  title,
+  onClose,
+  titleIcon,
+}: WidgetProps & { titleIcon?: React.ComponentType<{ size?: number; className?: string }> }) {
+  const {
+    currentTree,
+    loadProjectTree,
+    createNode,
+    updateNode,
+    deleteNode,
+    moveNode,
+    reorderSiblings,
+    error,
+  } = useContentStore();
   const [currentProjectId, setCurrentProjectId] = useState<string | null>(null);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -471,7 +506,8 @@ export default function ContentTree({ title, onClose, titleIcon }: WidgetProps &
 
   const countChildrenByPrefix = (parentNode: ContentNode | null, prefix: string): number => {
     if (!parentNode) return 0;
-    return parentNode.children.filter((child: ContentNode) => child.title.startsWith(prefix)).length;
+    return parentNode.children.filter((child: ContentNode) => child.title.startsWith(prefix))
+      .length;
   };
 
   const getNextTitle = (parentNode: ContentNode | null, prefix: string): string => {
@@ -647,7 +683,7 @@ export default function ContentTree({ title, onClose, titleIcon }: WidgetProps &
 
     // Capture current sibling order BEFORE moving
     const allNodesBefore = flattenTree(currentTree);
-    const siblingsBefore = allNodesBefore.filter(n => n.parentId === parentId);
+    const siblingsBefore = allNodesBefore.filter((n) => n.parentId === parentId);
 
     // Move all nodes to target's parent
     for (const draggedId of draggedIds) {
@@ -662,12 +698,10 @@ export default function ContentTree({ title, onClose, titleIcon }: WidgetProps &
 
     // Build new order: place draggedIds before targetId
     // Use the BEFORE state to know original positions
-    const filtered = siblingsBefore
-      .map(n => n.nodeId)
-      .filter(id => !draggedIds.includes(id));
+    const filtered = siblingsBefore.map((n) => n.nodeId).filter((id) => !draggedIds.includes(id));
 
     // Find target index and insert dragged nodes before it
-    const targetIndex = filtered.findIndex(id => id === targetId);
+    const targetIndex = filtered.findIndex((id) => id === targetId);
     if (targetIndex === -1) {
       // Fallback: just reload
       if (currentProjectId) {
@@ -728,7 +762,7 @@ export default function ContentTree({ title, onClose, titleIcon }: WidgetProps &
 
     // Capture current sibling order BEFORE moving
     const allNodesBefore = flattenTree(currentTree);
-    const siblingsBefore = allNodesBefore.filter(n => n.parentId === parentId);
+    const siblingsBefore = allNodesBefore.filter((n) => n.parentId === parentId);
 
     // Move all nodes to target's parent
     for (const draggedId of draggedIds) {
@@ -742,12 +776,10 @@ export default function ContentTree({ title, onClose, titleIcon }: WidgetProps &
     }
 
     // Build new order: place draggedIds after targetId
-    const filtered = siblingsBefore
-      .map(n => n.nodeId)
-      .filter(id => !draggedIds.includes(id));
+    const filtered = siblingsBefore.map((n) => n.nodeId).filter((id) => !draggedIds.includes(id));
 
     // Find target index and insert dragged nodes after it
-    const targetIndex = filtered.findIndex(id => id === targetId);
+    const targetIndex = filtered.findIndex((id) => id === targetId);
     if (targetIndex === -1) {
       // Fallback: just reload
       if (currentProjectId) {
@@ -790,13 +822,13 @@ export default function ContentTree({ title, onClose, titleIcon }: WidgetProps &
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <BaseWidget title={title || 'Content Tree'} onClose={onClose} titleIcon={titleIcon || GitBranch}>
+      <BaseWidget
+        title={title || 'Content Tree'}
+        onClose={onClose}
+        titleIcon={titleIcon || GitBranch}
+      >
         <div className="p-4 h-full flex flex-col gap-3">
-          {error && (
-            <div className="ws-alert ws-alert-danger text-xs">
-              {error}
-            </div>
-          )}
+          {error && <div className="ws-alert ws-alert-danger text-xs">{error}</div>}
 
           {!currentProjectId ? (
             <div className="ws-empty flex-1">
@@ -808,17 +840,11 @@ export default function ContentTree({ title, onClose, titleIcon }: WidgetProps &
               {/* Toolbar */}
               <div className="flex items-center justify-between">
                 <div className="flex gap-2">
-                  <button
-                    className="ws-btn ws-btn-sm ws-btn-outline"
-                    onClick={addGroup}
-                  >
+                  <button className="ws-btn ws-btn-sm ws-btn-outline" onClick={addGroup}>
                     <FolderIcon size={14} />
                     Group
                   </button>
-                  <button
-                    className="ws-btn ws-btn-sm ws-btn-outline"
-                    onClick={addContent}
-                  >
+                  <button className="ws-btn ws-btn-sm ws-btn-outline" onClick={addContent}>
                     <Film size={14} />
                     Content
                   </button>
@@ -845,37 +871,43 @@ export default function ContentTree({ title, onClose, titleIcon }: WidgetProps &
                   <>
                     {/* Drop zone before first child */}
                     <FirstChildDropZone
-                      firstChildId={rootNode.children && rootNode.children.length > 0 ? rootNode.children[0].nodeId : null}
+                      firstChildId={
+                        rootNode.children && rootNode.children.length > 0
+                          ? rootNode.children[0].nodeId
+                          : null
+                      }
                       onMoveBefore={handleMoveBefore}
                     />
-                    {rootNode.children && rootNode.children.map((child: ContentNode) => (
-                      <NodeRow
-                        key={child.nodeId}
-                        node={child}
-                        depth={0}
-                        expandedIds={expandedIds}
-                        toggleExpanded={toggleExpanded}
-                        selectedId={selectedId}
-                        selectedIds={selectedIds}
-                        onNodeClick={handleNodeClick}
-                        updateNode={updateNode}
-                        deleteNode={deleteNode}
-                        onDeleteComplete={() => {
-                          if (currentProjectId) {
-                            loadProjectTree(currentProjectId);
-                          }
-                        }}
-                        onMoveInto={handleMoveInto}
-                        onMoveBefore={handleMoveBefore}
-                        onMoveAfter={handleMoveAfter}
-                      />
-                    ))}
+                    {rootNode.children &&
+                      rootNode.children.map((child: ContentNode) => (
+                        <NodeRow
+                          key={child.nodeId}
+                          node={child}
+                          depth={0}
+                          expandedIds={expandedIds}
+                          toggleExpanded={toggleExpanded}
+                          selectedId={selectedId}
+                          selectedIds={selectedIds}
+                          onNodeClick={handleNodeClick}
+                          updateNode={updateNode}
+                          deleteNode={deleteNode}
+                          onDeleteComplete={() => {
+                            if (currentProjectId) {
+                              loadProjectTree(currentProjectId);
+                            }
+                          }}
+                          onMoveInto={handleMoveInto}
+                          onMoveBefore={handleMoveBefore}
+                          onMoveAfter={handleMoveAfter}
+                        />
+                      ))}
                   </>
                 )}
               </div>
 
               <div className="ws-alert ws-alert-info text-xs">
-                <strong>Tip:</strong> Drag the grip handle to move • Shift+Click for range select • Ctrl/Cmd+Click for multi-select
+                <strong>Tip:</strong> Drag the grip handle to move • Shift+Click for range select •
+                Ctrl/Cmd+Click for multi-select
               </div>
             </>
           )}

@@ -43,7 +43,9 @@ export function getCurrentTenantId(): string | null {
   return currentTenantId;
 }
 
-const API_URL = (import.meta as ImportMeta & { env: Record<string, string> }).env.VITE_API_URL ?? 'http://localhost:3333';
+const API_URL =
+  (import.meta as ImportMeta & { env: Record<string, string> }).env.VITE_API_URL ??
+  'http://localhost:3333';
 
 type HttpOptions = RequestInit & { parseJson?: boolean };
 
@@ -137,10 +139,7 @@ async function tryRefresh(): Promise<boolean> {
  *   schema: { req: LoginRequestSchema, res: LoginResponseSchema }
  * });
  */
-export async function httpTyped<
-  TReq extends z.ZodTypeAny | undefined,
-  TRes extends z.ZodTypeAny,
->(
+export async function httpTyped<TReq extends z.ZodTypeAny | undefined, TRes extends z.ZodTypeAny>(
   input: RequestInfo,
   init: Omit<RequestInit, 'body'> & {
     body?: TReq extends z.ZodTypeAny ? z.infer<TReq> : undefined;

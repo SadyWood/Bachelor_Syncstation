@@ -65,18 +65,19 @@ export async function checkPermission(perm: string): Promise<boolean> {
 
 // Role membership management
 export async function listUserRoles(tenantId: string, userId: string): Promise<SimpleRole[]> {
-  const response = await httpTyped(
-    `/ws/members/${encodeURIComponent(userId)}/roles`,
-    {
-      method: 'GET',
-      headers: { 'X-WS-Tenant': tenantId },
-      schema: { res: SimpleRolesListResponseSchema },
-    },
-  );
+  const response = await httpTyped(`/ws/members/${encodeURIComponent(userId)}/roles`, {
+    method: 'GET',
+    headers: { 'X-WS-Tenant': tenantId },
+    schema: { res: SimpleRolesListResponseSchema },
+  });
   return response.items;
 }
 
-export async function addRoleToUser(tenantId: string, userId: string, roleId: string): Promise<void> {
+export async function addRoleToUser(
+  tenantId: string,
+  userId: string,
+  roleId: string,
+): Promise<void> {
   await httpTyped('/ws/memberships', {
     method: 'POST',
     headers: { 'X-WS-Tenant': tenantId },
@@ -85,7 +86,11 @@ export async function addRoleToUser(tenantId: string, userId: string, roleId: st
   });
 }
 
-export async function removeRoleFromUser(tenantId: string, userId: string, roleId: string): Promise<void> {
+export async function removeRoleFromUser(
+  tenantId: string,
+  userId: string,
+  roleId: string,
+): Promise<void> {
   await httpTyped('/ws/memberships', {
     method: 'DELETE',
     headers: { 'X-WS-Tenant': tenantId },
@@ -94,7 +99,12 @@ export async function removeRoleFromUser(tenantId: string, userId: string, roleI
   });
 }
 
-export async function bulkUpdateUserRoles(tenantId: string, userId: string, add?: string[], remove?: string[]): Promise<void> {
+export async function bulkUpdateUserRoles(
+  tenantId: string,
+  userId: string,
+  add?: string[],
+  remove?: string[],
+): Promise<void> {
   await httpTyped('/ws/memberships/bulk', {
     method: 'POST',
     headers: { 'X-WS-Tenant': tenantId },
@@ -115,7 +125,10 @@ export async function listRoles(tenantId: string): Promise<Role[]> {
   return response.items;
 }
 
-export async function createRole(tenantId: string, payload: { name: string; allow?: string[]; deny?: string[] }): Promise<RoleDetail> {
+export async function createRole(
+  tenantId: string,
+  payload: { name: string; allow?: string[]; deny?: string[] },
+): Promise<RoleDetail> {
   const response = await httpTyped('/ws/roles', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'X-WS-Tenant': tenantId },
@@ -131,7 +144,11 @@ export async function createRole(tenantId: string, payload: { name: string; allo
   return role;
 }
 
-export async function updateRole(tenantId: string, roleId: string, payload: { name?: string; allow?: string[]; deny?: string[] }): Promise<RoleDetail> {
+export async function updateRole(
+  tenantId: string,
+  roleId: string,
+  payload: { name?: string; allow?: string[]; deny?: string[] },
+): Promise<RoleDetail> {
   const response = await httpTyped(`/ws/roles/${encodeURIComponent(roleId)}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', 'X-WS-Tenant': tenantId },
@@ -153,13 +170,10 @@ export async function getRole(tenantId: string, roleId: string): Promise<RoleDet
 }
 
 export async function deleteRole(tenantId: string, roleId: string): Promise<void> {
-  await httpTyped(
-    `/ws/roles/${encodeURIComponent(roleId)}`,
-    {
-      method: 'DELETE',
-      headers: { 'X-WS-Tenant': tenantId },
-      schema: { res: SuccessResponseSchema },
-    },
-  );
+  await httpTyped(`/ws/roles/${encodeURIComponent(roleId)}`, {
+    method: 'DELETE',
+    headers: { 'X-WS-Tenant': tenantId },
+    schema: { res: SuccessResponseSchema },
+  });
   broadcast('ws:roles:changed', { action: 'deleted', roleId });
 }

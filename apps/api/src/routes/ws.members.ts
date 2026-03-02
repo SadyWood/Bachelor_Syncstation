@@ -36,7 +36,9 @@ export const wsMembersRoutes: FastifyPluginAsyncZod = async (app) => {
         const members = await membersRepo.listTenantMembers(tenantId);
         return reply.send({ ok: true, items: members });
       } catch (error) {
-        return reply.code(500).send({ ok: false, code: 'INTERNAL_ERROR', message: 'Failed to fetch members' });
+        return reply
+          .code(500)
+          .send({ ok: false, code: 'INTERNAL_ERROR', message: 'Failed to fetch members' });
       }
     },
   );
@@ -61,7 +63,9 @@ export const wsMembersRoutes: FastifyPluginAsyncZod = async (app) => {
         await membersRepo.inviteMember(tenantId, email);
         return reply.send({ ok: true, message: 'Invite sent' });
       } catch (error) {
-        return reply.code(500).send({ ok: false, code: 'INTERNAL_ERROR', message: 'Failed to send invite' });
+        return reply
+          .code(500)
+          .send({ ok: false, code: 'INTERNAL_ERROR', message: 'Failed to send invite' });
       }
     },
   );
@@ -88,7 +92,9 @@ export const wsMembersRoutes: FastifyPluginAsyncZod = async (app) => {
         if (error instanceof Error && error.message === 'Member not found or not in tenant') {
           return reply.code(404).send({ ok: false, code: 'NOT_FOUND', message: error.message });
         }
-        return reply.code(500).send({ ok: false, code: 'INTERNAL_ERROR', message: 'Failed to deactivate member' });
+        return reply
+          .code(500)
+          .send({ ok: false, code: 'INTERNAL_ERROR', message: 'Failed to deactivate member' });
       }
     },
   );

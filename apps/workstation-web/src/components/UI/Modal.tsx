@@ -6,28 +6,39 @@ import type { ModalProps, ModalAction } from '../../types';
 
 const toneClass = (tone: ModalAction['tone']) => {
   switch (tone) {
-    case 'danger':  return 'ws-danger';
-    case 'success': return 'ws-success';
-    case 'info':    return 'ws-info';
-    default:        return '';
+    case 'danger':
+      return 'ws-danger';
+    case 'success':
+      return 'ws-success';
+    case 'info':
+      return 'ws-info';
+    default:
+      return '';
   }
 };
 
 const appearanceClass = (appearance: ModalAction['appearance']) => {
   switch (appearance) {
-    case 'outline': return 'ws-btn-outline';
-    case 'soft':    return 'ws-btn-soft';
-    default:        return 'ws-btn-solid';
+    case 'outline':
+      return 'ws-btn-outline';
+    case 'soft':
+      return 'ws-btn-soft';
+    default:
+      return 'ws-btn-solid';
   }
 };
 
 const sizeMaxWidth = (size: ModalProps['size']) => {
   switch (size) {
-    case 'sm': return 'max-w-sm';
-    case 'md': return 'max-w-md';
-    case 'lg': return 'max-w-lg';
+    case 'sm':
+      return 'max-w-sm';
+    case 'md':
+      return 'max-w-md';
+    case 'lg':
+      return 'max-w-lg';
     case 'xl':
-    default:   return 'max-w-4xl'; // a touch wider by default for editors
+    default:
+      return 'max-w-4xl'; // a touch wider by default for editors
   }
 };
 
@@ -43,7 +54,9 @@ export default function Modal({
 
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose?.(); };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose?.();
+    };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [open, onClose]);
@@ -52,7 +65,9 @@ export default function Modal({
     if (!open) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    return () => { document.body.style.overflow = prev; };
+    return () => {
+      document.body.style.overflow = prev;
+    };
   }, [open]);
 
   if (!open) return null;
@@ -63,7 +78,9 @@ export default function Modal({
       aria-modal="true"
       aria-label={title ?? 'Dialog'}
       className="fixed inset-0 z-[1000] ws-fade-in"
-      onMouseDown={(e) => { if (e.target === e.currentTarget) onClose?.(); }}
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) onClose?.();
+      }}
     >
       <div className="absolute inset-0 bg-black/40" />
       <div className="absolute inset-0 flex items-start md:items-center justify-center p-2 md:p-6">
@@ -94,7 +111,7 @@ export default function Modal({
                   {a.label}
                 </button>
               ))}
-              {!actions.some(a => /cancel/i.test(a.label)) && (
+              {!actions.some((a) => /cancel/i.test(a.label)) && (
                 <button className="ws-btn ws-btn-sm ws-btn-soft" onClick={onClose}>
                   Cancel
                 </button>

@@ -9,14 +9,22 @@ import type { z } from 'zod';
 type ContentNode = z.infer<typeof ContentNodeSchema>;
 
 const TEMPLATES: Array<{ value: TemplateType; label: string; description: string }> = [
-  { value: 'series', label: 'TV Series', description: '2 Seasons (5 episodes each) + Extra folder with trailers' },
+  {
+    value: 'series',
+    label: 'TV Series',
+    description: '2 Seasons (5 episodes each) + Extra folder with trailers',
+  },
   { value: 'movie', label: 'Movie', description: '1 Movie + Trailers folder (3 trailers)' },
   { value: 'podcast', label: 'Podcast', description: '2 Seasons with 5 audio episodes each' },
   { value: 'audiobook', label: 'Audiobook', description: '10 audio chapters' },
   { value: 'empty', label: 'Empty', description: 'Start from scratch' },
 ];
 
-export default function ProjectTemplates({ title, onClose, titleIcon }: WidgetProps & { titleIcon?: React.ComponentType<{ size?: number; className?: string }> }) {
+export default function ProjectTemplates({
+  title,
+  onClose,
+  titleIcon,
+}: WidgetProps & { titleIcon?: React.ComponentType<{ size?: number; className?: string }> }) {
   const { currentProject, applyTemplate, loadProjectTree } = useContentStore();
   const [project, setProject] = useState<ContentNode | null>(null);
   const [tpl, setTpl] = useState<TemplateType>('series');
@@ -48,8 +56,11 @@ export default function ProjectTemplates({ title, onClose, titleIcon }: WidgetPr
     }
 
     // Don't confirm for empty template
-    // eslint-disable-next-line no-alert -- User confirmation required for applying template
-    if (tpl !== 'empty' && !confirm(`Apply "${tpl}" template? This will add nodes to the project.`)) {
+
+    if (
+      tpl !== 'empty' &&
+      !confirm(`Apply "${tpl}" template? This will add nodes to the project.`)
+    ) {
       return;
     }
 
@@ -83,7 +94,9 @@ export default function ProjectTemplates({ title, onClose, titleIcon }: WidgetPr
             </button>
           ))}
         </div>
-        <button className="ws-btn ws-btn-xs ws-btn-solid w-full" onClick={apply}>Apply Template</button>
+        <button className="ws-btn ws-btn-xs ws-btn-solid w-full" onClick={apply}>
+          Apply Template
+        </button>
       </div>
     </BaseWidget>
   );

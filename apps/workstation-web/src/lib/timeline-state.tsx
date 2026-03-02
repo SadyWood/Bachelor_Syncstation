@@ -1,5 +1,13 @@
 // apps/workstation-web/src/lib/timeline-state.tsx
-import React, { createContext, useContext, useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+  useMemo,
+} from 'react';
 import type { Subject, SubjectAppearance } from '@hk26/schema';
 import type { TimelineTrack, Marker } from '@hoolsy/timeline';
 
@@ -32,7 +40,9 @@ export function TimelineProvider({ children }: { children: React.ReactNode }) {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [appearances, setAppearances] = useState<SubjectAppearance[]>([]);
   const [isDragging, setIsDragging] = useState(false);
-  const [selectedAppearanceIdInternal, setSelectedAppearanceIdInternal] = useState<string | null>(null);
+  const [selectedAppearanceIdInternal, setSelectedAppearanceIdInternal] = useState<string | null>(
+    null,
+  );
   const [tracks, setTracks] = useState<TimelineTrack[]>([]);
   const [markers, setMarkers] = useState<Marker[]>([]);
 
@@ -41,17 +51,20 @@ export function TimelineProvider({ children }: { children: React.ReactNode }) {
   const [currentTimeInternal, setCurrentTimeInternal] = useState(0);
 
   // Update currentTime without causing re-renders during drag
-  const setCurrentTime = useCallback((time: number) => {
-    currentTimeRef.current = time;
-    if (!isDragging) {
-      setCurrentTimeInternal(time);
-    }
-  }, [isDragging]);
+  const setCurrentTime = useCallback(
+    (time: number) => {
+      currentTimeRef.current = time;
+      if (!isDragging) {
+        setCurrentTimeInternal(time);
+      }
+    },
+    [isDragging],
+  );
 
   // Calculate selectedSubjectId from selectedAppearanceId
   const selectedSubjectId = React.useMemo(() => {
-    if (!selectedAppearanceIdInternal || selectedAppearanceIdInternal === 'MULTIPLE') return selectedAppearanceIdInternal;
-    const appearance = appearances.find(a => a.appearanceId === selectedAppearanceIdInternal);
+    if (!selectedAppearanceIdInternal || selectedAppearanceIdInternal === 'MULTIPLE') { return selectedAppearanceIdInternal; }
+    const appearance = appearances.find((a) => a.appearanceId === selectedAppearanceIdInternal);
     return appearance?.subjectId ?? null;
   }, [selectedAppearanceIdInternal, appearances]);
 
@@ -62,20 +75,20 @@ export function TimelineProvider({ children }: { children: React.ReactNode }) {
 
   // Update subject metadata (affects all appearances)
   const updateSubject = useCallback((subjectId: string, updates: Partial<Subject>) => {
-    setSubjects(prev => prev.map(subject =>
-      subject.subjectId === subjectId
-        ? { ...subject, ...updates }
-        : subject,
-    ));
+    setSubjects((prev) =>
+      prev.map((subject) =>
+        subject.subjectId === subjectId ? { ...subject, ...updates } : subject,
+      ),
+    );
   }, []);
 
   // Update appearance timing
   const updateAppearance = useCallback((appearanceId: string, startMs: number, endMs: number) => {
-    setAppearances(prev => prev.map(appearance =>
-      appearance.appearanceId === appearanceId
-        ? { ...appearance, startMs, endMs }
-        : appearance,
-    ));
+    setAppearances((prev) =>
+      prev.map((appearance) =>
+        appearance.appearanceId === appearanceId ? { ...appearance, startMs, endMs } : appearance,
+      ),
+    );
   }, []);
 
   // Sync currentTime when dragging ends
@@ -85,47 +98,46 @@ export function TimelineProvider({ children }: { children: React.ReactNode }) {
     }
   }, [isDragging]);
 
-  const value: TimelineState = useMemo(() => ({
-    currentTime: currentTimeInternal,
-    duration,
-    subjects,
-    appearances,
-    isDragging,
-    selectedAppearanceId: selectedAppearanceIdInternal,
-    selectedSubjectId,
-    tracks,
-    markers,
-    setCurrentTime,
-    setDuration,
-    setSubjects,
-    setAppearances,
-    updateSubject,
-    updateAppearance,
-    setIsDragging,
-    setSelectedAppearanceId,
-    setTracks,
-    setMarkers,
-  }), [
-    currentTimeInternal,
-    duration,
-    subjects,
-    appearances,
-    isDragging,
-    selectedAppearanceIdInternal,
-    selectedSubjectId,
-    tracks,
-    markers,
-    setCurrentTime,
-    updateSubject,
-    updateAppearance,
-    setSelectedAppearanceId,
-  ]);
-
-  return (
-    <TimelineContext.Provider value={value}>
-      {children}
-    </TimelineContext.Provider>
+  const value: TimelineState = useMemo(
+    () => ({
+      currentTime: currentTimeInternal,
+      duration,
+      subjects,
+      appearances,
+      isDragging,
+      selectedAppearanceId: selectedAppearanceIdInternal,
+      selectedSubjectId,
+      tracks,
+      markers,
+      setCurrentTime,
+      setDuration,
+      setSubjects,
+      setAppearances,
+      updateSubject,
+      updateAppearance,
+      setIsDragging,
+      setSelectedAppearanceId,
+      setTracks,
+      setMarkers,
+    }),
+    [
+      currentTimeInternal,
+      duration,
+      subjects,
+      appearances,
+      isDragging,
+      selectedAppearanceIdInternal,
+      selectedSubjectId,
+      tracks,
+      markers,
+      setCurrentTime,
+      updateSubject,
+      updateAppearance,
+      setSelectedAppearanceId,
+    ],
   );
+
+  return <TimelineContext.Provider value={value}>{children}</TimelineContext.Provider>;
 }
 
 export function useTimelineState() {

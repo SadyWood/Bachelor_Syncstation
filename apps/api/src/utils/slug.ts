@@ -20,9 +20,9 @@ export function slugify(text: string): string {
   return text
     .toLowerCase()
     .trim()
-    .replace(/[^a-z0-9]+/g, '-')      // Replace non-alphanumeric with hyphens
-    .replace(/^-+|-+$/g, '')          // Remove leading/trailing hyphens
-    .slice(0, 160);                   // Max 160 chars
+    .replace(/[^a-z0-9]+/g, '-') // Replace non-alphanumeric with hyphens
+    .replace(/^-+|-+$/g, '') // Remove leading/trailing hyphens
+    .slice(0, 160); // Max 160 chars
 }
 
 /**

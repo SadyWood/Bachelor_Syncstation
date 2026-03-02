@@ -18,16 +18,13 @@ export interface WidgetProps {
 
 // Grid item meta for WidgetGrid
 export type GridItemMeta = Layout & {
-  widget: string;                // Key to look up in registry
-  title: string;                 // Header title
-  icon?: IconComp;               // Lucide icon component
+  widget: string; // Key to look up in registry
+  title: string; // Header title
+  icon?: IconComp; // Lucide icon component
 };
 
 // Widget registry type
-export type WidgetRegistry = Record<
-  string,
-  ComponentType<WidgetProps & { titleIcon?: IconComp }>
->;
+export type WidgetRegistry = Record<string, ComponentType<WidgetProps & { titleIcon?: IconComp }>>;
 
 export interface GridLayoutItem {
   i: string;

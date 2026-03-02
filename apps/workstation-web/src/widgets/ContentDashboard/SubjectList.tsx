@@ -13,7 +13,8 @@ interface SubjectGroup {
 }
 
 export default function SubjectList({ title, onClose }: Omit<WidgetProps, 'id'>) {
-  const { subjects, appearances, selectedAppearanceId, setSelectedAppearanceId } = useTimelineState();
+  const { subjects, appearances, selectedAppearanceId, setSelectedAppearanceId } =
+    useTimelineState();
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedSubjects, setExpandedSubjects] = useState<Set<string>>(new Set());
   // Track the last processed selection for auto-expand
@@ -26,21 +27,22 @@ export default function SubjectList({ title, onClose }: Omit<WidgetProps, 'id'>)
     // Filter subjects first (before expensive operations)
     const query = searchQuery.trim().toLowerCase();
     const filteredSubjects = query
-      ? subjects.filter(subject =>
-        subject.label.toLowerCase().includes(query) ||
-          getTrackLabel(subject.subjectType).toLowerCase().includes(query) ||
-          subject.subjectId.toLowerCase().includes(query) ||
-          subject.description?.toLowerCase().includes(query),
+      ? subjects.filter(
+        (subject) =>
+          subject.label.toLowerCase().includes(query) ||
+            getTrackLabel(subject.subjectType).toLowerCase().includes(query) ||
+            subject.subjectId.toLowerCase().includes(query) ||
+            subject.description?.toLowerCase().includes(query),
       )
       : subjects;
 
     // Now map only the filtered subjects
     const groups: SubjectGroup[] = [];
 
-    filteredSubjects.forEach(subject => {
+    filteredSubjects.forEach((subject) => {
       // Find all appearances for this subject, sorted by start time
       const subjectAppearances = appearances
-        .filter(a => a.subjectId === subject.subjectId)
+        .filter((a) => a.subjectId === subject.subjectId)
         .sort((a, b) => a.startMs - b.startMs)
         .map((appearance, index) => ({
           appearance,
@@ -59,9 +61,10 @@ export default function SubjectList({ title, onClose }: Omit<WidgetProps, 'id'>)
   }, [subjects, appearances, searchQuery]);
 
   // Auto-expand subject when selection changes (state-based pattern)
-  const selectedAppearance = selectedAppearanceId && selectedAppearanceId !== 'MULTIPLE'
-    ? appearances.find(a => a.appearanceId === selectedAppearanceId)
-    : null;
+  const selectedAppearance =
+    selectedAppearanceId && selectedAppearanceId !== 'MULTIPLE'
+      ? appearances.find((a) => a.appearanceId === selectedAppearanceId)
+      : null;
 
   // Derive selected subject ID from selected appearance
   const selectedSubjectId = selectedAppearance?.subjectId ?? null;
@@ -104,7 +107,7 @@ export default function SubjectList({ title, onClose }: Omit<WidgetProps, 'id'>)
   // Toggle subject expansion (only from chevron click)
   const toggleSubject = (subjectId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    setExpandedSubjects(prev => {
+    setExpandedSubjects((prev) => {
       const next = new Set(prev);
       if (next.has(subjectId)) {
         next.delete(subjectId);
@@ -119,7 +122,7 @@ export default function SubjectList({ title, onClose }: Omit<WidgetProps, 'id'>)
   const handleSubjectClick = (subjectId: string) => {
     // Find first appearance of this subject
     const firstAppearance = appearances
-      .filter(a => a.subjectId === subjectId)
+      .filter((a) => a.subjectId === subjectId)
       .sort((a, b) => a.startMs - b.startMs)[0];
 
     if (firstAppearance) {
@@ -193,9 +196,7 @@ export default function SubjectList({ title, onClose }: Omit<WidgetProps, 'id'>)
                       <span className="font-medium text-gray-900 text-sm truncate">
                         {group.subject.label}
                       </span>
-                      <span className="text-xs text-gray-500">
-                        ({group.appearances.length})
-                      </span>
+                      <span className="text-xs text-gray-500">({group.appearances.length})</span>
                     </div>
                     <span className="text-xs text-gray-500 ml-2">
                       {getTrackLabel(group.subject.subjectType)}
@@ -206,7 +207,8 @@ export default function SubjectList({ title, onClose }: Omit<WidgetProps, 'id'>)
                   {isExpanded && (
                     <div className="bg-white">
                       {group.appearances.map(({ appearance, appearanceNumber }) => {
-                        const isAppearanceSelected = selectedAppearanceId === appearance.appearanceId;
+                        const isAppearanceSelected =
+                          selectedAppearanceId === appearance.appearanceId;
 
                         return (
                           <div
