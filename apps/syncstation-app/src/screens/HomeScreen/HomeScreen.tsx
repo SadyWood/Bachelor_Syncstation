@@ -105,7 +105,7 @@ export function HomeScreen() {
     setErrorMessage(null);
 
     try {
-      const tenantId = '';
+      const tenantId = ''; // TODO: wire tenantId when available
       const authToken = token ?? '';
 
       const noticesData = await fetchNotices(authToken, tenantId);
