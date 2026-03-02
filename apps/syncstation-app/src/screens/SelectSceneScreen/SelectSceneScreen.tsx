@@ -36,9 +36,7 @@ export function SelectSceneScreen({
   const activeProject = useContentStore((state) => state.activeProject);
 
   useEffect(() => {
-    void (async () => {
-      await loadScenes();
-    })();
+    void loadScenes();
   }, []);
 
   async function loadScenes() {
