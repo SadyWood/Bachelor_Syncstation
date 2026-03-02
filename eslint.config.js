@@ -396,6 +396,11 @@ export default [
   // react-hooks/refs is a false positive for this pattern - Animated.Value is designed for this use case
   {
     files: ['apps/syncstation-app/**/*.{ts,tsx}'],
+    languageOptions: {
+      globals: {
+        __DEV__: 'readonly',
+      },
+    },
     rules: {
       'react-hooks/refs': 'off',
     },
