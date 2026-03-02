@@ -47,7 +47,16 @@ export function SelectSceneScreen({ onBack, onSelectScene }: SelectSceneScreenPr
   function handleScenePress(scene: Scene) {
     onSelectScene(scene);
   }
-
+  function filterScenes(sceneList: Scene[]): Scene[] {
+    if (!searchQuery.trim()) return sceneList;
+    const query = searchQuery.toLowerCase();
+    return sceneList.filter(
+      (scene) =>
+        scene.name.toLowerCase().includes(query) ||
+                scene.description.toLowerCase().includes(query) ||
+                scene.location.toLowerCase().includes(query),
+    );
+  }
   return (
     <SafeAreaView style={styles.container} edges={['top'] as const}>
       <View style={styles.header}>
