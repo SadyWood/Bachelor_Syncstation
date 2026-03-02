@@ -11,12 +11,22 @@ const MOCK_SCENES: Scene[] = [
   { id: '1', number: 1, name: 'Scene 1', description: 'Mike phone call', location: 'LA - Office building' },
   { id: '2', number: 2, name: 'Scene 2', description: 'Marcus home', location: 'LA - Suburb house' },
 ];
+async function fetchScenes(
+  _token: string,
+  _tenantId: string,
+  _projectId: string,
+): Promise<Scene[]> {
+  await new Promise((resolve) => setTimeout(resolve, 500));
+  return MOCK_SCENES;
+}
 
 export function SelectSceneScreen({ onBack }: SelectSceneScreenProps) {
   const [isLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [scenes] = useState<Scene[]>([]);
+
   const activeProject = useContentStore((state) => state.activeProject);
+
   return (
     <SafeAreaView style={styles.container} edges={['top'] as const}>
       <View style={styles.header}>
@@ -25,7 +35,9 @@ export function SelectSceneScreen({ onBack }: SelectSceneScreenProps) {
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Select Scene</Text>
       </View>
+
       <View style={styles.divider} />
+
       {isLoading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={Colors.primary} />
@@ -42,8 +54,8 @@ export function SelectSceneScreen({ onBack }: SelectSceneScreenProps) {
               onChangeText={setSearchQuery}
             />
           </View>
+
           <Text style={styles.projectTitle}>{activeProject?.name ?? 'Project'}</Text>
-          <View>{scenes.length + MOCK_SCENES.length}</View>
         </ScrollView>
       )}
     </SafeAreaView>
