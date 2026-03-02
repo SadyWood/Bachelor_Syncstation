@@ -17,7 +17,6 @@ const MOCK_SCENES: Scene[] = [
   { id: '7', number: 7, name: 'Scene 7', description: 'Rooftop showdown', location: 'Miami - Downtown tower' },
   { id: '8', number: 8, name: 'Scene 8', description: 'Hospital visit', location: 'LA - General Hospital' },
 ];
-
 async function fetchScenes(
   _token: string,
   _tenantId: string,
@@ -38,7 +37,9 @@ export function SelectSceneScreen({
   const activeProject = useContentStore((state) => state.activeProject);
 
   useEffect(() => {
-    void loadScenes();
+    void (async () => {
+      await loadScenes();
+    })();
   }, []);
 
   async function loadScenes() {
@@ -75,26 +76,17 @@ export function SelectSceneScreen({
 
   function renderSceneCard(scene: Scene) {
     return (
-      <TouchableOpacity
-        key={scene.id}
-        style={styles.sceneCard}
-        onPress={() => handleScenePress(scene)}
-      >
-        <Ionicons name="folder" size={24} color={Colors.sceneBlue} style={styles.sceneIcon} />
+      <TouchableOpacity key={scene.id} style={styles.sceneCard} onPress={() => handleScenePress(scene)} >
+        <Ionicons name="folder" size={24} color={Colors.sceneBlue} style={styles.sceneIcon}/>
 
         <View style={styles.sceneInfo}>
           <Text style={styles.sceneText}>
-            <Text style={styles.sceneNumber}>
-              Scene {scene.number}
-            </Text>
-            <Text style={styles.sceneDescription}>
-              {' '}
-              - {scene.description}
-            </Text>
+            <Text style={styles.sceneNumber}>Scene {scene.number}</Text>
+            <Text style={styles.sceneDescription}> - {scene.description}</Text>
           </Text>
         </View>
 
-        <Ionicons name="arrow-forward" size={20} color={Colors.text} style={styles.arrowIcon} />
+        <Ionicons name="arrow-forward" size={20} color={Colors.text} style={styles.arrowIcon}/>
       </TouchableOpacity>
     );
   }
