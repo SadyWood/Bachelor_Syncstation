@@ -76,6 +76,16 @@ export function HomeScreen() {
     );
   }
 
+  const sceneDisplayName = activeScene
+    ? `Scene ${activeScene.number} - ${activeScene.description}`
+    : 'No scene selected';
+
+  const takeDisplayName = activeTake
+    ? `${activeTake.name} - ${activeTake.description}`
+    : 'No take selected';
+
+  const locationDisplay = activeScene ? 'CA - Hollywood street 2' : 'Select a scene';
+
   return (
     <SafeAreaView style={styles.container} edges={['top'] as const}>
       <View style={styles.header}>
