@@ -1,11 +1,12 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import React, { useState } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ActiveSceneCard, AgendaCard, ContextCard } from '@/components';
 import type { AgendaItem, NoticeItem } from '@/components';
+import { useAuthStore } from '@/stores/authStore';
 import { useContentStore } from '@/stores/ContentStore';
 import { Colors } from '@/styles';
 import { styles } from './HomeScreen.styles';
@@ -25,6 +26,18 @@ const MOCK_AGENDA: AgendaItem[] = [
   { id: '5', time: '09:45', title: 'Team meetup', isCompleted: false },
   { id: '6', time: '09:45', title: 'Team meetup', isCompleted: false },
 ];
+
+// TODO: Replace with API call when backend is ready
+async function fetchNotices(_token: string, _tenantId: string): Promise<NoticeItem[]> {
+  await new Promise((resolve) => setTimeout(resolve, 500));
+  return MOCK_NOTICES;
+}
+
+// TODO: Replace with API call when backend is ready
+async function fetchAgenda(_token: string, _tenantId: string): Promise<AgendaItem[]> {
+  await new Promise((resolve) => setTimeout(resolve, 500));
+  return MOCK_AGENDA;
+}
 
 function getProjectName(projectName?: string) {
   return projectName ?? 'No project selected';
@@ -64,11 +77,44 @@ function getLocationDisplay(location?: string, hasScene?: boolean) {
 
 export function HomeScreen() {
   const navigation = useNavigation();
-  const [agendaItems, setAgendaItems] = useState<AgendaItem[]>(MOCK_AGENDA);
+
+  const token = useAuthStore((state) => state.token);
 
   const activeProject = useContentStore((state) => state.activeProject);
   const activeScene = useContentStore((state) => state.activeScene);
   const activeTake = useContentStore((state) => state.activeTake);
+
+  const [agendaItems, setAgendaItems] = useState<AgendaItem[]>([]);
+  const [notices, setNotices] = useState<NoticeItem[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    void loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeProject?.id, token]);
+
+  async function loadData() {
+    setIsLoading(true);
+    setErrorMessage(null);
+
+    try {
+      const tenantId = ''; // TODO: wire tenantId when available
+      const authToken = token ?? '';
+
+      const [noticesData, agendaData] = await Promise.all([
+        fetchNotices(authToken, tenantId),
+        fetchAgenda(authToken, tenantId),
+      ]);
+
+      setNotices(noticesData);
+      setAgendaItems(agendaData);
+    } catch (_error) {
+      setErrorMessage('Failed to load home data');
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   function handleChangeContext() {
     navigation.navigate('SelectContext' as never);
@@ -79,6 +125,7 @@ export function HomeScreen() {
   }
 
   function handleAgendaItemToggle(id: string) {
+    // TODO: when backend is ready, replace with optimistic update + API call
     setAgendaItems((prev) =>
       prev.map((item) =>
         item.id === id ? { ...item, isCompleted: !item.isCompleted } : item,
@@ -103,24 +150,39 @@ export function HomeScreen() {
 
       <View style={styles.divider} />
 
-      <ScrollView style={styles.scrollContent} contentContainerStyle={styles.scrollContainer}>
-        <ContextCard
-          projectName={projectName}
-          role={roleName}
-          dayInfo={dayInfo}
-          notices={MOCK_NOTICES}
-          onChangePress={handleChangeContext}
-        />
+      {isLoading ? (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color={Colors.primary} />
+        </View>
+      ) : (
+        <ScrollView style={styles.scrollContent} contentContainerStyle={styles.scrollContainer}>
+          {errorMessage ? (
+            <View style={{ marginBottom: 12 }}>
+              <Text style={{ color: Colors.error }}>{errorMessage}</Text>
+              <Text style={{ color: Colors.textSecondary }} onPress={() => void loadData()}>
+                Tap to retry
+              </Text>
+            </View>
+          ) : null}
 
-        <ActiveSceneCard
-          sceneName={sceneName}
-          takeName={takeName}
-          location={location}
-          onChangePress={handleChangeScene}
-        />
+          <ContextCard
+            projectName={projectName}
+            role={roleName}
+            dayInfo={dayInfo}
+            notices={notices}
+            onChangePress={handleChangeContext}
+          />
 
-        <AgendaCard items={agendaItems} onItemToggle={handleAgendaItemToggle} />
-      </ScrollView>
+          <ActiveSceneCard
+            sceneName={sceneName}
+            takeName={takeName}
+            location={location}
+            onChangePress={handleChangeScene}
+          />
+
+          <AgendaCard items={agendaItems} onItemToggle={handleAgendaItemToggle} />
+        </ScrollView>
+      )}
     </SafeAreaView>
   );
 }
