@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useContentStore } from '../../stores';
+import { useContentStore } from '@/stores/ContentStore';
 import { styles } from './SelectSceneScreen.styles';
 import { Colors } from '../../styles';
 import type { SelectSceneScreenProps } from './types/SelectSceneScreen.types';
