@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
+import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { styles } from './SelectSceneScreen.styles';
@@ -20,7 +20,7 @@ async function fetchScenes(
   return MOCK_SCENES;
 }
 
-export function SelectSceneScreen({ onBack }: SelectSceneScreenProps) {
+export function SelectSceneScreen({ onBack, onSelectScene }: SelectSceneScreenProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [scenes, setScenes] = useState<Scene[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -44,6 +44,10 @@ export function SelectSceneScreen({ onBack }: SelectSceneScreenProps) {
     }
   }
 
+  function handleScenePress(scene: Scene) {
+    onSelectScene(scene);
+  }
+
   return (
     <SafeAreaView style={styles.container} edges={['top'] as const}>
       <View style={styles.header}>
@@ -54,27 +58,6 @@ export function SelectSceneScreen({ onBack }: SelectSceneScreenProps) {
       </View>
 
       <View style={styles.divider} />
-
-      {isLoading ? (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={Colors.primary} />
-        </View>
-      ) : (
-        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-          <View style={styles.searchContainer}>
-            <Ionicons name="search" size={20} color={Colors.textSecondary} style={styles.searchIcon} />
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Search scene..."
-              placeholderTextColor={Colors.textSecondary}
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-            />
-          </View>
-
-          <Text style={styles.projectTitle}>{activeProject?.name ?? 'Project'}</Text>
-        </ScrollView>
-      )}
     </SafeAreaView>
   );
 }
