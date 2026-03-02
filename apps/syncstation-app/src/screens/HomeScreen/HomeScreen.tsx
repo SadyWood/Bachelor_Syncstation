@@ -105,9 +105,9 @@ export function HomeScreen() {
         />
 
         <ActiveSceneCard
-          sceneName="Scene 6 - Car chase"
-          takeName="Take 2 - Mike POV"
-          location="CA - Hollywood street 2"
+          sceneName={sceneDisplayName}
+          takeName={takeDisplayName}
+          location={locationDisplay}
           onChangePress={handleChangeScene}
         />
 
