@@ -1,5 +1,5 @@
+import React, { useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import React, { useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { styles } from './SelectSceneScreen.styles';
@@ -21,11 +21,28 @@ async function fetchScenes(
 }
 
 export function SelectSceneScreen({ onBack }: SelectSceneScreenProps) {
-  const [isLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [scenes] = useState<Scene[]>([]);
+  const [scenes, setScenes] = useState<Scene[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const activeProject = useContentStore((state) => state.activeProject);
+
+  useEffect(() => {
+    void loadScenes();
+  }, []);
+
+  async function loadScenes() {
+    setIsLoading(true);
+    try {
+      const token = '';
+      const tenantId = '';
+      const projectId = activeProject?.id ?? '';
+      const data = await fetchScenes(token, tenantId, projectId);
+      setScenes(data);
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   return (
     <SafeAreaView style={styles.container} edges={['top'] as const}>
