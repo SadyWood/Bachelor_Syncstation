@@ -3,13 +3,12 @@ import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-import { ActiveSceneCard, AgendaCard, ContextCard } from '@/components';
-import type { AgendaItem, NoticeItem } from '@/components';
-import { useAuthStore } from '@/stores/authStore';
-import { useContentStore } from '@/stores/ContentStore';
-import { Colors } from '@/styles';
 import { styles } from './HomeScreen.styles';
+import type { AgendaItem, NoticeItem } from '@/components';
+import { ActiveSceneCard, AgendaCard, ContextCard } from '@/components';
+import { useAuthStore } from '@/stores/authStore';
+import { useContentStore } from '@/stores/contentStore';
+import { Colors } from '@/styles';
 
 const MOCK_NOTICES: NoticeItem[] = [
   { id: '1', time: '13.45', message: 'Lunch extended due to weather, resume 15.00' },
@@ -39,36 +38,36 @@ async function fetchAgenda(_token: string, _tenantId: string): Promise<AgendaIte
   return MOCK_AGENDA;
 }
 
-function getProjectName(projectName?: string) {
+function getProjectName(projectName?: string): string {
   return projectName ?? 'No project selected';
 }
 
-function getRoleName(role?: string) {
+function getRoleName(role?: string): string {
   return role ?? 'Select a project';
 }
 
-function getDayInfo(currentDay?: number, totalDays?: number) {
+function getDayInfo(currentDay?: number, totalDays?: number): string {
   if (!currentDay || !totalDays) {
     return '';
   }
   return `Day ${currentDay} of ${totalDays}`;
 }
 
-function getSceneDisplayName(scene?: { number: number; description: string } | null) {
+function getSceneDisplayName(scene?: { number: number; description: string } | null): string {
   if (!scene) {
     return 'No scene selected';
   }
   return `Scene ${scene.number} - ${scene.description}`;
 }
 
-function getTakeDisplayName(take?: { name: string; description: string } | null) {
+function getTakeDisplayName(take?: { name: string; description: string } | null): string {
   if (!take) {
     return 'No take selected';
   }
   return `${take.name} - ${take.description}`;
 }
 
-function getLocationDisplay(location?: string, hasScene?: boolean) {
+function getLocationDisplay(location?: string, hasScene?: boolean): string {
   if (!hasScene) {
     return 'Select a scene';
   }
@@ -90,6 +89,13 @@ export function HomeScreen() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!activeProject?.id) {
+      setAgendaItems([]);
+      setNotices([]);
+      setIsLoading(false);
+      return;
+    }
+
     void loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeProject?.id, token]);
@@ -99,13 +105,11 @@ export function HomeScreen() {
     setErrorMessage(null);
 
     try {
-      const tenantId = ''; // TODO: wire tenantId when available
+      const tenantId = '';
       const authToken = token ?? '';
 
-      const [noticesData, agendaData] = await Promise.all([
-        fetchNotices(authToken, tenantId),
-        fetchAgenda(authToken, tenantId),
-      ]);
+      const noticesData = await fetchNotices(authToken, tenantId);
+      const agendaData = await fetchAgenda(authToken, tenantId);
 
       setNotices(noticesData);
       setAgendaItems(agendaData);
