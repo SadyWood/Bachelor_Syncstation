@@ -6,4 +6,11 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.background,
   },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingTop: Spacing.xl,
+    paddingBottom: Spacing.md,
+    paddingHorizontal: Spacing.md,
+  },
 });
