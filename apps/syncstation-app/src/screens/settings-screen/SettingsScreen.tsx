@@ -4,13 +4,14 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
+  SafeAreaView,
 } from 'react-native';
 import { styles } from './SettingScreen.styles';
 
 
 export function SettingsScreen() {
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Text style={styles.header}>Settings</Text>
 
@@ -61,6 +62,6 @@ export function SettingsScreen() {
           <Text style={styles.menuButtonText}>Send Feedback</Text>
         </TouchableOpacity>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
