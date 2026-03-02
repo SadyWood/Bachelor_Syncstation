@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { apiClient } from '@/api/client';
 
 type User = {
   id: string;
@@ -22,15 +23,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   isAuthenticated: false,
 
   login: async (email, password) => {
-    const response = await fetch('http://192.168.50.208:3333/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok || !data.ok) {
+    const { data } = await apiClient.post('/auth/login', { email, password });
+    if (!data.ok) {
       throw new Error(data.message ?? 'Login failed');
     }
 
