@@ -1,7 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, TextInput, ActivityIndicator } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuthStore } from '@/stores/authStore';
 import { useContentStore } from '@/stores/ContentStore';
 import { Colors } from '@/styles';
@@ -130,7 +129,7 @@ export function SelectContextScreen({ onBack, onSelectProject }: SelectContextSc
   const filteredRecents = filterProjects(recents);
 
   return (
-    <SafeAreaView style={styles.container} edges={['top'] as const}>
+    <View style={styles.container} edges={['top'] as const}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={onBack}>
           <Ionicons name="arrow-back" size={24} color={Colors.textOnPrimary} />
@@ -184,6 +183,6 @@ export function SelectContextScreen({ onBack, onSelectProject }: SelectContextSc
           )}
         </ScrollView>
       )}
-    </SafeAreaView>
+    </View>
   );
 }

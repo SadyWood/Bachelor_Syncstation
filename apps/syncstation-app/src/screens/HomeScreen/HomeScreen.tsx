@@ -2,7 +2,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useEffect, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { ActiveSceneCard, AgendaCard, ContextCard } from '@/components';
 import { useAuthStore } from '@/stores/authStore';
 import { useContentStore } from '@/stores/ContentStore';
@@ -75,7 +74,7 @@ export function HomeScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top'] as const}>
+    <View style={styles.container} edges={['top'] as const}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Home</Text>
         <Ionicons
@@ -109,6 +108,6 @@ export function HomeScreen() {
 
         <AgendaCard items={agendaItems} onItemToggle={handleAgendaItemToggle} />
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
