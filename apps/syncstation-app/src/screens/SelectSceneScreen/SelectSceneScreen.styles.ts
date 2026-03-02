@@ -33,4 +33,9 @@ export const styles = StyleSheet.create({
     marginHorizontal: Spacing.md,
     marginBottom: Spacing.lg,
   },
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });

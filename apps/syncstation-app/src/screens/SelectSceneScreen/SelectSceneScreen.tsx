@@ -1,12 +1,14 @@
+import React, { useState } from 'react';
+import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import React from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
 import { styles } from './SelectSceneScreen.styles';
 import { Colors } from '../../styles';
 import type { SelectSceneScreenProps } from './types/SelectSceneScreen.types';
 
 export function SelectSceneScreen({ onBack }: SelectSceneScreenProps) {
+  const [isLoading] = useState(true);
   return (
     <SafeAreaView style={styles.container} edges={['top'] as const}>
       <View style={styles.header}>
@@ -16,6 +18,13 @@ export function SelectSceneScreen({ onBack }: SelectSceneScreenProps) {
         <Text style={styles.headerTitle}>Select Scene</Text>
       </View>
       <View style={styles.divider} />
+      {isLoading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={Colors.primary} />
+        </View>
+      ) : (
+        <View />
+      )}
     </SafeAreaView>
   );
 }
