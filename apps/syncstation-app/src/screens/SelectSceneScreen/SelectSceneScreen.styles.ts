@@ -68,4 +68,33 @@ export const styles = StyleSheet.create({
     marginBottom: Spacing.xs,
     textDecorationLine: 'underline',
   },
+  sceneCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.cardBackground,
+    borderRadius: BorderRadius.lg,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    padding: Spacing.md,
+    marginBottom: Spacing.sm,
+  },
+  sceneIcon: {
+    marginRight: Spacing.md,
+  },
+  sceneInfo: {
+    flex: 1,
+  },
+  sceneText: {
+    fontSize: 16,
+    color: Colors.text,
+  },
+  sceneNumber: {
+    fontWeight: '700',
+  },
+  sceneDescription: {
+    fontWeight: '400',
+  },
+  arrowIcon: {
+    marginLeft: Spacing.sm,
+  },
 });
