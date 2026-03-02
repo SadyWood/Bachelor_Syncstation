@@ -2,14 +2,15 @@ import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useContentStore } from '@/stores/ContentStore';
 import { styles } from './SelectSceneScreen.styles';
-import { Colors } from '../../styles';
-import type { SelectSceneScreenProps } from './types/SelectSceneScreen.types';
+import { Colors } from '@/styles';
+import type { Scene, SelectSceneScreenProps } from './types/SelectSceneScreen.types';
+import { useContentStore } from '@/stores/ContentStore';
 
 export function SelectSceneScreen({ onBack }: SelectSceneScreenProps) {
   const [isLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [scenes] = useState<Scene[]>([]);
   const activeProject = useContentStore((state) => state.activeProject);
   return (
     <SafeAreaView style={styles.container} edges={['top'] as const}>
@@ -37,6 +38,8 @@ export function SelectSceneScreen({ onBack }: SelectSceneScreenProps) {
             />
           </View>
           <Text style={styles.projectTitle}>{activeProject?.name ?? 'Project'}</Text>
+
+          <View>{scenes.length}</View>
         </ScrollView>
       )}
     </SafeAreaView>
