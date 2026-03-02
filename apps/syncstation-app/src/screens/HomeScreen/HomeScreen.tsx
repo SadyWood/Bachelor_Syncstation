@@ -42,10 +42,11 @@ export function HomeScreen() {
   const [agendaItems, setAgendaItems] = useState<AgendaItem[]>([]);
   const [notices, setNotices] = useState<NoticeItem[]>([]);
 
+  const token = useAuthStore((s) => s.token);
+
   const activeProject = useContentStore((state) => state.activeProject);
   const activeScene = useContentStore((state) => state.activeScene);
   const activeTake = useContentStore((state) => state.activeTake);
-  const token = useAuthStore((s) => s.token);
 
   useEffect(() => {
     void loadData();
@@ -54,8 +55,9 @@ export function HomeScreen() {
 
   async function loadData() {
     const tenantId = '';
-    const noticesData = await fetchNotices(token ?? '', tenantId);
-    const agendaData = await fetchAgenda(token ?? '', tenantId);
+    const authToken = token ?? '';
+    const noticesData = await fetchNotices(authToken, tenantId);
+    const agendaData = await fetchAgenda(authToken, tenantId);
     setNotices(noticesData);
     setAgendaItems(agendaData);
   }
