@@ -94,7 +94,7 @@ export function HomeScreen() {
     if (!activeScene) {
       return 'Select a scene';
     }
-    return 'CA - Hollywood street 2';
+    return activeScene.location ?? 'Location not set';
   }, [activeScene]);
 
   return (
