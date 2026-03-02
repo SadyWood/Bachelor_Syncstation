@@ -43,6 +43,8 @@ export function HomeScreen() {
   const [notices, setNotices] = useState<NoticeItem[]>([]);
 
   const activeProject = useContentStore((state) => state.activeProject);
+  const activeScene = useContentStore((state) => state.activeScene);
+  const activeTake = useContentStore((state) => state.activeTake);
   const token = useAuthStore((s) => s.token);
 
   useEffect(() => {
