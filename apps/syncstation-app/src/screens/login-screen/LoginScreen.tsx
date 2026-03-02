@@ -88,8 +88,13 @@ export function LoginScreen({ onBack }: Props) {
     }
     setLoading(true);
     setError('');
-    await login(email, password);
-    setLoading(false);
+    try {
+      await login(email, password);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Login failed');
+    } finally {
+      setLoading(false);
+    }
   }
   return (
     <KeyboardAvoidingView

@@ -120,6 +120,6 @@ export async function build() {
 }
 
 if (env.NODE_ENV !== 'test') {
-  const host = env.NODE_ENV === 'development' ? 'localhost' : '0.0.0.0';
-  build().then((app) => app.listen({ port: env.PORT, host }));
+  const host = '0.0.0.0';
+  build().then(app => app.listen({ port: env.PORT, host }));
 }
