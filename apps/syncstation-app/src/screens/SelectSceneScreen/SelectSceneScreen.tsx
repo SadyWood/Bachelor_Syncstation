@@ -76,12 +76,7 @@ export function SelectSceneScreen({
         style={styles.sceneCard}
         onPress={() => handleScenePress(scene)}
       >
-        <Ionicons
-          name="folder"
-          size={24}
-          color={Colors.sceneBlue}
-          style={styles.sceneIcon}
-        />
+        <Ionicons name="folder" size={24} color={Colors.sceneBlue} style={styles.sceneIcon} />
 
         <View style={styles.sceneInfo}>
           <Text style={styles.sceneText}>
@@ -95,12 +90,7 @@ export function SelectSceneScreen({
           </Text>
         </View>
 
-        <Ionicons
-          name="arrow-forward"
-          size={20}
-          color={Colors.text}
-          style={styles.arrowIcon}
-        />
+        <Ionicons name="arrow-forward" size={20} color={Colors.text} style={styles.arrowIcon} />
       </TouchableOpacity>
     );
   }
@@ -119,46 +109,27 @@ export function SelectSceneScreen({
       <View style={styles.divider} />
 
       {isLoading ? (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={Colors.primary} />
+        <View style={styles.loadingContainer}> <ActivityIndicator size="large" color={Colors.primary} />
         </View>
       ) : (
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-          {/* Search */}
+
           <View style={styles.searchContainer}>
-            <Ionicons
-              name="search"
-              size={20}
-              color={Colors.textSecondary}
-              style={styles.searchIcon}
-            />
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Search scene..."
-              placeholderTextColor={Colors.textSecondary}
-              value={searchQuery}
-              onChangeText={setSearchQuery}
+            <Ionicons name="search" size={20} color={Colors.textSecondary} style={styles.searchIcon} />
+            <TextInput style={styles.searchInput}
+              placeholder="Search scene..." placeholderTextColor={Colors.textSecondary}
+              value={searchQuery} onChangeText={setSearchQuery}
             />
           </View>
 
-          {/* Project Title */}
-          <Text style={styles.projectTitle}>
-            {activeProject?.name ?? 'Project'}
-          </Text>
+          <Text style={styles.projectTitle}> {activeProject?.name ?? 'Project'} </Text>
 
-          {/* Scene List */}
           {filteredScenes.length > 0 ? (
             filteredScenes.map(renderSceneCard)
           ) : (
             <View style={styles.emptyState}>
-              <Ionicons
-                name="film-outline"
-                size={48}
-                color={Colors.textSecondary}
-              />
-              <Text style={styles.emptyStateText}>
-                No scenes found
-              </Text>
+              <Ionicons name="film-outline" size={48} color={Colors.textSecondary}/>
+              <Text style={styles.emptyStateText}> No scenes found </Text>
             </View>
           )}
         </ScrollView>
