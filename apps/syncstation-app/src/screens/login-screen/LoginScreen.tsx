@@ -88,7 +88,7 @@ export function LoginScreen({ onBack }: Props) {
     }
     setLoading(true);
     setError('');
-    try{
+    try {
       await login(email, password);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Login failed');
