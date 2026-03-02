@@ -25,4 +25,18 @@ export const useContentStore = create<ContentState>((set) => ({
       activeSceneId: null,
       activeScene: null,
     }),
+
+  setActiveScene: (scene: Scene) =>
+    set({
+      activeSceneId: scene.id,
+      activeScene: scene,
+    }),
+
+  clearContext: () =>
+    set({
+      activeProjectId: null,
+      activeSceneId: null,
+      activeProject: null,
+      activeScene: null,
+    }),
 }));

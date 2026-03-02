@@ -16,15 +16,15 @@ const MOCK_SCENES: Scene[] = [
   { id: '6', number: 6, name: 'Scene 6', description: 'Car chase', location: 'CA - Hollywood street 2' },
   { id: '7', number: 7, name: 'Scene 7', description: 'Rooftop showdown', location: 'Miami - Downtown tower' },
   { id: '8', number: 8, name: 'Scene 8', description: 'Hospital visit', location: 'LA - General Hospital' },
-];async function fetchScenes(
-  _token: string,
-  _tenantId: string,
-  _projectId: string,
-): Promise<Scene[]> {
+];
+
+// API function - ready for backend integration
+// Endpoint: GET /ws/projects/:projectId/tree
+async function fetchScenes(_token: string, _tenantId: string, _projectId: string): Promise<Scene[]> {
+  // TODO: Replace with actual API call when backend is ready
   await new Promise((resolve) => setTimeout(resolve, 500));
   return MOCK_SCENES;
 }
-
 export function SelectSceneScreen({
   onBack,
   onSelectScene,
