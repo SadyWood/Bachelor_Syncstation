@@ -43,6 +43,23 @@ export function SettingsScreen() {
           <Text style={styles.menuButtonIcon}>ℹ️</Text>
           <Text style={styles.menuButtonText}>About</Text>
         </TouchableOpacity>
+
+        <Text style={styles.sectionTitle}>Support</Text>
+
+        <TouchableOpacity style={styles.menuButton}>
+          <Text style={styles.menuButtonIcon}>❔</Text>
+          <Text style={styles.menuButtonText}>FAQs</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.menuButton}>
+          <Text style={styles.menuButtonIcon}>💬</Text>
+          <Text style={styles.menuButtonText}>Contact Support</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.menuButton}>
+          <Text style={styles.menuButtonIcon}>👍</Text>
+          <Text style={styles.menuButtonText}>Send Feedback</Text>
+        </TouchableOpacity>
       </ScrollView>
     </View>
   );
