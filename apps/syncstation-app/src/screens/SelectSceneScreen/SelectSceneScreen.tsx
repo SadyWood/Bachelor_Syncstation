@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
-import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { styles } from './SelectSceneScreen.styles';
 import { Colors } from '../../styles';
@@ -8,6 +8,7 @@ import type { SelectSceneScreenProps } from './types/SelectSceneScreen.types';
 
 export function SelectSceneScreen({ onBack }: SelectSceneScreenProps) {
   const [isLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
   return (
     <SafeAreaView style={styles.container} edges={['top'] as const}>
       <View style={styles.header}>
@@ -23,7 +24,16 @@ export function SelectSceneScreen({ onBack }: SelectSceneScreenProps) {
         </View>
       ) : (
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-          <View />
+          <View style={styles.searchContainer}>
+            <Ionicons name="search" size={20} color={Colors.textSecondary} style={styles.searchIcon} />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search scene..."
+              placeholderTextColor={Colors.textSecondary}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
+          </View>
         </ScrollView>
       )}
     </SafeAreaView>
