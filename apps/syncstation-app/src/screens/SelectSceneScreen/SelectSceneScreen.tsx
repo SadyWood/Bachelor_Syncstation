@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
-import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import React, { useState } from 'react';
+import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
 import { styles } from './SelectSceneScreen.styles';
 import { Colors } from '../../styles';
 import type { SelectSceneScreenProps } from './types/SelectSceneScreen.types';
@@ -23,7 +22,9 @@ export function SelectSceneScreen({ onBack }: SelectSceneScreenProps) {
           <ActivityIndicator size="large" color={Colors.primary} />
         </View>
       ) : (
-        <View />
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+          <View />
+        </ScrollView>
       )}
     </SafeAreaView>
   );
