@@ -21,8 +21,14 @@ export default function ImportPanel({ title, onClose, ...props }: WidgetProps) {
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
           {items.map(({ icon: Icon, label, hint }) => (
-            <div key={label} className="ws-block ws-block-interactive p-3 flex flex-col items-center gap-2">
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: 'var(--ws-brand-light)' }}>
+            <div
+              key={label}
+              className="ws-block ws-block-interactive p-3 flex flex-col items-center gap-2"
+            >
+              <div
+                className="w-12 h-12 rounded-xl flex items-center justify-center"
+                style={{ background: 'var(--ws-brand-light)' }}
+              >
                 <Icon size={18} style={{ color: 'var(--ws-brand)' }} />
               </div>
               <div className="text-sm font-medium">{label}</div>

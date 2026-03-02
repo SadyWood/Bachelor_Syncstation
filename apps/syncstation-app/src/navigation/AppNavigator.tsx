@@ -1,14 +1,24 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createNativeStackNavigator, type NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { Fragment, useState } from 'react';
-import { FabMenu, TabBar, type FabMenuOption, type TabName } from '@/components/TabBar';
-import { HomeScreen } from '@/screens';
+import type { FabMenuOption, TabName } from '@/components/TabBar/types/TabBar.types';
+import type { Project } from '@/screens/SelectContextScreen/types/SelectContextScreen.types';
+import type { NavigatorScreenParams } from '@react-navigation/native';
+import { FabMenu, TabBar } from '@/components/TabBar';
+import { tabNavigatorScreenOptions } from '@/navigation/AppNavigator.styles';
+import { HomeScreen, SelectContextScreen } from '@/screens';
 import { LoginScreen } from '@/screens/login-screen';
-import { ProfileScreen } from '@/screens/profile-screen';
 import { WelcomeScreen } from '@/screens/welcome-screen';
+import { ProfileScreen } from '@/screens/profile-screen';
+// TODO: import when is ready
+// import { SettingsScreen } from '@/screens/settings-screen';
+// import { ProductionScreen } from '@/screens/production-screen';
+// import { SelectSceneScreen } from '@/screens/select-scene-screen';
+// import { SelectTakeScreen } from '@/screens/select-take-screen';
+// import { CreateLogScreen } from '@/screens/create-log-screen';
+// import { SubjectScreen } from '@/screens/subject-screen';
 import { useAuthStore } from '@/stores/authStore';
-import { tabNavigatorScreenOptions } from './AppNavigator.styles';
-
+import { useContentStore } from '@/stores/ContentStore';
 
 type AppTabsParamList = {
   Home: undefined;
@@ -17,11 +27,27 @@ type AppTabsParamList = {
   Settings: undefined;
 };
 
+type AuthStackParamList = {
+  Welcome: undefined;
+  Login: undefined;
+};
+
+type RootStackParamList = {
+  Auth: undefined;
+  App: NavigatorScreenParams<AppTabsParamList>;
+  SelectContext: undefined;
+
+  SelectScene: undefined;
+  SelectTake: undefined;
+  CreateLog: undefined;
+  Subject: undefined;
+};
+
+const RootStack = createNativeStackNavigator<RootStackParamList>();
+const AuthStackNav = createNativeStackNavigator<AuthStackParamList>();
 const Tab = createBottomTabNavigator<AppTabsParamList>();
-const Stack = createNativeStackNavigator();
 
-
-export function AppTabs() {
+function AppTabs() {
   const [isFabMenuVisible, setIsFabMenuVisible] = useState<boolean>(false);
 
   function handleFabPress() {
@@ -33,7 +59,6 @@ export function AppTabs() {
   }
 
   function handleMenuOptionPress(_option: FabMenuOption) {
-    // TODO: koble til riktig flow senere
     setIsFabMenuVisible(false);
   }
 
@@ -41,60 +66,97 @@ export function AppTabs() {
     <Fragment>
       <Tab.Navigator
         screenOptions={tabNavigatorScreenOptions}
-        tabBar={({ state, navigation }) => {
-          const activeRouteName = state.routeNames[state.index] as TabName;
-
-          function handleTabPress(tab: TabName) {
-            navigation.navigate(tab);
-          }
-
-          return (
-            <TabBar
-              activeTab={activeRouteName}
-              onTabPress={handleTabPress}
-              onFabPress={handleFabPress}
-            />
-          );
-        }}
+        tabBar={({ state, navigation }) => (
+          <TabBar
+            activeTab={state.routeNames[state.index] as TabName}
+            onTabPress={(tab: TabName) => navigation.navigate(tab)}
+            onFabPress={handleFabPress}
+          />
+        )}
       >
         <Tab.Screen name="Home" component={HomeScreen} />
-        <Tab.Screen name="Production" component={HomeScreen} />
+        <Tab.Screen name="Production" component={HomeScreen} /> {/* TODO: ProductionScreen */}
         <Tab.Screen name="Profile" component={ProfileScreen} />
-        <Tab.Screen name="Settings" component={HomeScreen} />
+        <Tab.Screen name="Settings" component={HomeScreen} /> {/* TODO: SettingsScreen */}
       </Tab.Navigator>
 
-      <FabMenu
-        isVisible={isFabMenuVisible}
-        onClose={handleCloseFabMenu}
-        onOptionPress={handleMenuOptionPress}
-      />
+      <FabMenu isVisible={isFabMenuVisible} onClose={handleCloseFabMenu} onOptionPress={handleMenuOptionPress} />
     </Fragment>
   );
 }
 
 function AuthStack() {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Welcome">
-        {({ navigation }) => (
-          <WelcomeScreen onLoginPress={() => navigation.navigate('Login')} />
-        )}
-      </Stack.Screen>
-      <Stack.Screen name="Login" component={LoginScreen} />
-    </Stack.Navigator>
+    <AuthStackNav.Navigator screenOptions={{ headerShown: false }}>
+      <AuthStackNav.Screen name="Welcome">
+        {({ navigation }) => <WelcomeScreen onLoginPress={() => navigation.navigate('Login')} />}
+      </AuthStackNav.Screen>
+      <AuthStackNav.Screen name="Login" component={LoginScreen} />
+    </AuthStackNav.Navigator>
   );
 }
 
+type SelectContextProps = NativeStackScreenProps<RootStackParamList, 'SelectContext'>;
+
+function SelectContextRoute({ navigation }: SelectContextProps) {
+  const setActiveProject = useContentStore((state) => state.setActiveProject);
+
+  function handleSelectProject(project: Project) {
+    setActiveProject(project);
+    navigation.goBack();
+  }
+
+  function handleBack() {
+    navigation.goBack();
+  }
+
+  return <SelectContextScreen onBack={handleBack} onSelectProject={handleSelectProject} />;
+}
+
+// TODO: Replace homescreen with selectscenescreen when ready
+type SelectSceneProps = NativeStackScreenProps<RootStackParamList, 'SelectScene'>;
+
+function SelectSceneRoute(_props: SelectSceneProps) {
+  return <HomeScreen />;
+}
+
+// TODO: replace Homescreen with selecttakescreen when ready
+type SelectTakeProps = NativeStackScreenProps<RootStackParamList, 'SelectTake'>;
+
+function SelectTakeRoute(_props: SelectTakeProps) {
+  return <HomeScreen />;
+}
+
+// TODO: replace homescreen with createlogscreen when ready
+type CreateLogProps = NativeStackScreenProps<RootStackParamList, 'CreateLog'>;
+
+function CreateLogRoute(_props: CreateLogProps) {
+  return <HomeScreen />;
+}
+
+// TODO: replace homescreen with subjectscreen when ready
+type SubjectProps = NativeStackScreenProps<RootStackParamList, 'Subject'>;
+
+function SubjectRoute(_props: SubjectProps) {
+  return <HomeScreen />;
+}
+
 export function AppNavigator() {
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <RootStack.Navigator screenOptions={{ headerShown: false }}>
       {isAuthenticated ? (
-        <Stack.Screen name="App" component={AppTabs}/>
+        <RootStack.Screen name="App" component={AppTabs} />
       ) : (
-        <Stack.Screen name="Auth" component={AuthStack} />
+        <RootStack.Screen name="Auth" component={AuthStack} />
       )}
-    </Stack.Navigator>
+
+      <RootStack.Screen name="SelectContext" component={SelectContextRoute} />
+      <RootStack.Screen name="SelectScene" component={SelectSceneRoute} />
+      <RootStack.Screen name="SelectTake" component={SelectTakeRoute} />
+      <RootStack.Screen name="CreateLog" component={CreateLogRoute} />
+      <RootStack.Screen name="Subject" component={SubjectRoute} />
+    </RootStack.Navigator>
   );
 }

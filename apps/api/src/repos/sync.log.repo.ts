@@ -94,9 +94,7 @@ export async function listLogEntries(
   nodeId?: string,
   status?: SyncStatusT,
 ): Promise<LogEntrySummary[]> {
-  const conditions = [
-    eq(schema.logEntries.tenantId, tenantId),
-  ];
+  const conditions = [eq(schema.logEntries.tenantId, tenantId)];
 
   if (nodeId) {
     conditions.push(eq(schema.logEntries.contentNodeId, nodeId));
@@ -343,16 +341,12 @@ export async function getAttachment(
       storage_path: schema.logAttachments.storagePath,
       attachment_type: schema.logAttachments.attachmentType,
       created_at: schema.logAttachments.createdAt,
-    }).from(schema.logAttachments)
-  // Join to log entries so we can check tenant ownership
-    .innerJoin(
-      schema.logEntries, eq(schema.logAttachments.logEntryId, schema.logEntries.id),
-    )
+    })
+    .from(schema.logAttachments)
+    // Join to log entries so we can check tenant ownership
+    .innerJoin(schema.logEntries, eq(schema.logAttachments.logEntryId, schema.logEntries.id))
     .where(
-      and(
-        eq(schema.logAttachments.id, attachmentId),
-        eq(schema.logEntries.tenantId, tenantId),
-      ),
+      and(eq(schema.logAttachments.id, attachmentId), eq(schema.logEntries.tenantId, tenantId)),
     )
     .limit(1);
 

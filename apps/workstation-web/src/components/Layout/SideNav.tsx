@@ -1,6 +1,13 @@
 // src/components/Layout/SideNav.tsx
 import {
-  Home, FolderKanban, LayoutDashboard, TrendingUp, HelpCircle, LogOut, Shield, GitBranch,
+  Home,
+  FolderKanban,
+  LayoutDashboard,
+  TrendingUp,
+  HelpCircle,
+  LogOut,
+  Shield,
+  GitBranch,
 } from 'lucide-react';
 import React, { useState, useMemo } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
@@ -72,18 +79,16 @@ const SideNav: React.FC<SideNavProps> = ({ className = '' }) => {
     can('role.create');
 
   const menuItems: MenuItem[] = [
-    { icon: Home,        label: 'Start Page',         path: '/start' },
-    { icon: GitBranch,   label: 'Project Structure',  path: '/project-structure' },
+    { icon: Home, label: 'Start Page', path: '/start' },
+    { icon: GitBranch, label: 'Project Structure', path: '/project-structure' },
     { icon: FolderKanban, label: 'Project Management', path: '/projects' },
     { icon: LayoutDashboard, label: 'Content Dashboard', path: '/content' },
-    { icon: TrendingUp,  label: 'Performance & Engagement', path: '/performance' },
-    { icon: TrendingUp,  label: 'Dummy Page', path: '/dummy' },
+    { icon: TrendingUp, label: 'Performance & Engagement', path: '/performance' },
+    { icon: TrendingUp, label: 'Dummy Page', path: '/dummy' },
     ...(canSeeAdmin ? [{ icon: Shield, label: 'Admin', path: '/admin', requiresAdmin: true }] : []),
   ];
 
-  const bottomMenuItems: MenuItem[] = [
-    { icon: HelpCircle, label: 'Help', path: '/help' },
-  ];
+  const bottomMenuItems: MenuItem[] = [{ icon: HelpCircle, label: 'Help', path: '/help' }];
 
   return (
     <>
@@ -103,9 +108,15 @@ const SideNav: React.FC<SideNavProps> = ({ className = '' }) => {
         <div className="sidenav-header">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 flex-shrink-0">
-              <img src={avatarUrl} alt={userName || 'Profile'} className="w-full h-full rounded-lg object-cover" />
+              <img
+                src={avatarUrl}
+                alt={userName || 'Profile'}
+                className="w-full h-full rounded-lg object-cover"
+              />
             </div>
-            <div className={`transition-all duration-300 overflow-hidden ${isExpanded ? 'opacity-100' : 'opacity-0'}`}>
+            <div
+              className={`transition-all duration-300 overflow-hidden ${isExpanded ? 'opacity-100' : 'opacity-0'}`}
+            >
               {!accessLoaded ? (
                 <>
                   <div className="w-32 h-3 rounded ws-skeleton mb-2" />
@@ -113,8 +124,12 @@ const SideNav: React.FC<SideNavProps> = ({ className = '' }) => {
                 </>
               ) : (
                 <>
-                  <div className="text-sm font-semibold sidenav-user-name whitespace-nowrap">{userName || '—'}</div>
-                  <div className="text-xs sidenav-user-company whitespace-nowrap">{orgName || '—'}</div>
+                  <div className="text-sm font-semibold sidenav-user-name whitespace-nowrap">
+                    {userName || '—'}
+                  </div>
+                  <div className="text-xs sidenav-user-company whitespace-nowrap">
+                    {orgName || '—'}
+                  </div>
                 </>
               )}
             </div>
@@ -200,7 +215,12 @@ const SideNav: React.FC<SideNavProps> = ({ className = '' }) => {
           <div className="mt-4 pt-4 border-t border-gray-200 sidenav-logo">
             <div className="flex justify-center">
               <div className="flex-shrink-0" style={{ width: '48px', height: '48px' }}>
-                <img src="/hoolsy_logo.png" alt="Hoolsy" className="object-contain" style={{ width: '48px', height: '48px' }} />
+                <img
+                  src="/hoolsy_logo.png"
+                  alt="Hoolsy"
+                  className="object-contain"
+                  style={{ width: '48px', height: '48px' }}
+                />
               </div>
             </div>
           </div>
@@ -209,7 +229,10 @@ const SideNav: React.FC<SideNavProps> = ({ className = '' }) => {
 
       {/* Mobile backdrop */}
       {isExpanded && (
-        <div className="fixed inset-0 bg-black/20 z-30 md:hidden" onClick={() => setIsExpanded(false)} />
+        <div
+          className="fixed inset-0 bg-black/20 z-30 md:hidden"
+          onClick={() => setIsExpanded(false)}
+        />
       )}
     </>
   );

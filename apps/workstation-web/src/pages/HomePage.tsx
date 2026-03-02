@@ -14,10 +14,7 @@ const HomePage: React.FC = () => (
             <h1 className="text-2xl font-bold text-gray-800">Hoolsy</h1>
           </div>
           <nav className="flex items-center gap-6">
-            <Link
-              to="/demopage"
-              className="text-gray-600 hover:text-gray-800 transition-colors"
-            >
+            <Link to="/demopage" className="text-gray-600 hover:text-gray-800 transition-colors">
               Dashboard
             </Link>
             <button className="bg-gray-600 text-white px-4 py-2 rounded-xl hover:bg-gray-700 transition-colors">
@@ -36,8 +33,7 @@ const HomePage: React.FC = () => (
           <span className="text-gray-600"> Projects</span>
         </h2>
         <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-          Streamline your workflow with powerful project management tools
-          designed for modern teams.
+          Streamline your workflow with powerful project management tools designed for modern teams.
         </p>
         <div className="flex items-center justify-center gap-4">
           <Link
@@ -58,12 +54,10 @@ const HomePage: React.FC = () => (
     <section className="py-16 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h3 className="text-3xl font-bold text-gray-900 mb-4">
-            Everything you need
-          </h3>
+          <h3 className="text-3xl font-bold text-gray-900 mb-4">Everything you need</h3>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Powerful features to help you manage projects, track progress,
-            and collaborate with your team.
+            Powerful features to help you manage projects, track progress, and collaborate with your
+            team.
           </p>
         </div>
 
@@ -72,12 +66,9 @@ const HomePage: React.FC = () => (
             <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-4">
               <Zap className="w-6 h-6 text-gray-600" />
             </div>
-            <h4 className="text-xl font-semibold text-gray-900 mb-2">
-              Lightning Fast
-            </h4>
+            <h4 className="text-xl font-semibold text-gray-900 mb-2">Lightning Fast</h4>
             <p className="text-gray-600">
-              Built with modern technologies for optimal performance
-              and user experience.
+              Built with modern technologies for optimal performance and user experience.
             </p>
           </div>
 
@@ -85,12 +76,9 @@ const HomePage: React.FC = () => (
             <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-4">
               <Shield className="w-6 h-6 text-gray-600" />
             </div>
-            <h4 className="text-xl font-semibold text-gray-900 mb-2">
-              Secure & Reliable
-            </h4>
+            <h4 className="text-xl font-semibold text-gray-900 mb-2">Secure & Reliable</h4>
             <p className="text-gray-600">
-              Enterprise-grade security with 99.9% uptime guarantee
-              for your peace of mind.
+              Enterprise-grade security with 99.9% uptime guarantee for your peace of mind.
             </p>
           </div>
 
@@ -98,12 +86,9 @@ const HomePage: React.FC = () => (
             <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-4">
               <Globe className="w-6 h-6 text-gray-600" />
             </div>
-            <h4 className="text-xl font-semibold text-gray-900 mb-2">
-              Global Access
-            </h4>
+            <h4 className="text-xl font-semibold text-gray-900 mb-2">Global Access</h4>
             <p className="text-gray-600">
-              Access your projects from anywhere in the world
-              with our cloud-based platform.
+              Access your projects from anywhere in the world with our cloud-based platform.
             </p>
           </div>
         </div>
@@ -113,12 +98,9 @@ const HomePage: React.FC = () => (
     {/* CTA Section */}
     <section className="py-16 bg-gray-600">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h3 className="text-3xl font-bold text-white mb-4">
-          Ready to get started?
-        </h3>
+        <h3 className="text-3xl font-bold text-white mb-4">Ready to get started?</h3>
         <p className="text-gray-200 mb-8 max-w-2xl mx-auto">
-          Join thousands of teams already using Hoolsy to manage
-          their projects more effectively.
+          Join thousands of teams already using Hoolsy to manage their projects more effectively.
         </p>
         <Link
           to="/demopage"
@@ -133,9 +115,7 @@ const HomePage: React.FC = () => (
     {/* Footer */}
     <footer className="bg-white border-t border-gray-200 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <p className="text-gray-600">
-          © 2024 Hoolsy. All rights reserved.
-        </p>
+        <p className="text-gray-600">© 2024 Hoolsy. All rights reserved.</p>
       </div>
     </footer>
   </div>

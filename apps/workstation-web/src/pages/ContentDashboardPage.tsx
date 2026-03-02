@@ -35,11 +35,66 @@ const SelectedNodeContext = createContext<SelectedNodeContextValue>({
 });
 
 const items: GridItemMeta[] = [
-  { i: 'browser', x: 0, y: 0, w: 2, h: 7, minW: 2, minH: 4, widget: 'ProjectBrowser', title: 'Content Browser', icon: FolderTree },
-  { i: 'list', x: 2, y: 0, w: 3, h: 7, minW: 2, minH: 4, widget: 'SubjectList', title: 'Subject List', icon: List },
-  { i: 'editor', x: 5, y: 0, w: 3, h: 7, minW: 2, minH: 4, widget: 'SubjectEditor', title: 'Subject Editor', icon: Edit3 },
-  { i: 'preview', x: 8, y: 0, w: 4, h: 7, minW: 4, minH: 4, widget: 'MediaPreview', title: 'Media Preview', icon: ImageIcon },
-  { i: 'timeline', x: 0, y: 7, w: 12, h: 6, minW: 6, minH: 2, widget: 'Timeline', title: 'Timeline', icon: Clock },
+  {
+    i: 'browser',
+    x: 0,
+    y: 0,
+    w: 2,
+    h: 7,
+    minW: 2,
+    minH: 4,
+    widget: 'ProjectBrowser',
+    title: 'Content Browser',
+    icon: FolderTree,
+  },
+  {
+    i: 'list',
+    x: 2,
+    y: 0,
+    w: 3,
+    h: 7,
+    minW: 2,
+    minH: 4,
+    widget: 'SubjectList',
+    title: 'Subject List',
+    icon: List,
+  },
+  {
+    i: 'editor',
+    x: 5,
+    y: 0,
+    w: 3,
+    h: 7,
+    minW: 2,
+    minH: 4,
+    widget: 'SubjectEditor',
+    title: 'Subject Editor',
+    icon: Edit3,
+  },
+  {
+    i: 'preview',
+    x: 8,
+    y: 0,
+    w: 4,
+    h: 7,
+    minW: 4,
+    minH: 4,
+    widget: 'MediaPreview',
+    title: 'Media Preview',
+    icon: ImageIcon,
+  },
+  {
+    i: 'timeline',
+    x: 0,
+    y: 7,
+    w: 12,
+    h: 6,
+    minW: 6,
+    minH: 2,
+    widget: 'Timeline',
+    title: 'Timeline',
+    icon: Clock,
+  },
 ];
 
 // Wrapper component that consumes context to inject selected node into MediaPreview
@@ -56,7 +111,8 @@ function ContentDashboardInner() {
   const [selectedNodeTitle, setSelectedNodeTitle] = useState<string | null>(null);
   // Use ref to track mount status without triggering re-renders
   const isMountedRef = useRef(false);
-  const { setCurrentTime, setDuration, setSubjects, setAppearances, setMarkers } = useTimelineState();
+  const { setCurrentTime, setDuration, setSubjects, setAppearances, setMarkers } =
+    useTimelineState();
 
   // Initialize subjects, appearances, and markers on mount
   useEffect(() => {
@@ -68,43 +124,45 @@ function ContentDashboardInner() {
   }, [setSubjects, setAppearances, setMarkers]);
 
   // Listen for video time updates
-  useEffect(() => addTypedEventListener<VideoTimeUpdateEvent>(
-    EVENT_NAMES.VIDEO_TIME_UPDATE,
-    (e) => {
-      if (e.detail.currentTime !== undefined) {
-        setCurrentTime(e.detail.currentTime * 1000); // Convert to ms
-      }
-      if (e.detail.duration !== undefined) {
-        setDuration(e.detail.duration * 1000); // Convert to ms
-      }
-    },
-  ), [setCurrentTime, setDuration]);
+  useEffect(
+    () =>
+      addTypedEventListener<VideoTimeUpdateEvent>(EVENT_NAMES.VIDEO_TIME_UPDATE, (e) => {
+        if (e.detail.currentTime !== undefined) {
+          setCurrentTime(e.detail.currentTime * 1000); // Convert to ms
+        }
+        if (e.detail.duration !== undefined) {
+          setDuration(e.detail.duration * 1000); // Convert to ms
+        }
+      }),
+    [setCurrentTime, setDuration],
+  );
 
   // Listen for node selection and update URL
-  useEffect(() => addTypedEventListener<NodeSelectedEvent>(
-    EVENT_NAMES.NODE_SELECTED,
-    (e) => {
-      const { nodeId } = e.detail;
-      const { title } = e.detail;
+  useEffect(
+    () =>
+      addTypedEventListener<NodeSelectedEvent>(EVENT_NAMES.NODE_SELECTED, (e) => {
+        const { nodeId } = e.detail;
+        const { title } = e.detail;
 
-      logger.debug('NODE_SELECTED event received', {
-        nodeId,
-        title,
-        currentSelectedNodeId: selectedNodeId,
-      });
+        logger.debug('NODE_SELECTED event received', {
+          nodeId,
+          title,
+          currentSelectedNodeId: selectedNodeId,
+        });
 
-      setSelectedNodeId(nodeId);
-      setSelectedNodeTitle(title);
+        setSelectedNodeId(nodeId);
+        setSelectedNodeTitle(title);
 
-      // Update URL when node is selected
-      if (nodeId) {
-        logger.debug(`Navigating to: /content/${nodeId}`);
-        navigate(`/content/${nodeId}`, { replace: true });
-      } else {
-        navigate('/content', { replace: true });
-      }
-    },
-  ), [navigate, selectedNodeId]);
+        // Update URL when node is selected
+        if (nodeId) {
+          logger.debug(`Navigating to: /content/${nodeId}`);
+          navigate(`/content/${nodeId}`, { replace: true });
+        } else {
+          navigate('/content', { replace: true });
+        }
+      }),
+    [navigate, selectedNodeId],
+  );
 
   // Load node from URL after mount is complete
   // Only triggers on urlNodeId changes to avoid race condition
@@ -123,13 +181,16 @@ function ContentDashboardInner() {
 
   // Create STABLE widget registry
   // MediaPreview gets selectedNode state from context, not props
-  const registry = useMemo<WidgetRegistry>(() => ({
-    ProjectBrowser,
-    SubjectList,
-    SubjectEditor,
-    MediaPreview: MediaPreviewWrapper,
-    Timeline: TimelineWidget,
-  }), []);
+  const registry = useMemo<WidgetRegistry>(
+    () => ({
+      ProjectBrowser,
+      SubjectList,
+      SubjectEditor,
+      MediaPreview: MediaPreviewWrapper,
+      Timeline: TimelineWidget,
+    }),
+    [],
+  );
 
   // Memoize context value to prevent unnecessary re-renders
   const selectedNodeContextValue = useMemo(
@@ -142,7 +203,12 @@ function ContentDashboardInner() {
       <div className="h-screen flex bg-[var(--ws-page-bg)]">
         <SideNav />
         <PageShell>
-          <WidgetGrid className="h-full w-full" items={items} registry={registry} persistKey="content-dashboard-v1" />
+          <WidgetGrid
+            className="h-full w-full"
+            items={items}
+            registry={registry}
+            persistKey="content-dashboard-v1"
+          />
         </PageShell>
       </div>
     </SelectedNodeContext.Provider>

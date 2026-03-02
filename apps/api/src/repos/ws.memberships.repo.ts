@@ -12,10 +12,12 @@ export async function getUserRoles(tenantId: string, userId: string): Promise<Us
     })
     .from(schema.wsUserMemberships)
     .innerJoin(schema.wsRoles, eq(schema.wsRoles.roleId, schema.wsUserMemberships.roleId))
-    .where(and(
-      eq(schema.wsUserMemberships.tenantId, tenantId),
-      eq(schema.wsUserMemberships.userUuid, userId),
-    ));
+    .where(
+      and(
+        eq(schema.wsUserMemberships.tenantId, tenantId),
+        eq(schema.wsUserMemberships.userUuid, userId),
+      ),
+    );
 
   return z.array(UserRoleSchema).parse(rows);
 }
@@ -35,7 +37,8 @@ export async function assignRole(tenantId: string, userId: string, roleId: strin
   }
 
   // Insert membership (ignore if already exists)
-  await dbWs.insert(schema.wsUserMemberships)
+  await dbWs
+    .insert(schema.wsUserMemberships)
     .values({
       userUuid: userId,
       tenantId,
@@ -45,25 +48,31 @@ export async function assignRole(tenantId: string, userId: string, roleId: strin
     .onConflictDoNothing();
 
   // Mark roster active if needed
-  await dbWs.update(schema.wsTenantMembers)
+  await dbWs
+    .update(schema.wsTenantMembers)
     .set({
       status: 'active' as const,
       activatedAt: new Date(),
       deactivatedAt: null,
     })
-    .where(and(
-      eq(schema.wsTenantMembers.tenantId, tenantId),
-      eq(schema.wsTenantMembers.userUuid, userId),
-    ));
+    .where(
+      and(
+        eq(schema.wsTenantMembers.tenantId, tenantId),
+        eq(schema.wsTenantMembers.userUuid, userId),
+      ),
+    );
 }
 
 export async function removeRole(tenantId: string, userId: string, roleId: string): Promise<void> {
-  await dbWs.delete(schema.wsUserMemberships)
-    .where(and(
-      eq(schema.wsUserMemberships.tenantId, tenantId),
-      eq(schema.wsUserMemberships.userUuid, userId),
-      eq(schema.wsUserMemberships.roleId, roleId),
-    ));
+  await dbWs
+    .delete(schema.wsUserMemberships)
+    .where(
+      and(
+        eq(schema.wsUserMemberships.tenantId, tenantId),
+        eq(schema.wsUserMemberships.userUuid, userId),
+        eq(schema.wsUserMemberships.roleId, roleId),
+      ),
+    );
 }
 
 export async function bulkUpdateRoles(
@@ -79,11 +88,14 @@ export async function bulkUpdateRoles(
   }
 
   if (remove.length) {
-    await dbWs.delete(schema.wsUserMemberships)
-      .where(and(
-        eq(schema.wsUserMemberships.tenantId, tenantId),
-        eq(schema.wsUserMemberships.userUuid, userId),
-        inArray(schema.wsUserMemberships.roleId, remove),
-      ));
+    await dbWs
+      .delete(schema.wsUserMemberships)
+      .where(
+        and(
+          eq(schema.wsUserMemberships.tenantId, tenantId),
+          eq(schema.wsUserMemberships.userUuid, userId),
+          inArray(schema.wsUserMemberships.roleId, remove),
+        ),
+      );
   }
 }

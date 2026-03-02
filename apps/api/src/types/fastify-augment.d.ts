@@ -6,6 +6,8 @@ declare module 'fastify' {
   interface FastifyInstance {
     authenticate: (req: FastifyRequest, reply: FastifyReply) => Promise<void>;
     can: (req: FastifyRequest, perm: string) => Promise<boolean>;
-    needsPerm: (perm: string) => (req: FastifyRequest, reply: FastifyReply) => Promise<void | undefined>;
+    needsPerm: (
+      perm: string,
+    ) => (req: FastifyRequest, reply: FastifyReply) => Promise<void | undefined>;
   }
 }

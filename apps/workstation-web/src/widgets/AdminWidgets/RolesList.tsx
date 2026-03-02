@@ -1,5 +1,15 @@
 // apps/workstation-web/src/widgets/AdminWidgets/RolesList.tsx
-import { ShieldPlus, Trash2, RefreshCw, Plus, ChevronUp, ChevronDown, Search, X, Shield } from 'lucide-react';
+import {
+  ShieldPlus,
+  Trash2,
+  RefreshCw,
+  Plus,
+  ChevronUp,
+  ChevronDown,
+  Search,
+  X,
+  Shield,
+} from 'lucide-react';
 import React, { useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 import { BaseWidget } from '../../components/WidgetBase/BaseWidget';
@@ -17,7 +27,12 @@ export default function RolesListWidget({ title, onClose, ...props }: WidgetProp
   const tenantId = currentTenantInfo?.id ?? '';
 
   // Fetch roles with useSWR
-  const { data: rows = [], error: swrError, isLoading: loading, mutate } = useSWR<RoleRow[]>(
+  const {
+    data: rows = [],
+    error: swrError,
+    isLoading: loading,
+    mutate,
+  } = useSWR<RoleRow[]>(
     tenantId ? `/api/tenants/${tenantId}/roles` : null,
     () => listRoles(tenantId),
     {
@@ -49,17 +64,17 @@ export default function RolesListWidget({ title, onClose, ...props }: WidgetProp
   }, [mutate]);
 
   function toggleSort(key: SortKey) {
-    if (key === sortKey) setSortDir(d => (d === 'asc' ? 'desc' : 'asc'));
-    else { setSortKey(key); setSortDir('asc'); }
+    if (key === sortKey) setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+    else {
+      setSortKey(key);
+      setSortDir('asc');
+    }
   }
 
   const filteredSorted = useMemo(() => {
     const q = search.trim().toLowerCase();
     const filtered = q
-      ? rows.filter(r =>
-        r.name.toLowerCase().includes(q) ||
-          r.scope.toLowerCase().includes(q),
-      )
+      ? rows.filter((r) => r.name.toLowerCase().includes(q) || r.scope.toLowerCase().includes(q))
       : rows.slice();
 
     filtered.sort((a, b) => {
@@ -114,10 +129,10 @@ export default function RolesListWidget({ title, onClose, ...props }: WidgetProp
       await mutate(
         async () => {
           await deleteRole(tenantId, role.roleId);
-          return rows.filter(r => r.roleId !== role.roleId);
+          return rows.filter((r) => r.roleId !== role.roleId);
         },
         {
-          optimisticData: rows.filter(r => r.roleId !== role.roleId),
+          optimisticData: rows.filter((r) => r.roleId !== role.roleId),
           rollbackOnError: true,
           revalidate: false,
         },
@@ -130,9 +145,11 @@ export default function RolesListWidget({ title, onClose, ...props }: WidgetProp
 
   function renderSortIcon(column: SortKey) {
     if (sortKey !== column) return null;
-    return sortDir === 'asc'
-      ? <ChevronUp size={14} className="inline-block ml-1" />
-      : <ChevronDown size={14} className="inline-block ml-1" />;
+    return sortDir === 'asc' ? (
+      <ChevronUp size={14} className="inline-block ml-1" />
+    ) : (
+      <ChevronDown size={14} className="inline-block ml-1" />
+    );
   }
 
   return (
@@ -167,13 +184,21 @@ export default function RolesListWidget({ title, onClose, ...props }: WidgetProp
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
             />
-            <button type="submit" className="ws-btn ws-btn-sm ws-btn-solid" disabled={!newName.trim() || creating}>
+            <button
+              type="submit"
+              className="ws-btn ws-btn-sm ws-btn-solid"
+              disabled={!newName.trim() || creating}
+            >
               <Plus size={14} />
               <span>Create</span>
             </button>
           </form>
 
-          <button className="ws-btn ws-btn-sm ws-btn-outline ml-auto" onClick={() => mutate()} title="Refresh">
+          <button
+            className="ws-btn ws-btn-sm ws-btn-outline ml-auto"
+            onClick={() => mutate()}
+            title="Refresh"
+          >
             <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
             <span>Refresh</span>
           </button>
@@ -208,49 +233,61 @@ export default function RolesListWidget({ title, onClose, ...props }: WidgetProp
             <tbody>
               {loading && (
                 <tr>
-                  <td colSpan={4}><div className="w-full h-10 ws-skeleton rounded" /></td>
+                  <td colSpan={4}>
+                    <div className="w-full h-10 ws-skeleton rounded" />
+                  </td>
                 </tr>
               )}
               {!loading && filteredSorted.length === 0 && (
                 <tr>
-                  <td colSpan={4}><div className="text-center ws-muted text-sm py-4">No roles found</div></td>
+                  <td colSpan={4}>
+                    <div className="text-center ws-muted text-sm py-4">No roles found</div>
+                  </td>
                 </tr>
               )}
-              {!loading && filteredSorted.length > 0 && filteredSorted.map((r) => {
-                const isSel = r.roleId === selectedRoleId;
-                return (
-                  <tr
-                    key={r.roleId}
-                    className={`cursor-pointer group ${isSel ? 'ws-row-active' : ''}`}
-                    onClick={() => selectRole(r)}
-                    title="Click to view permissions"
-                  >
-                    <td>
-                      <div className="flex items-center gap-2">
-                        <ShieldPlus size={16} className="text-gray-400" />
-                        <span className="font-medium">{r.name}</span>
-                      </div>
-                    </td>
-                    <td>
-                      <span className={`ws-chip ${r.scope === 'global' ? 'ws-chip-primary' : ''}`}>{r.scope}</span>
-                    </td>
-                    <td><span className="ws-badge ws-badge-neutral">{r.memberCount ?? 0}</span></td>
-                    <td>
-                      <div className="flex justify-end">
-                        {r.scope === 'tenant' && (
-                          <button
-                            className="ws-btn ws-btn-sm ws-btn-icon ws-btn-soft ws-danger"
-                            onClick={(ev) => onDelete(r, ev)}
-                            title="Delete role"
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
+              {!loading &&
+                filteredSorted.length > 0 &&
+                filteredSorted.map((r) => {
+                  const isSel = r.roleId === selectedRoleId;
+                  return (
+                    <tr
+                      key={r.roleId}
+                      className={`cursor-pointer group ${isSel ? 'ws-row-active' : ''}`}
+                      onClick={() => selectRole(r)}
+                      title="Click to view permissions"
+                    >
+                      <td>
+                        <div className="flex items-center gap-2">
+                          <ShieldPlus size={16} className="text-gray-400" />
+                          <span className="font-medium">{r.name}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <span
+                          className={`ws-chip ${r.scope === 'global' ? 'ws-chip-primary' : ''}`}
+                        >
+                          {r.scope}
+                        </span>
+                      </td>
+                      <td>
+                        <span className="ws-badge ws-badge-neutral">{r.memberCount ?? 0}</span>
+                      </td>
+                      <td>
+                        <div className="flex justify-end">
+                          {r.scope === 'tenant' && (
+                            <button
+                              className="ws-btn ws-btn-sm ws-btn-icon ws-btn-soft ws-danger"
+                              onClick={(ev) => onDelete(r, ev)}
+                              title="Delete role"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
             </tbody>
           </table>
         </div>
@@ -258,7 +295,11 @@ export default function RolesListWidget({ title, onClose, ...props }: WidgetProp
         {!alertDismissed && (
           <div className="ws-alert ws-alert-info ws-alert-dismissible text-xs">
             Tip: Click a role to view and edit its permissions
-            <button onClick={() => setAlertDismissed(true)} className="ws-alert-dismiss" aria-label="Dismiss">
+            <button
+              onClick={() => setAlertDismissed(true)}
+              className="ws-alert-dismiss"
+              aria-label="Dismiss"
+            >
               <X size={12} />
             </button>
           </div>

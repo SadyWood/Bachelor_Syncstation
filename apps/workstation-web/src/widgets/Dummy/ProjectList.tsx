@@ -37,13 +37,19 @@ export default function ProjectList({ title, onClose, ...props }: WidgetProps) {
             <tbody>
               {rows.map((r) => (
                 <tr key={r.name}>
-                  <td><div className="text-sm font-medium">{r.name}</div></td>
+                  <td>
+                    <div className="text-sm font-medium">{r.name}</div>
+                  </td>
                   <td className="ws-muted text-xs">{r.id || '—'}</td>
                   <td>
-                    <div className="ws-progress"><div className="ws-progress-bar" style={{ width: `${r.pct}%` }} /></div>
+                    <div className="ws-progress">
+                      <div className="ws-progress-bar" style={{ width: `${r.pct}%` }} />
+                    </div>
                     <div className="text-xs ws-muted mt-1">{r.pct}%</div>
                   </td>
-                  <td><span className={getBadge(r.status)}>{r.status}</span></td>
+                  <td>
+                    <span className={getBadge(r.status)}>{r.status}</span>
+                  </td>
                   <td className="text-right">
                     <div className="flex justify-end gap-2">
                       <button className="ws-pill ws-outline ws-success">Open</button>

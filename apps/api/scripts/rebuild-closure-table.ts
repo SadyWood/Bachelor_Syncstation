@@ -34,7 +34,7 @@ async function rebuildClosureTable() {
 
     // 3. Insert self-closure for all nodes
     console.log('3. Inserting self-closure rows (depth=0)...');
-    const selfClosures = allNodes.map(node => ({
+    const selfClosures = allNodes.map((node) => ({
       ancestorId: node.nodeId,
       descendantId: node.nodeId,
       depth: 0,
@@ -65,12 +65,14 @@ async function rebuildClosureTable() {
         .where(sql`${schema.contentClosure.descendantId} = ${node.parentId}`);
 
       if (parentAncestors.length === 0) {
-        console.warn(`   ⚠️  Warning: Parent ${node.parentId} not found for node ${node.nodeId} (${node.title})`);
+        console.warn(
+          `   ⚠️  Warning: Parent ${node.parentId} not found for node ${node.nodeId} (${node.title})`,
+        );
         continue;
       }
 
       // For each ancestor of parent, add (ancestor, this_node, depth+1)
-      const ancestorRows = parentAncestors.map(a => ({
+      const ancestorRows = parentAncestors.map((a) => ({
         ancestorId: a.ancestorId,
         descendantId: node.nodeId,
         depth: a.depth + 1,
@@ -92,13 +94,16 @@ async function rebuildClosureTable() {
 
     console.log(`   Total closure rows: ${closureCount.count}`);
     console.log(`   Expected: ${selfClosures.length + totalAncestorRows}`);
-    console.log(`   Match: ${closureCount.count === selfClosures.length + totalAncestorRows ? '✅' : '❌'}\n`);
+    console.log(
+      `   Match: ${closureCount.count === selfClosures.length + totalAncestorRows ? '✅' : '❌'}\n`,
+    );
 
     // 6. Show some examples
     console.log('6. Example: Project trees');
-    const projects = allNodes.filter(n => n.parentId === null);
+    const projects = allNodes.filter((n) => n.parentId === null);
 
-    for (const project of projects.slice(0, 3)) { // Show first 3 projects
+    for (const project of projects.slice(0, 3)) {
+      // Show first 3 projects
       const descendants = await dbWs
         .select({
           nodeId: schema.contentNodes.nodeId,
@@ -133,7 +138,7 @@ rebuildClosureTable()
     console.log('Done!');
     process.exit(0);
   })
-  .catch(error => {
+  .catch((error) => {
     console.error('Script failed:', error);
     process.exit(1);
   });

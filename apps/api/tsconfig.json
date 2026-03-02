@@ -13,9 +13,5 @@
     "skipLibCheck": true,
     "types": ["node"]
   },
-  "include": [
-    "src",
-    "../../packages/schema/src",
-    "../../packages/databases/src"
-  ]
+  "include": ["src", "../../packages/schema/src", "../../packages/databases/src"]
 }

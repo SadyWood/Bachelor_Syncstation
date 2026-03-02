@@ -15,8 +15,9 @@ export default function ProjectManagementPage() {
             </div>
             <div className="ws-card-body">
               <p className="text-sm ws-muted">
-                This page is reserved for execution/operations (work queues, status, assignments, timelines, etc.).
-                You can add widgets later—kept separate from <strong>Project Structure</strong> by design.
+                This page is reserved for execution/operations (work queues, status, assignments,
+                timelines, etc.). You can add widgets later—kept separate from{' '}
+                <strong>Project Structure</strong> by design.
               </p>
             </div>
           </div>

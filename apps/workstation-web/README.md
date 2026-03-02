@@ -158,15 +158,14 @@ import { BaseWidget } from '../components/WidgetBase/BaseWidget';
 export default function MyWidget({ title, onClose, ...props }: WidgetProps) {
   return (
     <BaseWidget title={title} onClose={onClose} {...props}>
-      <div className="p-4">
-        Widget content here
-      </div>
+      <div className="p-4">Widget content here</div>
     </BaseWidget>
   );
 }
 ```
 
 **Available Widgets:**
+
 - **ProjectBrowser** - Content tree with drag-and-drop
 - **MediaPreview** - Video/audio/image player
 - **MembersList** - Tenant members management
@@ -182,21 +181,24 @@ import useSWR from 'swr';
 import { listRoles } from '../lib/ws-client';
 
 function RolesList() {
-  const { data: roles = [], error, isLoading, mutate } = useSWR(
-    tenantId ? `/api/tenants/${tenantId}/roles` : null,
-    () => listRoles(tenantId),
-    {
-      revalidateOnFocus: false,
-      dedupingInterval: 30000,
-    }
-  );
+  const {
+    data: roles = [],
+    error,
+    isLoading,
+    mutate,
+  } = useSWR(tenantId ? `/api/tenants/${tenantId}/roles` : null, () => listRoles(tenantId), {
+    revalidateOnFocus: false,
+    dedupingInterval: 30000,
+  });
 
   if (isLoading) return <Skeleton />;
   if (error) return <Error message={error.message} />;
 
   return (
     <div>
-      {roles.map(role => <RoleCard key={role.roleId} role={role} />)}
+      {roles.map((role) => (
+        <RoleCard key={role.roleId} role={role} />
+      ))}
       <button onClick={() => mutate()}>Refresh</button>
     </div>
   );
@@ -298,6 +300,7 @@ const { asset } = await completeUpload(uploadId);
 ```
 
 All functions:
+
 - Include `Authorization: Bearer <token>` header
 - Include `x-ws-tenant: <tenantId>` header
 - Handle errors consistently

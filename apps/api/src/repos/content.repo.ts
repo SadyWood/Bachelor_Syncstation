@@ -1,10 +1,5 @@
 // apps/api/src/repos/content.repo.ts
-import {
-  ContentNodeSchema,
-  ProjectSummary,
-  type NodeTypeT,
-  type ContentNode,
-} from '@hk26/schema';
+import { ContentNodeSchema, ProjectSummary, type NodeTypeT, type ContentNode } from '@hk26/schema';
 import { and, eq, isNull, sql, desc, asc, inArray } from 'drizzle-orm';
 import { dbWs, schema } from '../db.js';
 
@@ -75,12 +70,7 @@ export async function listProjects(tenantId: string) {
       )`.as('children_count'),
     })
     .from(schema.contentNodes)
-    .where(
-      and(
-        eq(schema.contentNodes.tenantId, tenantId),
-        isNull(schema.contentNodes.parentId),
-      ),
-    )
+    .where(and(eq(schema.contentNodes.tenantId, tenantId), isNull(schema.contentNodes.parentId)))
     .orderBy(desc(schema.contentNodes.createdAt));
 
   return rows.map((row) =>
@@ -142,7 +132,10 @@ export async function createProject(input: {
 /**
  * Get a single project by ID.
  */
-export async function getProjectById(tenantId: string, nodeId: string): Promise<ContentNode | null> {
+export async function getProjectById(
+  tenantId: string,
+  nodeId: string,
+): Promise<ContentNode | null> {
   const [row] = await dbWs
     .select({
       node_id: schema.contentNodes.nodeId,
@@ -160,14 +153,8 @@ export async function getProjectById(tenantId: string, nodeId: string): Promise<
       updated_at: schema.contentNodes.updatedAt,
     })
     .from(schema.contentNodes)
-    .leftJoin(
-      schema.mediaKind,
-      eq(schema.contentNodes.mediaKindId, schema.mediaKind.id),
-    )
-    .leftJoin(
-      schema.mediaClass,
-      eq(schema.mediaKind.mediaClassId, schema.mediaClass.id),
-    )
+    .leftJoin(schema.mediaKind, eq(schema.contentNodes.mediaKindId, schema.mediaKind.id))
+    .leftJoin(schema.mediaClass, eq(schema.mediaKind.mediaClassId, schema.mediaClass.id))
     .where(
       and(
         eq(schema.contentNodes.nodeId, nodeId),
@@ -247,20 +234,9 @@ export async function getNodeById(tenantId: string, nodeId: string): Promise<Con
       updated_at: schema.contentNodes.updatedAt,
     })
     .from(schema.contentNodes)
-    .leftJoin(
-      schema.mediaKind,
-      eq(schema.contentNodes.mediaKindId, schema.mediaKind.id),
-    )
-    .leftJoin(
-      schema.mediaClass,
-      eq(schema.mediaKind.mediaClassId, schema.mediaClass.id),
-    )
-    .where(
-      and(
-        eq(schema.contentNodes.nodeId, nodeId),
-        eq(schema.contentNodes.tenantId, tenantId),
-      ),
-    );
+    .leftJoin(schema.mediaKind, eq(schema.contentNodes.mediaKindId, schema.mediaKind.id))
+    .leftJoin(schema.mediaClass, eq(schema.mediaKind.mediaClassId, schema.mediaClass.id))
+    .where(and(eq(schema.contentNodes.nodeId, nodeId), eq(schema.contentNodes.tenantId, tenantId)));
 
   if (!row) return null;
   return mapRowToDto(row);
@@ -297,14 +273,8 @@ export async function getProjectTreeFlat(tenantId: string, projectId: string) {
       schema.contentNodes,
       eq(schema.contentClosure.descendantId, schema.contentNodes.nodeId),
     )
-    .leftJoin(
-      schema.mediaKind,
-      eq(schema.contentNodes.mediaKindId, schema.mediaKind.id),
-    )
-    .leftJoin(
-      schema.mediaClass,
-      eq(schema.mediaKind.mediaClassId, schema.mediaClass.id),
-    )
+    .leftJoin(schema.mediaKind, eq(schema.contentNodes.mediaKindId, schema.mediaKind.id))
+    .leftJoin(schema.mediaClass, eq(schema.mediaKind.mediaClassId, schema.mediaClass.id))
     .where(
       and(
         eq(schema.contentClosure.ancestorId, projectId),
@@ -398,7 +368,7 @@ export async function createNode(input: {
       .where(eq(schema.contentClosure.descendantId, input.parentId));
 
     if (parentAncestors.length > 0) {
-      const rows = parentAncestors.map(a => ({
+      const rows = parentAncestors.map((a) => ({
         ancestorId: a.ancestorId,
         descendantId: newId,
         depth: a.depth + 1,
@@ -447,12 +417,7 @@ export async function updateNode(
       mediaKindId,
       updatedAt: new Date(),
     })
-    .where(
-      and(
-        eq(schema.contentNodes.nodeId, nodeId),
-        eq(schema.contentNodes.tenantId, tenantId),
-      ),
-    )
+    .where(and(eq(schema.contentNodes.nodeId, nodeId), eq(schema.contentNodes.tenantId, tenantId)))
     .returning({ nodeId: schema.contentNodes.nodeId });
 
   if (!result.length) return null;
@@ -471,7 +436,7 @@ export async function deleteNode(tenantId: string, nodeId: string): Promise<bool
     .from(schema.contentClosure)
     .where(eq(schema.contentClosure.ancestorId, nodeId));
 
-  const idsToDelete = descendants.map(d => d.descendantId);
+  const idsToDelete = descendants.map((d) => d.descendantId);
 
   if (idsToDelete.length === 0) {
     return false;
@@ -554,16 +519,18 @@ export async function moveNode(
   await dbWs.transaction(async (tx) => {
     // 1. Validate source and target nodes exist and belong to same tenant
     const [srcRows, dstRows] = await Promise.all([
-      tx.select({
-        tenantId: schema.contentNodes.tenantId,
-        nodeType: schema.contentNodes.nodeType,
-      })
+      tx
+        .select({
+          tenantId: schema.contentNodes.tenantId,
+          nodeType: schema.contentNodes.nodeType,
+        })
         .from(schema.contentNodes)
         .where(eq(schema.contentNodes.nodeId, nodeId)),
-      tx.select({
-        tenantId: schema.contentNodes.tenantId,
-        nodeType: schema.contentNodes.nodeType,
-      })
+      tx
+        .select({
+          tenantId: schema.contentNodes.tenantId,
+          nodeType: schema.contentNodes.nodeType,
+        })
         .from(schema.contentNodes)
         .where(eq(schema.contentNodes.nodeId, newParentId)),
     ]);
@@ -643,10 +610,7 @@ export async function moveNode(
         updatedAt: new Date(),
       })
       .where(
-        and(
-          eq(schema.contentNodes.nodeId, nodeId),
-          eq(schema.contentNodes.tenantId, tenantId),
-        ),
+        and(eq(schema.contentNodes.nodeId, nodeId), eq(schema.contentNodes.tenantId, tenantId)),
       );
 
     // 7. Insert self-closure for all descendants in subtree (depth=0)

@@ -226,7 +226,9 @@ export async function applyTemplate(
         }
       }
     } catch (error) {
-      throw new Error(`Failed to create node "${nodeData.title}": ${error instanceof Error ? error.message : String(error)}`);
+      throw new Error(
+        `Failed to create node "${nodeData.title}": ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
   }
 
@@ -246,76 +248,295 @@ type TemplateNode = {
 /**
  * Build template structure based on template type.
  */
-function buildTemplateStructure(
-  projectId: string,
-  templateId: string,
-): Array<TemplateNode> {
+function buildTemplateStructure(projectId: string, templateId: string): Array<TemplateNode> {
   const templates: Record<string, TemplateNode[]> = {
     series: [
       // Season 1 (group)
       { id: 'season1', parentId: projectId, nodeType: 'group', title: 'Season 1', position: 0 },
-      { parentId: 'season1', nodeType: 'content', title: 'Episode 1', position: 0, mediaKindCode: 'episode_video' },
-      { parentId: 'season1', nodeType: 'content', title: 'Episode 2', position: 1, mediaKindCode: 'episode_video' },
-      { parentId: 'season1', nodeType: 'content', title: 'Episode 3', position: 2, mediaKindCode: 'episode_video' },
-      { parentId: 'season1', nodeType: 'content', title: 'Episode 4', position: 3, mediaKindCode: 'episode_video' },
-      { parentId: 'season1', nodeType: 'content', title: 'Episode 5', position: 4, mediaKindCode: 'episode_video' },
+      {
+        parentId: 'season1',
+        nodeType: 'content',
+        title: 'Episode 1',
+        position: 0,
+        mediaKindCode: 'episode_video',
+      },
+      {
+        parentId: 'season1',
+        nodeType: 'content',
+        title: 'Episode 2',
+        position: 1,
+        mediaKindCode: 'episode_video',
+      },
+      {
+        parentId: 'season1',
+        nodeType: 'content',
+        title: 'Episode 3',
+        position: 2,
+        mediaKindCode: 'episode_video',
+      },
+      {
+        parentId: 'season1',
+        nodeType: 'content',
+        title: 'Episode 4',
+        position: 3,
+        mediaKindCode: 'episode_video',
+      },
+      {
+        parentId: 'season1',
+        nodeType: 'content',
+        title: 'Episode 5',
+        position: 4,
+        mediaKindCode: 'episode_video',
+      },
 
       // Season 2 (group)
       { id: 'season2', parentId: projectId, nodeType: 'group', title: 'Season 2', position: 1 },
-      { parentId: 'season2', nodeType: 'content', title: 'Episode 1', position: 0, mediaKindCode: 'episode_video' },
-      { parentId: 'season2', nodeType: 'content', title: 'Episode 2', position: 1, mediaKindCode: 'episode_video' },
-      { parentId: 'season2', nodeType: 'content', title: 'Episode 3', position: 2, mediaKindCode: 'episode_video' },
-      { parentId: 'season2', nodeType: 'content', title: 'Episode 4', position: 3, mediaKindCode: 'episode_video' },
-      { parentId: 'season2', nodeType: 'content', title: 'Episode 5', position: 4, mediaKindCode: 'episode_video' },
+      {
+        parentId: 'season2',
+        nodeType: 'content',
+        title: 'Episode 1',
+        position: 0,
+        mediaKindCode: 'episode_video',
+      },
+      {
+        parentId: 'season2',
+        nodeType: 'content',
+        title: 'Episode 2',
+        position: 1,
+        mediaKindCode: 'episode_video',
+      },
+      {
+        parentId: 'season2',
+        nodeType: 'content',
+        title: 'Episode 3',
+        position: 2,
+        mediaKindCode: 'episode_video',
+      },
+      {
+        parentId: 'season2',
+        nodeType: 'content',
+        title: 'Episode 4',
+        position: 3,
+        mediaKindCode: 'episode_video',
+      },
+      {
+        parentId: 'season2',
+        nodeType: 'content',
+        title: 'Episode 5',
+        position: 4,
+        mediaKindCode: 'episode_video',
+      },
 
       // Extra folder (group)
       { id: 'extra', parentId: projectId, nodeType: 'group', title: 'Extra', position: 2 },
-      { parentId: 'extra', nodeType: 'content', title: 'Trailer 1', position: 0, mediaKindCode: 'trailer' },
-      { parentId: 'extra', nodeType: 'content', title: 'Trailer 2', position: 1, mediaKindCode: 'trailer' },
-      { parentId: 'extra', nodeType: 'content', title: 'Trailer 3', position: 2, mediaKindCode: 'trailer' },
+      {
+        parentId: 'extra',
+        nodeType: 'content',
+        title: 'Trailer 1',
+        position: 0,
+        mediaKindCode: 'trailer',
+      },
+      {
+        parentId: 'extra',
+        nodeType: 'content',
+        title: 'Trailer 2',
+        position: 1,
+        mediaKindCode: 'trailer',
+      },
+      {
+        parentId: 'extra',
+        nodeType: 'content',
+        title: 'Trailer 3',
+        position: 2,
+        mediaKindCode: 'trailer',
+      },
     ],
 
     movie: [
       // Main Feature (content)
-      { parentId: projectId, nodeType: 'content', title: 'Main Feature', position: 0, mediaKindCode: 'movie' },
+      {
+        parentId: projectId,
+        nodeType: 'content',
+        title: 'Main Feature',
+        position: 0,
+        mediaKindCode: 'movie',
+      },
 
       // Trailers folder (group)
       { id: 'trailers', parentId: projectId, nodeType: 'group', title: 'Trailers', position: 1 },
-      { parentId: 'trailers', nodeType: 'content', title: 'Trailer 1', position: 0, mediaKindCode: 'trailer' },
-      { parentId: 'trailers', nodeType: 'content', title: 'Trailer 2', position: 1, mediaKindCode: 'trailer' },
-      { parentId: 'trailers', nodeType: 'content', title: 'Trailer 3', position: 2, mediaKindCode: 'trailer' },
+      {
+        parentId: 'trailers',
+        nodeType: 'content',
+        title: 'Trailer 1',
+        position: 0,
+        mediaKindCode: 'trailer',
+      },
+      {
+        parentId: 'trailers',
+        nodeType: 'content',
+        title: 'Trailer 2',
+        position: 1,
+        mediaKindCode: 'trailer',
+      },
+      {
+        parentId: 'trailers',
+        nodeType: 'content',
+        title: 'Trailer 3',
+        position: 2,
+        mediaKindCode: 'trailer',
+      },
     ],
 
     podcast: [
       // Season 1 (group)
       { id: 'season1', parentId: projectId, nodeType: 'group', title: 'Season 1', position: 0 },
-      { parentId: 'season1', nodeType: 'content', title: 'Episode 1', position: 0, mediaKindCode: 'podcast_episode' },
-      { parentId: 'season1', nodeType: 'content', title: 'Episode 2', position: 1, mediaKindCode: 'podcast_episode' },
-      { parentId: 'season1', nodeType: 'content', title: 'Episode 3', position: 2, mediaKindCode: 'podcast_episode' },
-      { parentId: 'season1', nodeType: 'content', title: 'Episode 4', position: 3, mediaKindCode: 'podcast_episode' },
-      { parentId: 'season1', nodeType: 'content', title: 'Episode 5', position: 4, mediaKindCode: 'podcast_episode' },
+      {
+        parentId: 'season1',
+        nodeType: 'content',
+        title: 'Episode 1',
+        position: 0,
+        mediaKindCode: 'podcast_episode',
+      },
+      {
+        parentId: 'season1',
+        nodeType: 'content',
+        title: 'Episode 2',
+        position: 1,
+        mediaKindCode: 'podcast_episode',
+      },
+      {
+        parentId: 'season1',
+        nodeType: 'content',
+        title: 'Episode 3',
+        position: 2,
+        mediaKindCode: 'podcast_episode',
+      },
+      {
+        parentId: 'season1',
+        nodeType: 'content',
+        title: 'Episode 4',
+        position: 3,
+        mediaKindCode: 'podcast_episode',
+      },
+      {
+        parentId: 'season1',
+        nodeType: 'content',
+        title: 'Episode 5',
+        position: 4,
+        mediaKindCode: 'podcast_episode',
+      },
 
       // Season 2 (group)
       { id: 'season2', parentId: projectId, nodeType: 'group', title: 'Season 2', position: 1 },
-      { parentId: 'season2', nodeType: 'content', title: 'Episode 1', position: 0, mediaKindCode: 'podcast_episode' },
-      { parentId: 'season2', nodeType: 'content', title: 'Episode 2', position: 1, mediaKindCode: 'podcast_episode' },
-      { parentId: 'season2', nodeType: 'content', title: 'Episode 3', position: 2, mediaKindCode: 'podcast_episode' },
-      { parentId: 'season2', nodeType: 'content', title: 'Episode 4', position: 3, mediaKindCode: 'podcast_episode' },
-      { parentId: 'season2', nodeType: 'content', title: 'Episode 5', position: 4, mediaKindCode: 'podcast_episode' },
+      {
+        parentId: 'season2',
+        nodeType: 'content',
+        title: 'Episode 1',
+        position: 0,
+        mediaKindCode: 'podcast_episode',
+      },
+      {
+        parentId: 'season2',
+        nodeType: 'content',
+        title: 'Episode 2',
+        position: 1,
+        mediaKindCode: 'podcast_episode',
+      },
+      {
+        parentId: 'season2',
+        nodeType: 'content',
+        title: 'Episode 3',
+        position: 2,
+        mediaKindCode: 'podcast_episode',
+      },
+      {
+        parentId: 'season2',
+        nodeType: 'content',
+        title: 'Episode 4',
+        position: 3,
+        mediaKindCode: 'podcast_episode',
+      },
+      {
+        parentId: 'season2',
+        nodeType: 'content',
+        title: 'Episode 5',
+        position: 4,
+        mediaKindCode: 'podcast_episode',
+      },
     ],
 
     audiobook: [
       // 10 chapters (all content, direct children of project)
-      { parentId: projectId, nodeType: 'content', title: 'Chapter 1', position: 0, mediaKindCode: 'audiobook_chapter' },
-      { parentId: projectId, nodeType: 'content', title: 'Chapter 2', position: 1, mediaKindCode: 'audiobook_chapter' },
-      { parentId: projectId, nodeType: 'content', title: 'Chapter 3', position: 2, mediaKindCode: 'audiobook_chapter' },
-      { parentId: projectId, nodeType: 'content', title: 'Chapter 4', position: 3, mediaKindCode: 'audiobook_chapter' },
-      { parentId: projectId, nodeType: 'content', title: 'Chapter 5', position: 4, mediaKindCode: 'audiobook_chapter' },
-      { parentId: projectId, nodeType: 'content', title: 'Chapter 6', position: 5, mediaKindCode: 'audiobook_chapter' },
-      { parentId: projectId, nodeType: 'content', title: 'Chapter 7', position: 6, mediaKindCode: 'audiobook_chapter' },
-      { parentId: projectId, nodeType: 'content', title: 'Chapter 8', position: 7, mediaKindCode: 'audiobook_chapter' },
-      { parentId: projectId, nodeType: 'content', title: 'Chapter 9', position: 8, mediaKindCode: 'audiobook_chapter' },
-      { parentId: projectId, nodeType: 'content', title: 'Chapter 10', position: 9, mediaKindCode: 'audiobook_chapter' },
+      {
+        parentId: projectId,
+        nodeType: 'content',
+        title: 'Chapter 1',
+        position: 0,
+        mediaKindCode: 'audiobook_chapter',
+      },
+      {
+        parentId: projectId,
+        nodeType: 'content',
+        title: 'Chapter 2',
+        position: 1,
+        mediaKindCode: 'audiobook_chapter',
+      },
+      {
+        parentId: projectId,
+        nodeType: 'content',
+        title: 'Chapter 3',
+        position: 2,
+        mediaKindCode: 'audiobook_chapter',
+      },
+      {
+        parentId: projectId,
+        nodeType: 'content',
+        title: 'Chapter 4',
+        position: 3,
+        mediaKindCode: 'audiobook_chapter',
+      },
+      {
+        parentId: projectId,
+        nodeType: 'content',
+        title: 'Chapter 5',
+        position: 4,
+        mediaKindCode: 'audiobook_chapter',
+      },
+      {
+        parentId: projectId,
+        nodeType: 'content',
+        title: 'Chapter 6',
+        position: 5,
+        mediaKindCode: 'audiobook_chapter',
+      },
+      {
+        parentId: projectId,
+        nodeType: 'content',
+        title: 'Chapter 7',
+        position: 6,
+        mediaKindCode: 'audiobook_chapter',
+      },
+      {
+        parentId: projectId,
+        nodeType: 'content',
+        title: 'Chapter 8',
+        position: 7,
+        mediaKindCode: 'audiobook_chapter',
+      },
+      {
+        parentId: projectId,
+        nodeType: 'content',
+        title: 'Chapter 9',
+        position: 8,
+        mediaKindCode: 'audiobook_chapter',
+      },
+      {
+        parentId: projectId,
+        nodeType: 'content',
+        title: 'Chapter 10',
+        position: 9,
+        mediaKindCode: 'audiobook_chapter',
+      },
     ],
 
     empty: [],
@@ -351,7 +572,10 @@ export async function createNode(req: CreateNodeRequestType): Promise<ContentNod
  * @param req Update data.
  * @returns Updated node schema.
  */
-export async function updateNode(nodeId: string, req: UpdateNodeRequestType): Promise<ContentNodeType> {
+export async function updateNode(
+  nodeId: string,
+  req: UpdateNodeRequestType,
+): Promise<ContentNodeType> {
   const response = await httpTyped(`/ws/nodes/${nodeId}`, {
     method: 'PATCH',
     body: req.body,
@@ -422,16 +646,16 @@ export function getMediaClassOptions(): MediaClassType[] {
 // Compat Aliases (PascalCase) for legacy calls
 // ------------------------------------------------------------------------------
 
-export const ListProjects     = listProjects;
-export const CreateProject    = createProject;
-export const GetProject       = getProject;
-export const UpdateProject    = updateProject;
-export const DeleteProject    = deleteProject;
-export const GetProjectTree   = getProjectTree;
-export const ApplyTemplate    = applyTemplate;
+export const ListProjects = listProjects;
+export const CreateProject = createProject;
+export const GetProject = getProject;
+export const UpdateProject = updateProject;
+export const DeleteProject = deleteProject;
+export const GetProjectTree = getProjectTree;
+export const ApplyTemplate = applyTemplate;
 
-export const CreateNode       = createNode;
-export const UpdateNode       = updateNode;
-export const DeleteNode       = deleteNode;
-export const MoveNode         = moveNode;
-export const ReorderSiblings  = reorderSiblings;
+export const CreateNode = createNode;
+export const UpdateNode = updateNode;
+export const DeleteNode = deleteNode;
+export const MoveNode = moveNode;
+export const ReorderSiblings = reorderSiblings;

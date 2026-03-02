@@ -36,7 +36,10 @@ export default function InviteWidget({ title, onClose, ...props }: WidgetProps) 
       setEmail('');
       setTimeout(() => window.dispatchEvent(new CustomEvent('admin:refreshMembers')), 50);
     } catch (error) {
-      setMsg({ tone: 'error', text: error instanceof Error ? error.message : 'Failed to send invite.' });
+      setMsg({
+        tone: 'error',
+        text: error instanceof Error ? error.message : 'Failed to send invite.',
+      });
     } finally {
       setBusy(false);
     }
@@ -45,11 +48,7 @@ export default function InviteWidget({ title, onClose, ...props }: WidgetProps) 
   return (
     <BaseWidget title={title} onClose={onClose} titleIcon={MailPlus} {...props}>
       <form className="p-3 space-y-2" onSubmit={onInvite}>
-        {msg && (
-          <div className={`ws-alert text-xs ${getAlertClass(msg.tone)}`}>
-            {msg.text}
-          </div>
-        )}
+        {msg && <div className={`ws-alert text-xs ${getAlertClass(msg.tone)}`}>{msg.text}</div>}
 
         <div className="flex items-center gap-2">
           <input
@@ -59,7 +58,11 @@ export default function InviteWidget({ title, onClose, ...props }: WidgetProps) 
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
-          <button type="submit" className="ws-btn ws-btn-sm ws-btn-solid" disabled={busy || !tenantId}>
+          <button
+            type="submit"
+            className="ws-btn ws-btn-sm ws-btn-solid"
+            disabled={busy || !tenantId}
+          >
             {busy ? 'Sending…' : 'Invite'}
           </button>
         </div>

@@ -8,11 +8,11 @@ import type React from 'react';
  *     <Button>Edit</Button>
  *   </PermGate>
  */
-export const PermGate: React.FC<{ perm: string; fallback?: React.ReactNode; children: React.ReactNode }> = ({
-  perm,
-  fallback = null,
-  children,
-}) => {
+export const PermGate: React.FC<{
+  perm: string;
+  fallback?: React.ReactNode;
+  children: React.ReactNode;
+}> = ({ perm, fallback = null, children }) => {
   const { can, accessLoaded } = useAuth();
   if (!accessLoaded) return null;
   return can(perm) ? children : fallback;

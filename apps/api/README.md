@@ -115,47 +115,48 @@ REFRESH_TOKEN_TTL=30d
 
 ### Authentication (`/auth`)
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/auth/login` | Login with email/password, returns access token + refresh cookie |
-| POST | `/auth/register` | Register new user from invite token |
-| POST | `/auth/refresh` | Refresh access token using httpOnly cookie |
-| GET | `/auth/me` | Get current user info and permissions |
-| GET | `/auth/invite/:token` | Preview invite details |
+| Method | Endpoint              | Description                                                      |
+| ------ | --------------------- | ---------------------------------------------------------------- |
+| POST   | `/auth/login`         | Login with email/password, returns access token + refresh cookie |
+| POST   | `/auth/register`      | Register new user from invite token                              |
+| POST   | `/auth/refresh`       | Refresh access token using httpOnly cookie                       |
+| GET    | `/auth/me`            | Get current user info and permissions                            |
+| GET    | `/auth/invite/:token` | Preview invite details                                           |
 
 ### Workstation (`/ws/*`)
 
 All `/ws/*` routes require:
+
 - **Authorization**: `Bearer <accessToken>`
 - **x-ws-tenant**: `<tenantId>` header
 
 #### Content Management
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/ws/projects` | List all projects |
-| POST | `/ws/projects` | Create new project |
-| GET | `/ws/projects/:id` | Get project details |
-| PATCH | `/ws/projects/:id` | Update project |
-| DELETE | `/ws/projects/:id` | Delete project |
-| GET | `/ws/projects/:id/tree` | Get full project tree |
-| POST | `/ws/nodes` | Create content node |
-| GET | `/ws/nodes/:id` | Get node details |
-| PATCH | `/ws/nodes/:id` | Update node |
-| DELETE | `/ws/nodes/:id` | Delete node |
-| POST | `/ws/nodes/:id/move` | Move node to new parent |
-| POST | `/ws/nodes/reorder` | Reorder siblings |
+| Method | Endpoint                | Description             |
+| ------ | ----------------------- | ----------------------- |
+| GET    | `/ws/projects`          | List all projects       |
+| POST   | `/ws/projects`          | Create new project      |
+| GET    | `/ws/projects/:id`      | Get project details     |
+| PATCH  | `/ws/projects/:id`      | Update project          |
+| DELETE | `/ws/projects/:id`      | Delete project          |
+| GET    | `/ws/projects/:id/tree` | Get full project tree   |
+| POST   | `/ws/nodes`             | Create content node     |
+| GET    | `/ws/nodes/:id`         | Get node details        |
+| PATCH  | `/ws/nodes/:id`         | Update node             |
+| DELETE | `/ws/nodes/:id`         | Delete node             |
+| POST   | `/ws/nodes/:id/move`    | Move node to new parent |
+| POST   | `/ws/nodes/reorder`     | Reorder siblings        |
 
 #### Media Management
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/ws/nodes/:nodeId/media/init` | Initialize upload session |
-| POST | `/ws/media/:uploadId/upload` | Upload file (multipart/form-data) |
-| POST | `/ws/media/:uploadId/complete` | Finalize upload, extract metadata |
-| GET | `/ws/nodes/:nodeId/media` | Get media for node |
-| GET | `/ws/media/:assetId/stream` | Stream media (supports Range requests) |
-| DELETE | `/ws/media/:assetId` | Delete media asset |
+| Method | Endpoint                       | Description                            |
+| ------ | ------------------------------ | -------------------------------------- |
+| POST   | `/ws/nodes/:nodeId/media/init` | Initialize upload session              |
+| POST   | `/ws/media/:uploadId/upload`   | Upload file (multipart/form-data)      |
+| POST   | `/ws/media/:uploadId/complete` | Finalize upload, extract metadata      |
+| GET    | `/ws/nodes/:nodeId/media`      | Get media for node                     |
+| GET    | `/ws/media/:assetId/stream`    | Stream media (supports Range requests) |
+| DELETE | `/ws/media/:assetId`           | Delete media asset                     |
 
 **Media Upload Flow:**
 
@@ -182,17 +183,17 @@ POST /ws/media/{uploadId}/complete
 
 #### RBAC & Members
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/ws/members` | List tenant members |
-| POST | `/ws/invite` | Invite user to tenant |
-| POST | `/ws/members/:userId/deactivate` | Deactivate member |
-| GET | `/ws/roles` | List roles |
-| POST | `/ws/roles` | Create role |
-| GET | `/ws/roles/:id` | Get role details |
-| PATCH | `/ws/roles/:id` | Update role permissions |
-| DELETE | `/ws/roles/:id` | Delete role |
-| GET | `/ws/permissions/catalog` | Get all available permissions |
+| Method | Endpoint                         | Description                   |
+| ------ | -------------------------------- | ----------------------------- |
+| GET    | `/ws/members`                    | List tenant members           |
+| POST   | `/ws/invite`                     | Invite user to tenant         |
+| POST   | `/ws/members/:userId/deactivate` | Deactivate member             |
+| GET    | `/ws/roles`                      | List roles                    |
+| POST   | `/ws/roles`                      | Create role                   |
+| GET    | `/ws/roles/:id`                  | Get role details              |
+| PATCH  | `/ws/roles/:id`                  | Update role permissions       |
+| DELETE | `/ws/roles/:id`                  | Delete role                   |
+| GET    | `/ws/permissions/catalog`        | Get all available permissions |
 
 ## Permission System
 
@@ -205,6 +206,7 @@ domain.resource.action
 ```
 
 Examples:
+
 - `content.view` - View content
 - `content.create` - Create content
 - `content.media.upload` - Upload media
@@ -236,6 +238,7 @@ Deny rules override allow rules.
 When media is uploaded, the API automatically extracts:
 
 **Video:**
+
 - Duration (milliseconds)
 - Dimensions (width × height)
 - Frame rate
@@ -244,10 +247,12 @@ When media is uploaded, the API automatically extracts:
 - Flags: `hasVideo`, `hasAudio`
 
 **Audio:**
+
 - Duration, codec, channels, sample rate
 - Bit rate
 
 **Images:**
+
 - Dimensions, format, color space
 - DPI, orientation, EXIF data
 
@@ -262,6 +267,7 @@ The `/ws/media/:assetId/stream` endpoint supports:
 - **Download mode** - `?download=true` sets `Content-Disposition: attachment`
 
 Example:
+
 ```html
 <video src="/ws/media/{assetId}/stream?token={jwt}&tenant={tenantId}" controls></video>
 ```
@@ -289,6 +295,7 @@ All endpoints return consistent error responses:
 ```
 
 Common error codes:
+
 - `UNAUTHORIZED` - Missing or invalid token
 - `FORBIDDEN` - Insufficient permissions
 - `TENANT_HEADER_MISSING` - x-ws-tenant header required

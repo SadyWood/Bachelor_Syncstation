@@ -57,17 +57,73 @@ const App: React.FC = () => (
 
         {/* App */}
         <Route path="/" element={<Navigate to="/start" replace />} />
-        <Route path="/start" element={<ProtectedRoute><StartPage /></ProtectedRoute>} />
+        <Route
+          path="/start"
+          element={
+            <ProtectedRoute>
+              <StartPage />
+            </ProtectedRoute>
+          }
+        />
 
         {/* Structure vs Management */}
-        <Route path="/project-structure" element={<ProtectedRoute><ProjectStructurePage /></ProtectedRoute>} />
-        <Route path="/projects" element={<ProtectedRoute><ProjectManagementPage /></ProtectedRoute>} />
+        <Route
+          path="/project-structure"
+          element={
+            <ProtectedRoute>
+              <ProjectStructurePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/projects"
+          element={
+            <ProtectedRoute>
+              <ProjectManagementPage />
+            </ProtectedRoute>
+          }
+        />
 
-        <Route path="/content" element={<ProtectedRoute><ContentDashboardPage /></ProtectedRoute>} />
-        <Route path="/content/:nodeId" element={<ProtectedRoute><ContentDashboardPage /></ProtectedRoute>} />
-        <Route path="/dummy" element={<ProtectedRoute><DummyPage /></ProtectedRoute>} />
-        <Route path="/performance" element={<ProtectedRoute><Placeholder title="Performance & Engagement" /></ProtectedRoute>} />
-        <Route path="/help" element={<ProtectedRoute><Placeholder title="Help" /></ProtectedRoute>} />
+        <Route
+          path="/content"
+          element={
+            <ProtectedRoute>
+              <ContentDashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/content/:nodeId"
+          element={
+            <ProtectedRoute>
+              <ContentDashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dummy"
+          element={
+            <ProtectedRoute>
+              <DummyPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/performance"
+          element={
+            <ProtectedRoute>
+              <Placeholder title="Performance & Engagement" />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/help"
+          element={
+            <ProtectedRoute>
+              <Placeholder title="Help" />
+            </ProtectedRoute>
+          }
+        />
 
         {/* Admin (locked) */}
         <Route
