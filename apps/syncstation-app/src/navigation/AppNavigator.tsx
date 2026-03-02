@@ -1,17 +1,14 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator, type NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { Fragment, useState } from 'react';
-import type { FabMenuOption, TabName } from '@/components/TabBar/types/TabBar.types';
-import type { Project } from '@/screens/SelectContextScreen/types/SelectContextScreen.types';
-import type { NavigatorScreenParams } from '@react-navigation/native';
 import { FabMenu, TabBar } from '@/components/TabBar';
 import { tabNavigatorScreenOptions } from '@/navigation/AppNavigator.styles';
 import { HomeScreen, SelectContextScreen } from '@/screens';
 import { LoginScreen } from '@/screens/login-screen';
-import { WelcomeScreen } from '@/screens/welcome-screen';
 import { ProfileScreen } from '@/screens/profile-screen';
 // TODO: import when is ready
 import { SettingsScreen } from '@/screens/settings-screen';
+import { WelcomeScreen } from '@/screens/welcome-screen';
 // import { ProductionScreen } from '@/screens/production-screen';
 // import { SelectSceneScreen } from '@/screens/select-scene-screen';
 // import { SelectTakeScreen } from '@/screens/select-take-screen';
@@ -19,6 +16,9 @@ import { SettingsScreen } from '@/screens/settings-screen';
 // import { SubjectScreen } from '@/screens/subject-screen';
 import { useAuthStore } from '@/stores/authStore';
 import { useContentStore } from '@/stores/ContentStore';
+import type { FabMenuOption, TabName } from '@/components/TabBar/types/TabBar.types';
+import type { Project } from '@/screens/SelectContextScreen/types/SelectContextScreen.types';
+import type { NavigatorScreenParams } from '@react-navigation/native';
 
 type AppTabsParamList = {
   Home: undefined;

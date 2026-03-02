@@ -1,12 +1,12 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, TextInput, ActivityIndicator } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useAuthStore } from '@/stores/authStore';
+import { useContentStore } from '@/stores/ContentStore';
 import { Colors } from '@/styles';
 import { styles } from './SelectContextScreen.styles';
 import type { Project, SelectContextScreenProps } from './types/SelectContextScreen.types';
-import { useAuthStore } from '@/stores/authStore';
-import { useContentStore } from '@/stores/ContentStore';
 
 const MOCK_PROJECTS: Project[] = [
   {
