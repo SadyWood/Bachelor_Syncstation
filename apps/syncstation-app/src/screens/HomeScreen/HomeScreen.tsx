@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -76,15 +76,26 @@ export function HomeScreen() {
     );
   }
 
-  const sceneDisplayName = activeScene
-    ? `Scene ${activeScene.number} - ${activeScene.description}`
-    : 'No scene selected';
+  const sceneDisplayName = useMemo(() => {
+    if (!activeScene) {
+      return 'No scene selected';
+    }
+    return `Scene ${activeScene.number} - ${activeScene.description}`;
+  }, [activeScene]);
 
-  const takeDisplayName = activeTake
-    ? `${activeTake.name} - ${activeTake.description}`
-    : 'No take selected';
+  const takeDisplayName = useMemo(() => {
+    if (!activeTake) {
+      return 'No take selected';
+    }
+    return `${activeTake.name} - ${activeTake.description}`;
+  }, [activeTake]);
 
-  const locationDisplay = activeScene ? 'CA - Hollywood street 2' : 'Select a scene';
+  const locationDisplay = useMemo(() => {
+    if (!activeScene) {
+      return 'Select a scene';
+    }
+    return 'CA - Hollywood street 2';
+  }, [activeScene]);
 
   return (
     <SafeAreaView style={styles.container} edges={['top'] as const}>
