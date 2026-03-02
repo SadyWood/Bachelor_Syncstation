@@ -21,6 +21,7 @@ export function SettingsScreen() {
         </TouchableOpacity>
 
         <Text style={styles.sectionTitle}>App</Text>
+
         <TouchableOpacity style={styles.menuButton}>
           <Text style={styles.menuButtonIcon}>🎨</Text>
           <Text style={styles.menuButtonText}>Appearance</Text>
@@ -29,6 +30,18 @@ export function SettingsScreen() {
         <TouchableOpacity style={styles.menuButton}>
           <Text style={styles.menuButtonIcon}>🔔</Text>
           <Text style={styles.menuButtonText}>Notification</Text>
+        </TouchableOpacity>
+
+        <Text style={styles.sectionTitle}>Privacy</Text>
+
+        <TouchableOpacity style={styles.menuButton}>
+          <Text style={styles.menuButtonIcon}>🔐</Text>
+          <Text style={styles.menuButtonText}>Privacy Policy</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.menuButton}>
+          <Text style={styles.menuButtonIcon}>ℹ️</Text>
+          <Text style={styles.menuButtonText}>About</Text>
         </TouchableOpacity>
       </ScrollView>
     </View>
