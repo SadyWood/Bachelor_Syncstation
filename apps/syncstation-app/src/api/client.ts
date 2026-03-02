@@ -1,7 +1,11 @@
 import axios from 'axios';
 import Constants from 'expo-constants';
 
-const apiUrl = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:3001';
+const hostUri = Constants.expoConfig?.hostUri;
+const devHost = hostUri ? hostUri.split(':')[0] : 'localhost';
+const apiUrl = __DEV__
+  ? `http://${devHost}:3333`
+  : (Constants.expoConfig?.extra?.apiUrl ?? 'http://localhost:3333');
 
 export const apiClient = axios.create({
   baseURL: apiUrl,
