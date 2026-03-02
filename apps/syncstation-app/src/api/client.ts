@@ -14,7 +14,7 @@ export const apiClient = axios.create({
   },
 });
 
-// Request interceptor to add auth token
+// Request interceptor to add authtoken
 apiClient.interceptors.request.use(
   (config) =>
   // TODO: Add auth token from secure storage
