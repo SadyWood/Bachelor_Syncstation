@@ -10,7 +10,10 @@ import { Colors } from '@/styles';
 const MOCK_SCENES: Scene[] = [
   { id: '1', number: 1, name: 'Scene 1', description: 'Mike phone call', location: 'LA - Office building' },
   { id: '2', number: 2, name: 'Scene 2', description: 'Marcus home', location: 'LA - Suburb house' },
+  { id: '3', number: 3, name: 'Scene 3', description: 'Police station', location: 'Miami - Police HQ' },
+  { id: '4', number: 4, name: 'Scene 4', description: 'M&M explosion', location: 'Miami - Warehouse district' },
 ];
+
 async function fetchScenes(
   _token: string,
   _tenantId: string,
@@ -20,7 +23,10 @@ async function fetchScenes(
   return MOCK_SCENES;
 }
 
-export function SelectSceneScreen({ onBack, onSelectScene }: SelectSceneScreenProps) {
+export function SelectSceneScreen({
+  onBack,
+  onSelectScene,
+}: SelectSceneScreenProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [scenes, setScenes] = useState<Scene[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -47,9 +53,14 @@ export function SelectSceneScreen({ onBack, onSelectScene }: SelectSceneScreenPr
   function handleScenePress(scene: Scene) {
     onSelectScene(scene);
   }
+
   function filterScenes(sceneList: Scene[]): Scene[] {
-    if (!searchQuery.trim()) return sceneList;
+    if (!searchQuery.trim()) {
+      return sceneList;
+    }
+
     const query = searchQuery.toLowerCase();
+
     return sceneList.filter(
       (scene) =>
         scene.name.toLowerCase().includes(query) ||
@@ -57,6 +68,45 @@ export function SelectSceneScreen({ onBack, onSelectScene }: SelectSceneScreenPr
                 scene.location.toLowerCase().includes(query),
     );
   }
+
+  function renderSceneCard(scene: Scene) {
+    return (
+      <TouchableOpacity
+        key={scene.id}
+        style={styles.sceneCard}
+        onPress={() => handleScenePress(scene)}
+      >
+        <Ionicons
+          name="folder"
+          size={24}
+          color={Colors.sceneBlue}
+          style={styles.sceneIcon}
+        />
+
+        <View style={styles.sceneInfo}>
+          <Text style={styles.sceneText}>
+            <Text style={styles.sceneNumber}>
+              Scene {scene.number}
+            </Text>
+            <Text style={styles.sceneDescription}>
+              {' '}
+              - {scene.description}
+            </Text>
+          </Text>
+        </View>
+
+        <Ionicons
+          name="arrow-forward"
+          size={20}
+          color={Colors.text}
+          style={styles.arrowIcon}
+        />
+      </TouchableOpacity>
+    );
+  }
+
+  const filteredScenes = filterScenes(scenes);
+
   return (
     <SafeAreaView style={styles.container} edges={['top'] as const}>
       <View style={styles.header}>
@@ -67,6 +117,52 @@ export function SelectSceneScreen({ onBack, onSelectScene }: SelectSceneScreenPr
       </View>
 
       <View style={styles.divider} />
+
+      {isLoading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={Colors.primary} />
+        </View>
+      ) : (
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+          {/* Search */}
+          <View style={styles.searchContainer}>
+            <Ionicons
+              name="search"
+              size={20}
+              color={Colors.textSecondary}
+              style={styles.searchIcon}
+            />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search scene..."
+              placeholderTextColor={Colors.textSecondary}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
+          </View>
+
+          {/* Project Title */}
+          <Text style={styles.projectTitle}>
+            {activeProject?.name ?? 'Project'}
+          </Text>
+
+          {/* Scene List */}
+          {filteredScenes.length > 0 ? (
+            filteredScenes.map(renderSceneCard)
+          ) : (
+            <View style={styles.emptyState}>
+              <Ionicons
+                name="film-outline"
+                size={48}
+                color={Colors.textSecondary}
+              />
+              <Text style={styles.emptyStateText}>
+                No scenes found
+              </Text>
+            </View>
+          )}
+        </ScrollView>
+      )}
     </SafeAreaView>
   );
 }
