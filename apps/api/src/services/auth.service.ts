@@ -85,7 +85,7 @@ export async function verifyPassword(plain: string, hash: string) {
   return bcrypt.compare(plain, hash);
 }
 
-export function signAccess(app: FastifyInstance, payload: object, ttl: string) {
+export function signAccess(app: FastifyInstance, payload: { sub: string }, ttl: string) {
   return app.jwt.sign(payload, { expiresIn: ttl });
 }
 

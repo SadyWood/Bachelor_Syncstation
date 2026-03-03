@@ -14,7 +14,6 @@ import { z } from 'zod';
 import * as syncLogRepo from '../repos/sync.log.repo.js';
 import * as fileStorage from '../services/file-storage.service.js';
 import { requireTenant } from '../utils/tenant.js';
-import type { FastifyRequest, FastifyReply } from 'fastify';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 
 /* ========================================
@@ -43,13 +42,13 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
         querystring: LogEntriesQuerySchema,
       },
     },
-    async (req: FastifyRequest, reply: FastifyReply) => {
+    async (req, reply) => {
       const tenantId = requireTenant(req);
       if (!tenantId) {
         return reply.code(400).send(ErrorResponse.parse({ ok: false, error: 'TENANT_HEADER_MISSING' }));
       }
 
-      const { nodeId, status } = req.query as z.infer<typeof LogEntriesQuerySchema>;
+      const { nodeId, status } = req.query;
 
       try {
         const items = await syncLogRepo.listLogEntries(tenantId, nodeId, status);
@@ -70,13 +69,13 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
         params: LogEntryIdParamsSchema,
       },
     },
-    async (req: FastifyRequest, reply: FastifyReply) => {
+    async (req, reply) => {
       const tenantId = requireTenant(req);
       if (!tenantId) {
         return reply.code(400).send(ErrorResponse.parse({ ok: false, error: 'TENANT_HEADER_MISSING' }));
       }
 
-      const { logEntryId } = req.params as z.infer<typeof LogEntryIdParamsSchema>;
+      const { logEntryId } = req.params;
 
       try {
         const entry = await syncLogRepo.getLogEntry(logEntryId, tenantId);
@@ -111,7 +110,7 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
       }
 
       // Get user ID from JWT (authenticated user)
-      const userId = (req.user as { sub: string }).sub;
+      const userId = req.user.sub;
 
       try {
         const body = CreateLogEntryRequest.shape.body.parse(req.body);
@@ -161,16 +160,13 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
         body: UpdateLogEntryRequest.shape.body,
       },
     },
-    async (
-      req: FastifyRequest,
-      reply: FastifyReply,
-    ) => {
+    async (req, reply) => {
       const tenantId = requireTenant(req);
       if (!tenantId) {
         return reply.code(400).send(ErrorResponse.parse({ ok: false, error: 'TENANT_HEADER_MISSING' }));
       }
 
-      const { logEntryId } = req.params as z.infer<typeof LogEntryIdParamsSchema>;
+      const { logEntryId } = req.params;
       const body = UpdateLogEntryRequest.shape.body.parse(req.body);
 
       try {
@@ -199,13 +195,13 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
         params: LogEntryIdParamsSchema,
       },
     },
-    async (req: FastifyRequest, reply: FastifyReply) => {
+    async (req, reply) => {
       const tenantId = requireTenant(req);
       if (!tenantId) {
         return reply.code(400).send(ErrorResponse.parse({ ok: false, error: 'TENANT_HEADER_MISSING' }));
       }
 
-      const { logEntryId } = req.params as z.infer<typeof LogEntryIdParamsSchema>;
+      const { logEntryId } = req.params;
 
       try {
         const deleted = await syncLogRepo.deleteLogEntry(logEntryId, tenantId);
@@ -237,10 +233,7 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
         params: LogEntryIdParamsSchema,
       },
     },
-    async (
-      req: FastifyRequest,
-      reply: FastifyReply,
-    ) => {
+    async (req, reply) => {
     // 1. Verify tenant header
       const tenantId = requireTenant(req);
       if (!tenantId) {
@@ -249,7 +242,7 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
         );
       }
 
-      const { logEntryId } = req.params as z.infer<typeof LogEntryIdParamsSchema>;
+      const { logEntryId } = req.params;
 
       // 2. Verify long entry exists and belongs to this tenant - checked before file processing
       const logEntry = await syncLogRepo.getLogEntry(logEntryId, tenantId);
@@ -314,9 +307,7 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
         params: z.object({ attachmentId: z.string().uuid() }),
       },
     },
-    async (req: FastifyRequest,
-      reply: FastifyReply,
-    ) => {
+    async (req, reply) => {
       // 1. Verify tenant header
       const tenantId = requireTenant(req);
       if (!tenantId) {
@@ -325,7 +316,7 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
         );
       }
 
-      const { attachmentId } = req.params as { attachmentId: string };
+      const { attachmentId } = req.params;
 
       // 2. Get attachment record with tenant verification - repo method joins through log-entries to check tenant ownership
       const attachment = await syncLogRepo.getAttachment(attachmentId, tenantId);
@@ -364,10 +355,7 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
         params: z.object({ attachmentId: z.string().uuid() }),
       },
     },
-    async (
-      req: FastifyRequest,
-      reply: FastifyReply,
-    ) => {
+    async (req, reply) => {
       // 1. Verify tenant header
       const tenantId = requireTenant(req);
       if (!tenantId) {
@@ -376,7 +364,7 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
         );
       }
 
-      const { attachmentId } = req.params as { attachmentId: string };
+      const { attachmentId } = req.params;
 
       // 2. Get attachment record with tenant verification
       const attachment = await syncLogRepo.getAttachment(attachmentId, tenantId);
@@ -413,13 +401,13 @@ export const syncLogRoutes: FastifyPluginAsyncZod = async (app) => {
     {
       preHandler: app.needsPerm('syncstation.status.view'),
     },
-    async (req: FastifyRequest, reply: FastifyReply) => {
+    async (req, reply) => {
       const tenantId = requireTenant(req);
       if (!tenantId) {
         return reply.code(400).send(ErrorResponse.parse({ ok: false, error: 'TENANT_HEADER_MISSING' }));
       }
 
-      const userId = (req.user as { sub: string }).sub;
+      const userId = req.user.sub;
       try {
         const status = await syncLogRepo.getSyncStatus(tenantId, userId);
 
