@@ -95,7 +95,9 @@ export function SelectSceneScreen({
   return (
     <SafeAreaView style={styles.container} edges={['top'] as const}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={onBack}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={onBack}>
           <Ionicons name="arrow-back" size={24} color={Colors.textOnPrimary} />
         </TouchableOpacity>
 
