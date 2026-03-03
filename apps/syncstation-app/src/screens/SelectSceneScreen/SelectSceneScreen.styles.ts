@@ -9,23 +9,33 @@ export const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingTop: Spacing.xl,
-    paddingBottom: Spacing.md,
-    paddingHorizontal: Spacing.md,
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
   },
+
   backButton: {
-    width: 48,
-    height: 48,
+    width: 40,
+    height: 40,
     backgroundColor: Colors.primary,
     borderRadius: BorderRadius.md,
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
   },
+
   headerTitle: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    textAlign: 'center',
     fontSize: 24,
     fontWeight: '700',
     color: Colors.text,
-    marginLeft: Spacing.md,
+  },
+
+
+  headerRightSpacer: {
+    width: 40,
   },
   divider: {
     height: 1,

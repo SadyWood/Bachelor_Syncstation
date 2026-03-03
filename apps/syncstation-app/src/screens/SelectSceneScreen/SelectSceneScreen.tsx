@@ -98,7 +98,10 @@ export function SelectSceneScreen({
         <TouchableOpacity style={styles.backButton} onPress={onBack}>
           <Ionicons name="arrow-back" size={24} color={Colors.textOnPrimary} />
         </TouchableOpacity>
+
         <Text style={styles.headerTitle}>Select Scene</Text>
+
+        <View style={styles.headerRightSpacer} />
       </View>
 
       <View style={styles.divider} />
