@@ -14,10 +14,13 @@ export const styles = StyleSheet.create({
     paddingHorizontal: Spacing.md,
   },
   headerTitle: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    textAlign: 'center',
     fontSize: 24,
     fontWeight: '700',
     color: Colors.text,
-    marginLeft: Spacing.md,
   },
   content: {
     flex: 1,
