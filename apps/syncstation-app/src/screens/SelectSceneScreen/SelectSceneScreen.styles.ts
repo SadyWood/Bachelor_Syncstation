@@ -19,8 +19,8 @@ export const styles = StyleSheet.create({
     height: 40,
     backgroundColor: Colors.primary,
     borderRadius: BorderRadius.md,
-    justifyContent: 'center',
     alignItems: 'center',
+    justifyContent: 'center',
   },
 
   headerTitle: {

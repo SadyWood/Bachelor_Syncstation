@@ -50,8 +50,8 @@ export const styles = StyleSheet.create({
     color: Colors.textSecondary,
   },
   backButton: {
-    width: 48,
-    height: 48,
+    width: 40,
+    height: 40,
     backgroundColor: Colors.primary,
     borderRadius: BorderRadius.md,
     alignItems: 'center',
