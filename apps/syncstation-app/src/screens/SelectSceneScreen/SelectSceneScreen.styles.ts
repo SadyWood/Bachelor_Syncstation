@@ -9,11 +9,10 @@ export const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingTop: Spacing.xl,
+    paddingBottom: Spacing.md,
+    paddingHorizontal: Spacing.md,
   },
-
   backButton: {
     width: 40,
     height: 40,
@@ -22,31 +21,22 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-
   headerTitle: {
     position: 'absolute',
+    fontSize: 24,
+    textAlign: 'center',
+    fontWeight: '700',
     left: 0,
     right: 0,
-    textAlign: 'center',
-    fontSize: 24,
-    fontWeight: '700',
     color: Colors.text,
-  },
-
-
-  headerRightSpacer: {
-    width: 40,
+    marginLeft: Spacing.md,
+    zIndex: -1,
   },
   divider: {
     height: 1,
     backgroundColor: Colors.primary,
     marginHorizontal: Spacing.md,
     marginBottom: Spacing.lg,
-  },
-  loadingContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   content: {
     flex: 1,
@@ -75,7 +65,7 @@ export const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     color: Colors.text,
-    marginBottom: Spacing.xs,
+    marginBottom: 10,
     textDecorationLine: 'underline',
   },
   sceneCard: {

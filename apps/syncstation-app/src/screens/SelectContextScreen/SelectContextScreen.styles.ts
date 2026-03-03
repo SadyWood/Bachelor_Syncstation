@@ -21,6 +21,8 @@ export const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '700',
     color: Colors.text,
+    marginLeft: Spacing.md,
+    zIndex: -1,
   },
   content: {
     flex: 1,
