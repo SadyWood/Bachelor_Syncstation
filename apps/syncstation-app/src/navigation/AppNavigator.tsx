@@ -6,9 +6,9 @@ import { tabNavigatorScreenOptions } from '@/navigation/AppNavigator.styles';
 import { HomeScreen, SelectContextScreen } from '@/screens';
 import { LoginScreen } from '@/screens/login-screen';
 import { ProfileScreen } from '@/screens/profile-screen';
+import { SelectSceneScreen } from '@/screens/SelectSceneScreen';
 import { SettingsScreen } from '@/screens/settings-screen';
 import { WelcomeScreen } from '@/screens/welcome-screen';
-import { SelectSceneScreen } from '@/screens/SelectSceneScreen';
 // TODO: import when is ready
 // import { ProductionScreen } from '@/screens/production-screen';
 // import { SelectTakeScreen } from '@/screens/select-take-screen';

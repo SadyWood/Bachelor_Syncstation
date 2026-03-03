@@ -23,20 +23,27 @@ export const styles = StyleSheet.create({
   },
   headerTitle: {
     position: 'absolute',
-    fontSize: 24,
-    textAlign: 'center',
-    fontWeight: '700',
     left: 0,
     right: 0,
+    textAlign: 'center',
+    fontSize: 24,
+    fontWeight: '700',
     color: Colors.text,
-    marginLeft: Spacing.md,
     zIndex: -1,
+  },
+  headerRightSpacer: {
+    width: 40,
   },
   divider: {
     height: 1,
     backgroundColor: Colors.primary,
     marginHorizontal: Spacing.md,
     marginBottom: Spacing.lg,
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   content: {
     flex: 1,
@@ -96,5 +103,15 @@ export const styles = StyleSheet.create({
   },
   arrowIcon: {
     marginLeft: Spacing.sm,
+  },
+  emptyState: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: Spacing.xxl,
+  },
+  emptyStateText: {
+    fontSize: 16,
+    color: Colors.textSecondary,
+    marginTop: Spacing.md,
   },
 });
