@@ -114,7 +114,11 @@ function SelectContextRoute({ navigation }: SelectContextProps) {
   }
 
   function handleBack() {
-    navigation.goBack();
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+      return;
+    }
+    navigation.navigate('App');
   }
 
   return (
@@ -131,7 +135,11 @@ function SelectSceneRoute({ navigation }: SelectSceneProps) {
   const setActiveScene = useContentStore((state) => state.setActiveScene);
 
   function handleBack() {
-    navigation.goBack();
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+      return;
+    }
+    navigation.navigate('App');
   }
 
   function handleSelectScene(scene: Scene) {
