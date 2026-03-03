@@ -7,7 +7,7 @@ import { styles } from './HomeScreen.styles';
 import type { AgendaItem, NoticeItem } from '@/components';
 import { ActiveSceneCard, AgendaCard, ContextCard } from '@/components';
 import { useAuthStore } from '@/stores/authStore';
-import { useContentStore } from '@/stores/contentStore';
+import { useContentStore } from '@/stores/ContentStore';
 import { Colors } from '@/styles';
 
 const MOCK_NOTICES: NoticeItem[] = [
@@ -121,11 +121,11 @@ export function HomeScreen() {
   }
 
   function handleChangeContext() {
-    navigation.navigate('SelectContext' as never);
+    navigation.navigate('SelectContext');
   }
 
   function handleChangeScene() {
-    navigation.navigate('SelectScene' as never);
+    navigation.navigate('SelectScene');
   }
 
   function handleAgendaItemToggle(id: string) {
