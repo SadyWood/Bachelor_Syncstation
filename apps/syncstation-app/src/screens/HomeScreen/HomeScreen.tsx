@@ -121,11 +121,11 @@ export function HomeScreen() {
   }
 
   function handleChangeContext() {
-    navigation.navigate('SelectContext');
+    navigation.navigate('SelectContext' as never);
   }
 
   function handleChangeScene() {
-    navigation.navigate('SelectScene');
+    navigation.navigate('SelectScene' as never);
   }
 
   function handleAgendaItemToggle(id: string) {
