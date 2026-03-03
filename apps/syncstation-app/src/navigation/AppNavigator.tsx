@@ -6,9 +6,9 @@ import { tabNavigatorScreenOptions } from '@/navigation/AppNavigator.styles';
 import { HomeScreen, SelectContextScreen } from '@/screens';
 import { LoginScreen } from '@/screens/login-screen';
 import { ProfileScreen } from '@/screens/profile-screen';
-import { SelectSceneScreen } from '@/screens/SelectSceneScreen';
 import { SettingsScreen } from '@/screens/settings-screen';
 import { WelcomeScreen } from '@/screens/welcome-screen';
+import { SelectSceneScreen } from '@/screens/SelectSceneScreen';
 // TODO: import when is ready
 // import { ProductionScreen } from '@/screens/production-screen';
 // import { SelectTakeScreen } from '@/screens/select-take-screen';
@@ -110,11 +110,11 @@ function SelectContextRoute({ navigation }: SelectContextProps) {
 
   function handleSelectProject(project: Project) {
     setActiveProject(project);
-    navigation.navigate('App');
+    navigation.navigate('App', { screen: 'Home' });
   }
 
   function handleBack() {
-    navigation.navigate('App');
+    navigation.navigate('App', { screen: 'Home' });
   }
 
   return (
@@ -131,12 +131,12 @@ function SelectSceneRoute({ navigation }: SelectSceneProps) {
   const setActiveScene = useContentStore((state) => state.setActiveScene);
 
   function handleBack() {
-    navigation.navigate('App');
+    navigation.navigate('App', { screen: 'Home' });
   }
 
   function handleSelectScene(scene: Scene) {
     setActiveScene(scene);
-    navigation.navigate('App');
+    navigation.navigate('App', { screen: 'Home' });
   }
 
   return (

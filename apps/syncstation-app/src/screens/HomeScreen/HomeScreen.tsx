@@ -81,7 +81,6 @@ export function HomeScreen() {
 
   const activeProject = useContentStore((state) => state.activeProject);
   const activeScene = useContentStore((state) => state.activeScene);
-  const activeTake = useContentStore((state) => state.activeTake);
 
   const [agendaItems, setAgendaItems] = useState<AgendaItem[]>([]);
   const [notices, setNotices] = useState<NoticeItem[]>([]);
@@ -142,7 +141,7 @@ export function HomeScreen() {
   const dayInfo = getDayInfo(activeProject?.currentDay, activeProject?.totalDays);
 
   const sceneName = getSceneDisplayName(activeScene);
-  const takeName = getTakeDisplayName(activeTake);
+  const takeName = getTakeDisplayName(null); // TODO: wire activeTake when SelectTakeScreen is ready
   const location = getLocationDisplay(activeScene?.location, Boolean(activeScene));
 
   return (
