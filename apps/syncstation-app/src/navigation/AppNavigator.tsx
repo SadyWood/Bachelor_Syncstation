@@ -6,10 +6,10 @@ import { tabNavigatorScreenOptions } from '@/navigation/AppNavigator.styles';
 import { HomeScreen, SelectContextScreen } from '@/screens';
 import { LoginScreen } from '@/screens/login-screen';
 import { ProfileScreen } from '@/screens/profile-screen';
-// TODO: import when is ready
 import { SettingsScreen } from '@/screens/settings-screen';
 import { WelcomeScreen } from '@/screens/welcome-screen';
 import { SelectSceneScreen } from '@/screens/SelectSceneScreen';
+// TODO: import when is ready
 // import { ProductionScreen } from '@/screens/production-screen';
 // import { SelectTakeScreen } from '@/screens/select-take-screen';
 // import { CreateLogScreen } from '@/screens/create-log-screen';
@@ -110,14 +110,10 @@ function SelectContextRoute({ navigation }: SelectContextProps) {
 
   function handleSelectProject(project: Project) {
     setActiveProject(project);
-    navigation.goBack();
+    navigation.navigate('App');
   }
 
   function handleBack() {
-    if (navigation.canGoBack()) {
-      navigation.goBack();
-      return;
-    }
     navigation.navigate('App');
   }
 
@@ -135,16 +131,12 @@ function SelectSceneRoute({ navigation }: SelectSceneProps) {
   const setActiveScene = useContentStore((state) => state.setActiveScene);
 
   function handleBack() {
-    if (navigation.canGoBack()) {
-      navigation.goBack();
-      return;
-    }
     navigation.navigate('App');
   }
 
   function handleSelectScene(scene: Scene) {
     setActiveScene(scene);
-    navigation.navigate('SelectTake');
+    navigation.navigate('App');
   }
 
   return (
