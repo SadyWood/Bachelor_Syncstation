@@ -14,10 +14,15 @@ export const styles = StyleSheet.create({
     paddingHorizontal: Spacing.md,
   },
   headerTitle: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    textAlign: 'center',
     fontSize: 24,
     fontWeight: '700',
     color: Colors.text,
     marginLeft: Spacing.md,
+    zIndex: -1,
   },
   content: {
     flex: 1,
@@ -47,8 +52,8 @@ export const styles = StyleSheet.create({
     color: Colors.textSecondary,
   },
   backButton: {
-    width: 48,
-    height: 48,
+    width: 40,
+    height: 40,
     backgroundColor: Colors.primary,
     borderRadius: BorderRadius.md,
     alignItems: 'center',

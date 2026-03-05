@@ -1,12 +1,14 @@
 import { create } from 'zustand';
 import type { Project } from '@/screens/SelectContextScreen/types/SelectContextScreen.types';
+import type { Scene } from '@/screens/SelectSceneScreen/types/SelectSceneScreen.types';
 
 interface ContentState {
   activeProjectId: string | null;
   activeSceneId: string | null;
   activeProject: Project | null;
+  activeScene: Scene | null;
   setActiveProject: (project: Project) => void;
-  setActiveSceneId: (sceneId: string) => void;
+  setActiveScene: (scene: Scene) => void;
   clearContext: () => void;
 }
 
@@ -14,17 +16,20 @@ export const useContentStore = create<ContentState>((set) => ({
   activeProjectId: null,
   activeSceneId: null,
   activeProject: null,
+  activeScene: null,
 
   setActiveProject: (project: Project) =>
     set({
       activeProjectId: project.id,
       activeProject: project,
       activeSceneId: null,
+      activeScene: null,
     }),
 
-  setActiveSceneId: (sceneId: string) =>
+  setActiveScene: (scene: Scene) =>
     set({
-      activeSceneId: sceneId,
+      activeSceneId: scene.id,
+      activeScene: scene,
     }),
 
   clearContext: () =>
@@ -32,5 +37,6 @@ export const useContentStore = create<ContentState>((set) => ({
       activeProjectId: null,
       activeSceneId: null,
       activeProject: null,
+      activeScene: null,
     }),
 }));
